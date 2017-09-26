@@ -1,0 +1,14 @@
+{
+	"baseDataUrl":"http://ibs-forrestc-ux1.corp.alleninstitute.org/render-ws/v1",
+	"owner":"KDM_SYN",
+	"project":"KDM_SYN_100430B_L5",
+	"stack": "Stitched_DAPI_7",
+	"referencestack":"Stitched_DAPI_1",
+	"outputStack":"TESTJAVARegistered_7",
+	"section": 6,
+	"steps":7,
+	"initialSigma":2.5,
+	"percentSaturated": 0.9,
+	"maxEpsilon":2.5,
+	"modelType": 1
+}
