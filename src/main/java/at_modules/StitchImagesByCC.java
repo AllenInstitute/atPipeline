@@ -166,7 +166,6 @@ public class StitchImagesByCC
 
 		    for ( final String filepath : filepaths )
 		    {
-		    	System.out.println( filepath );
 		        ImagePlus img = IJ.openImage(filepath);
 		        images.add(img);
 		    }
@@ -204,8 +203,7 @@ public class StitchImagesByCC
 				String delims = "[/]";
 				String[] tokens = fullfilename.split(delims);
 				ImagePlus I = new ImagePlus(tokens[tokens.length-1], sectionImage);
-				System.out.println("This is token:");
-				System.out.println(tokens[tokens.length-1]);
+
 				return I;
 	}
 
@@ -259,8 +257,6 @@ public class StitchImagesByCC
 							images.add(ip);
 							if (connects.containsKey( ip.getTitle() ))
 							{
-								System.out.println("This file is here:");
-								System.out.println(ip.getTitle());
 								j = filehash.get(ip.getTitle());
 								ImagePlusTimePoint imt = originaloptimized.get(j);
 								optimized.add(imt);
@@ -291,8 +287,7 @@ public class StitchImagesByCC
 							}
 							i++;
 		    		}//end while
-						System.out.println("End while loop...");
-		    		//f0.close();
+
 				}//end try
 
 		    catch(Exception e)
