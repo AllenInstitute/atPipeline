@@ -2,10 +2,8 @@
 package at_modules;
 
 import ij.ImagePlus;
-
 import ij.process.ImageProcessor;
 import ij.IJ;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -18,7 +16,6 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.lang.StringBuilder;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -33,8 +30,6 @@ import java.awt.Graphics;
 import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-
 import mpicbg.imagefeatures.Feature;
 import mpicbg.imagefeatures.FloatArray2DSIFT;
 import mpicbg.ij.SIFT;
@@ -44,7 +39,6 @@ import mpicbg.models.InterpolatedCoordinateTransform;
 import mpicbg.models.AffineModel2D;
 import mpicbg.models.TranslationModel2D;
 import mpicbg.models.InvertibleBoundable;
-
 import mpicbg.models.CoordinateTransformMesh;
 import mpicbg.ij.TransformMeshMapping;
 import ij.process.ImageStatistics;
@@ -52,22 +46,18 @@ import ij.measure.Calibration;
 import ij.measure.Measurements;
 import ij.plugin.ContrastEnhancer;
 import ij.io.FileSaver;
-
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
-
 import mpicbg.stitching.fusion.Fusion;
 import mpicbg.stitching.ImageCollectionElement;
 import mpicbg.stitching.StitchingParameters;
 import mpicbg.stitching.ImagePlusTimePoint;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.*;
@@ -75,7 +65,6 @@ import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-
 import org.janelia.alignment.spec.*;
 import org.janelia.alignment.json.JsonUtils;
 import org.janelia.alignment.spec.TileSpec;
@@ -84,7 +73,6 @@ import org.janelia.alignment.spec.ReferenceTransformSpec;
 import org.janelia.alignment.spec.ListTransformSpec;
 import org.janelia.alignment.*;
 import org.janelia.alignment.util.*;
-
 import org.janelia.render.client.RenderDataClient;
 import org.janelia.render.client.RenderDataClientParameters;
 import org.janelia.render.client.FileUtil;
@@ -93,7 +81,6 @@ import org.janelia.render.client.ImportJsonClient;
 import org.janelia.alignment.spec.stack.StackMetaData.StackState;
 import org.janelia.alignment.spec.stack.StackMetaData;
 import org.janelia.alignment.spec.stack.StackVersion;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -229,9 +216,6 @@ public class StitchImagesByCC
 		    return images;
 	}
 
-
-
-
 	public static void calculatediffs(ArrayList<ImageCollectionElement> elements, ArrayList<ImagePlus> imagesR, ArrayList<ImagePlus> images, Map<String,Integer> connects, Map<String,Integer> filehash, Map<String,Integer> rawelementshash, ArrayList <ImagePlusTimePoint> originaloptimized, ArrayList <ImagePlusTimePoint> optimized,ArrayList <InvertibleBoundable> models, Params params, StitchingParameters stitchparams, ArrayList<Float> rawx, ArrayList<Float> rawy)
 	{
 				Integer i = 0;
@@ -246,7 +230,6 @@ public class StitchImagesByCC
 
 				// Calculate diffs for debugging and force images that the optimization throws out to come back
 				ArrayList<Double> diffs = new ArrayList();
-
 
 		    try
 				{
@@ -363,7 +346,7 @@ public class StitchImagesByCC
 	}
 
 
-	public  static void outputtotilespec(ArrayList<ImagePlus> imagesR, ArrayList<TranslationModel2D> translation_models, Map<String,Integer> rawelementshash, List<TileSpec> tileSpecs, RenderDataClient r, Params params)
+	public  static ResolvedTileSpecCollection outputtotilespec(ArrayList<ImagePlus> imagesR, ArrayList<TranslationModel2D> translation_models, Map<String,Integer> rawelementshash, List<TileSpec> tileSpecs,Params params)
 	{
 
 
@@ -399,18 +382,7 @@ public class StitchImagesByCC
 
         final ResolvedTileSpecCollection resTiles = new ResolvedTileSpecCollection(transformlist,tileSpecs);
 
-				try
-				{
-		        final StackMetaData smd = r.getStackMetaData(params.stack);
-		        ensureStackExists(r,params.outputStack,smd);
-		        r.setStackState(params.outputStack,StackState.LOADING);
-		        r.saveResolvedTiles(resTiles,params.outputStack,null);
-		        r.setStackState(params.outputStack,StackState.COMPLETE);
-				}
-				catch ( final Exception e )
-      	{
-          	return;
-      	}
+				return resTiles;
 
 	}
 
@@ -441,51 +413,9 @@ public class StitchImagesByCC
         return allfiles;
 	}
 
-	public static List<TileSpec> readtilespecs(String inputtilespec)
+
+	public static ResolvedTileSpecCollection stitch_tilespecs(List<TileSpec> tileSpecs,ArrayList<ImagePlus> imagesR, Params params)
 	{
-				List<TileSpec> tileSpecs;
-
-				final URI uri = Utils.convertPathOrUriStringToUri(inputtilespec);
-				final URL urlObject;
-				try
-				{
-					urlObject = uri.toURL();
-				}
-				catch (final Throwable tt)
-				{
-					throw new IllegalArgumentException("failed to convert URI '" + uri + "'", tt);
-				}
-				InputStream urlStream = null;
-				try
-				{
-					urlStream = urlObject.openStream();
-				}
-				catch (final UnknownHostException uhe)
-				{
-					urlStream = null;
-				    throw new IllegalArgumentException("Not happening!",uhe);
-				}
-				catch (final Throwable t)
-				{
-					throw new IllegalArgumentException("failed to load render parameters from " + urlObject, t);
-				}
-
-				final Reader reader = new InputStreamReader(urlStream);
-				try
-				{
-					tileSpecs = TileSpec.fromJsonArray(reader);
-				}
-				catch (final Throwable t)
-				{
-					throw new IllegalArgumentException("failed to parse tile specification loaded from this" , t);
-				}
-				return tileSpecs;
-	}
-
-
-	public static void stitch(Params params)
-	{
-
 				//Stitching Parameters
 				StitchingParameters stitchparams=new StitchingParameters();
 				stitchparams.dimensionality = 2;
@@ -498,10 +428,6 @@ public class StitchImagesByCC
 				stitchparams.subpixelAccuracy = true;
 				stitchparams.fusionMethod = 2;
 
-
-				final RenderDataClient r ;
-				r = new RenderDataClient(params.baseDataUrl,params.owner,params.project);
-
 				//raw element storage and initialization
 
 				ArrayList<ImageCollectionElement> elements=new ArrayList();
@@ -509,19 +435,6 @@ public class StitchImagesByCC
 				ArrayList<Float> rawx = new ArrayList();
 				ArrayList<Float> rawy = new ArrayList();
 				Map<String,Integer> rawelementshash = new HashMap<String,Integer> ();
-
-				ResolvedTileSpecCollection resTileSpecs = new ResolvedTileSpecCollection();
-
-				try
-				{
-					resTileSpecs = r.getResolvedTiles(params.stack,params.section);
-				}
-				catch (Exception ex)
-				{
-					throw new RuntimeException(ex);
-				}
-
-				List<TileSpec> tileSpecs = settilespecs(resTileSpecs);
 				params.files= readandsetinput(tileSpecs, elements,rawelementshash,rawx,rawy);
 
 				//registration
@@ -532,10 +445,7 @@ public class StitchImagesByCC
 				ArrayList <ImagePlusTimePoint> optimized = new ArrayList();
 				Map<String,Integer> filehash = new HashMap<String,Integer> ();
 
-
-
-				//read in the images and create hashes
-				ArrayList<ImagePlus> imagesR = read_images(r,params.stack,resTileSpecs);
+				//create hashes
 				ArrayList<ImagePlus> images = new ArrayList<ImagePlus> ();
 				ArrayList <InvertibleBoundable> models = new ArrayList();
 				Integer i = 0, j = 0;
@@ -569,9 +479,43 @@ public class StitchImagesByCC
 						fs.saveAsTiff(params.outputImage);
 				}
 
-				//output to json
 				adjustmodels_nonnegative(translation_models);
-				outputtotilespec(imagesR, translation_models, rawelementshash, tileSpecs, r, params);
+				ResolvedTileSpecCollection resTiles = outputtotilespec(imagesR, translation_models, rawelementshash, tileSpecs, params);
+				return resTiles;
+	}
+
+	public static void stitch(Params params)
+	{
+
+				final RenderDataClient r ;
+				r = new RenderDataClient(params.baseDataUrl,params.owner,params.project);
+				ResolvedTileSpecCollection resTileSpecs = new ResolvedTileSpecCollection();
+
+				try
+				{
+					resTileSpecs = r.getResolvedTiles(params.stack,params.section);
+				}
+				catch (Exception ex)
+				{
+					throw new RuntimeException(ex);
+				}
+
+				List<TileSpec> tileSpecs = settilespecs(resTileSpecs);
+				ArrayList<ImagePlus> imagesR = read_images(r,params.stack,resTileSpecs);
+				ResolvedTileSpecCollection resTiles = stitch_tilespecs(tileSpecs,imagesR,params);
+
+				try
+				{
+		        final StackMetaData smd = r.getStackMetaData(params.stack);
+		        ensureStackExists(r,params.outputStack,smd);
+		        r.setStackState(params.outputStack,StackState.LOADING);
+		        r.saveResolvedTiles(resTiles,params.outputStack,null);
+		        r.setStackState(params.outputStack,StackState.COMPLETE);
+				}
+				catch ( final Exception e )
+      	{
+          	return;
+      	}
 
 	}
 
