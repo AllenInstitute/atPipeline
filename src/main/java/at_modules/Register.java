@@ -54,7 +54,7 @@ import net.imglib2.img.array.ArrayImgFactory;
 //import net.imglib2.io.ImgIOException;
 //import net.imglib2.io.ImgOpener;
 //import net.imglib2.type.numeric.real.FloatType;
-import net.imglib2.type.numeric.RealType;
+//import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 //import net.imglib2.type.numeric.integer.UnsignedByteType;
 
@@ -67,6 +67,7 @@ import ij.measure.Measurements;
 import ij.plugin.ContrastEnhancer;
 import ij.io.FileSaver;
 import ij.gui.Roi;
+import ij.process.ImageConverter;
 
 
 import mpicbg.imagefeatures.Feature;
@@ -106,7 +107,7 @@ import mpicbg.imglib.type.numeric.integer.UnsignedByteType;
 import mpicbg.imglib.type.numeric.real.FloatType;
 import mpicbg.imglib.image.Image;
 import mpicbg.imglib.image.ImagePlusAdapter;
-//import mpicbg.imglib.type.numeric.RealType;
+import mpicbg.imglib.type.numeric.RealType;
 import mpicbg.stitching.Peak;
 
 import org.janelia.alignment.*;
@@ -164,6 +165,9 @@ public class Register
 
         @Parameter( names = "--input_json", description = "Input Json", required = true )
         private String input_json = null;
+
+        @Parameter( names = "--tileDistance", description = "Threshold of distance between overlapping tiles", required = false )
+        private Double tileDistance = 5000.0;
 
 				//file input params (old)
 
@@ -251,6 +255,7 @@ public class Register
       initmodel.toArray(array);
       double rot = Math.atan(array[2]/array[3]);
       ImageProcessor ip = img2.getProcessor();
+      //ip.translate(array[4],array[5]);
       ip.rotate(rot);
 
       System.out.println(array.toString());
@@ -259,7 +264,7 @@ public class Register
       PairWiseStitchingResult p = computePhaseCorrelation(img1,img2,5,true);
       offset = p.getOffset();
 
-      model.set(rot, -1*offset[0], -1*offset[1]);
+      model.set(rot,  -1*offset[0], -1*offset[1]);
       return model;
 
     }
@@ -288,11 +293,11 @@ public class Register
       	refImage = createSection(r,params.section,params.referencestack,reftileSpecs);
       	extractfeatures(refImage,referencefs, params);
 
-        //FileSaver f = new FileSaver(inputImage);
-        //f.saveAsTiff("/home/sharmishtaas/input.tif");
+        FileSaver f = new FileSaver(inputImage);
+        f.saveAsTiff("/home/sharmishtaas/input.tif");
 
-        //FileSaver ff = new FileSaver(refImage);
-        //ff.saveAsTiff("/home/sharmishtaas/ref.tif");
+        FileSaver ff = new FileSaver(refImage);
+        ff.saveAsTiff("/home/sharmishtaas/ref.tif");
 
 
     		//match
@@ -347,8 +352,8 @@ public class Register
 
   		//if (inliers.size() ==0)
   		//public static RigidModel2D createInverseModel(RigidModel2D initmodel)
-  		model = createInverseModel((RigidModel2D)model);
-  		if (inliers.size() < 10)
+  		//model = createInverseModel((RigidModel2D)model);
+  		if (inliers.size() < 20)
   			model = calculateCC(inputImage, refImage, initmodel);
 
   		//check what the model has calculated
@@ -363,10 +368,11 @@ public class Register
   		System.out.println(model2datastring(model));
   		System.out.println(model2datastring(initmodel));
   		//commented out by sharmi on may 2 2017, while running on santacruz data
-  		/*if (Math.abs(-initarray[4]-modelarray[4]) > 100 || Math.abs(-initarray[5]-modelarray[5]) > 100) // if translation is too large, usually caused by dust particles...
+  		if (Math.abs(initarray[4]-modelarray[4]) > 1000 || Math.abs(initarray[5]-modelarray[5]) > 1000) // if translation is too large, usually caused by dust particles...
   		{
   			model = initmodel;
-  		} */
+  		}
+      //model = initmodel;
 
   		System.out.println(modelarray[4]);
   		System.out.println(initarray[4]);
@@ -406,11 +412,23 @@ public class Register
     	ImagePlus inputImage = new ImagePlus();
     	ImagePlus refImage = new ImagePlus();
 
-      inputImage = createSection(r,params.section,params.stack);
+      Bounds refBounds = new Bounds();
+      try
+      {
+        final StackMetaData smd = r.getStackMetaData(params.referencestack);
+        refBounds = smd.getStats().getStackBounds();
+      }
+      catch(Exception e)
+      {
+
+        System.out.println("Cannot calculate stack bounds!");
+      }
+    	refImage = createSection(r,params.section,params.referencestack,refBounds);
+    	extractfeatures(refImage,referencefs, params);
+
+      inputImage = createSection(r,params.section,params.stack,refBounds);
       extractfeatures(inputImage, inputfs, params);
 
-    	refImage = createSection(r,params.section,params.referencestack);
-    	extractfeatures(refImage,referencefs, params);
 
     	//match
     	final List< PointMatch > candidates = new ArrayList< PointMatch >();
@@ -458,30 +476,42 @@ public class Register
   	}
 
 
-    public static PairWiseStitchingResult computePhaseCorrelation ( final ImagePlus img1, final ImagePlus img2, final int numPeaks, final boolean subpixelAccuracy )
+    public static < T extends RealType<T>, S extends RealType<S> > PairWiseStitchingResult computePhaseCorrelation ( final ImagePlus img1, final ImagePlus img2, final int numPeaks, final boolean subpixelAccuracy )
   	{
 
-  		Image <FloatType> image1 = ImagePlusAdapter.wrap(img1);
-  		Image <FloatType> image2 = ImagePlusAdapter.wrap(img2);
-  		PhaseCorrelation< FloatType, FloatType > phaseCorr = new PhaseCorrelation<FloatType, FloatType>( image1,image2 );
-  		phaseCorr.setInvestigateNumPeaks( numPeaks );
+      ImageConverter ic1 = new ImageConverter(img1);
+      ic1.convertToGray8();
+      img1.updateImage();
+      ImageConverter ic2 = new ImageConverter(img2);
+      ic2.convertToGray8();
+      img2.updateImage();
 
+
+  		Image <T> image1 = ImagePlusAdapter.wrap(img1);
+      System.out.println("pc DEB 1");
+  		Image <S> image2 = ImagePlusAdapter.wrap(img2);
+      System.out.println("pc DEB 2");
+      PhaseCorrelation< T,S > phaseCorr = new PhaseCorrelation<T,S>( image1,image2);
+  		phaseCorr.setInvestigateNumPeaks( numPeaks );
+      System.out.println("pc DEB 3");
 
   		if ( subpixelAccuracy )
   			phaseCorr.setKeepPhaseCorrelationMatrix( true );
-
+      System.out.println("pc DEB 4");
   		phaseCorr.setComputeFFTinParalell( true );
   		if ( !phaseCorr.process() )
   		{
   			System.out.println( "Could not compute phase correlation: " + phaseCorr.getErrorMessage() );
   			return null;
   		}
+      System.out.println("pc DEB 5");
 
   		// result
   		final PhaseCorrelationPeak pcp = phaseCorr.getShift();
 
   		final float[] shift = new float[ img1.getNDimensions() ];
   		final PairWiseStitchingResult result;
+      System.out.println("pc DEB 6");
 
   		if ( subpixelAccuracy )
   		{
@@ -517,7 +547,7 @@ public class Register
 
   			result = new PairWiseStitchingResult( shift, pcp.getCrossCorrelationPeak(), pcp.getPhaseCorrelationPeak() );
   		}
-
+      System.out.println("pc DEB 7");
   		return result;
   	}
 
@@ -538,7 +568,7 @@ public class Register
   		return model;
   	}
 
-    public static ImagePlus createSection(RenderDataClient r,final Double z, String stack,List<TileSpec> tilespecs)
+    /*public static ImagePlus createSection(RenderDataClient r,final Double z, String stack,List<TileSpec> tilespecs)
   	{
       //create image of box of region covering the tilespecs
 
@@ -553,15 +583,44 @@ public class Register
   				e.printStackTrace();
   				return sectionImage;
   			}
+  	}*/
+
+    public static ImagePlus createSection(RenderDataClient r,final Double z, String stack,List<TileSpec> tilespecs)
+  	{
+      //create image of box of region covering the tilespecs
+
+      if (tilespecs.size() > 1)
+      {
+    		System.out.println("test");
+    		ImagePlus sectionImage = new ImagePlus();
+    		try{
+    			sectionImage = generateImageForZ(r, z, stack, 1.0,tilespecs);
+    			return sectionImage;
+    		}
+    		catch ( final Exception e )
+    			{
+    				e.printStackTrace();
+    				return sectionImage;
+    			}
+      }
+      else
+      {
+        ImagePlus sectionImage = new ImagePlus(tilespecs.get(0).getFirstMipmapEntry().getValue().getImageFilePath());
+
+        //System.out.println(tilespecs.get(0).getFirstMipmapEntry().getValue().getImageFilePath());
+        //System.exit(0);
+        return sectionImage;
+      }
   	}
 
 
-    public static ImagePlus createSection(RenderDataClient r,final Double z, String stack)
+
+    public static ImagePlus createSection(RenderDataClient r,final Double z, String stack, Bounds refBounds)
   	{
   		System.out.println("test");
   		ImagePlus sectionImage = new ImagePlus();
   		try{
-  			sectionImage = generateImageForZ(r, z, stack, 1.0);
+  			sectionImage = generateImageForZ(r, z, stack, 1.0,refBounds);
   			return sectionImage;
   		}
   		catch ( final Exception e )
@@ -661,7 +720,7 @@ public class Register
     }
 
 
-    public static ImagePlus generateImageForZ(RenderDataClient renderDataClient, final Double z, String stack, Double scale, List<TileSpec> ts)
+    public static ImagePlus generateImageForZ(RenderDataClient renderDataClient, Double z, String stack, Double scale, List<TileSpec> ts)
   					throws Exception {
 
   			//LOG.info("generateImageForZ: {}, entry, sectionDirectory={}, dataClient={}",
@@ -673,13 +732,14 @@ public class Register
         //TileBounds layerBounds = new TileBounds(t.getTileId(), t.getMinX(), t.getMinY(), t.getMaxX(), t.getMaxY());
         TileBounds layerBounds = new TileBounds(t.getTileId(), t.getLayout().getSectionId(),t.getZ(), t.getMinX(), t.getMinY(), t.getMaxX(), t.getMaxY());
   			//final Bounds layerBounds = renderDataClient.getLayerBounds(stack, z);
+        z = t.getZ();
   			final String parametersUrl =
   							renderDataClient.getRenderParametersUrlString(stack,
   																														layerBounds.getMinX(),
   																														layerBounds.getMinY(),
   																														z,
-  																														(int) (layerBounds.getDeltaX() + 0.5),
-  																														(int) (layerBounds.getDeltaY() + 0.5),
+  																														(int) (layerBounds.getDeltaX() +0.0),
+  																														(int) (layerBounds.getDeltaY() +0.0),
   																														scale);
 
   			//LOG.debug("generateImageForZ: {}, loading {}", z, parametersUrl);
@@ -699,26 +759,32 @@ public class Register
 
   			/*Utils.saveImage(sectionImage, sectionFile.getAbsolutePath(), clientParameters.format, true, 0.85f);
   			LOG.info("generateImageForZ: {}, exit", z);*/
-  			ImagePlus I = new ImagePlus("sectionImage", sectionImage);
+        String fullfilename = t.getFirstMipmapEntry().getValue().getImageFilePath();
+				String delims = "[/]";
+				String[] tokens = fullfilename.split(delims);
+				ImagePlus I = new ImagePlus(tokens[tokens.length-1], sectionImage);
+
+  			//ImagePlus I = new ImagePlus("sectionImage", sectionImage);
   			return I;
   	}
 
 
 
-    public static ImagePlus generateImageForZ(RenderDataClient renderDataClient, final Double z, String stack, Double scale)
+    public static ImagePlus generateImageForZ(RenderDataClient renderDataClient, final Double z, String stack, Double scale, Bounds refBounds)
   					throws Exception {
 
   			//LOG.info("generateImageForZ: {}, entry, sectionDirectory={}, dataClient={}",
   			//				 z, sectionDirectory, renderDataClient);
 
-  			final Bounds layerBounds = renderDataClient.getLayerBounds(stack, z);
+        //final StackMetaData smd = renderDataClient.getStackMetaData(stack);
+  			//final Bounds layerBounds = smd.getStats().getStackBounds();
   			final String parametersUrl =
   							renderDataClient.getRenderParametersUrlString(stack,
-  																														layerBounds.getMinX(),
-  																														layerBounds.getMinY(),
+  																														refBounds.getMinX(),
+  																														refBounds.getMinY(),
   																														z,
-  																														(int) (layerBounds.getDeltaX() + 0.5),
-  																														(int) (layerBounds.getDeltaY() + 0.5),
+  																														(int) (refBounds.getDeltaX() + 0.0),
+  																														(int) (refBounds.getDeltaY() + 0.0),
   																														scale);
 
   			//LOG.debug("generateImageForZ: {}, loading {}", z, parametersUrl);
@@ -793,239 +859,269 @@ public class Register
       return ts;
     }
 
-    public static final int POOL_TIMEOUT_IN_SECONDS = 2000;
-    public static final int STD_THREAD_POOL_SIZE = 16;
+    public static final int POOL_TIMEOUT_IN_SECONDS = 20000;
+    public static final int STD_THREAD_POOL_SIZE = 1;
 
     public static void main( String[] args )
     {
-      Params params = new Params();
-      try
-      {
-        final JCommander jc = new JCommander( params, args );
-        if ( params.help )
-        {
-          jc.usage();
-          return;
-        }
-      }
-      catch ( final Exception e )
-      {
-        e.printStackTrace();
-        final JCommander jc = new JCommander( params );
-        jc.setProgramName( "java [-options] -cp something.jar org.janelia.alignment.RegisterSections" );
-        jc.usage();
-        return;
-      }
+              Params params = new Params();
+              try
+              {
+                final JCommander jc = new JCommander( params, args );
+                if ( params.help )
+                {
+                  jc.usage();
+                  return;
+                }
+              }
+              catch ( final Exception e )
+              {
+                e.printStackTrace();
+                final JCommander jc = new JCommander( params );
+                jc.setProgramName( "java [-options] -cp something.jar org.janelia.alignment.RegisterSections" );
+                jc.usage();
+                return;
+              }
 
 
 
-      final Gson gson = new Gson();
-      try{
+              final Gson gson = new Gson();
+              try{
 
-			     params = gson.fromJson( new FileReader( params.input_json ), Params.class );
-         }
-      catch ( final Exception e )
-      {
-          return;
-      }
-      System.out.println(params.initialSigma);
-      System.out.println(params.stack);
+        			     params = gson.fromJson( new FileReader( params.input_json ), Params.class );
+                 }
+              catch ( final Exception e )
+              {
+                  return;
+              }
+              //System.out.println(params.initialSigma);
+              //System.out.println(params.stack);
 
-      //System.exit(0);
-      final RenderDataClient r ;
+              //System.exit(0);
+              final RenderDataClient r ;
 
-      try
-      {
+              try
+              {
 
-          //load params
-
-
-          //initialize
-          r = new RenderDataClient(params.baseDataUrl,params.owner,params.project);
-          System.out.println("Debug 0");
-          System.out.println(params.section);
-          ResolvedTileSpecCollection resolvedTilesinput = r.getResolvedTiles(params.stack,params.section);
-          System.out.println("Debug 1");
-          ResolvedTileSpecCollection resolvedTilesref = r.getResolvedTiles(params.referencestack,params.section);
-          System.out.println("Debug 1");
-          //calculate initial model and invert
-          AbstractModel <?> model = new RigidModel2D();
-      		//model = calculatetransform(resolvedTilesinput, resolvedTilesref, params,r); //MIGHT NEED TO SWITCH????
-          model = calculatetransform( resolvedTilesref, resolvedTilesinput,params,r);
-          String classname = "mpicbg.trakem2.transform.AffineModel2D";
-      		String modstring = model2datastring_inv(model);
-          LeafTransformSpec modtrans = new LeafTransformSpec(classname,modstring);
-          System.out.println("Debug 2");
-          //createtilespec ArrayList and apply the initial model
-          List<TileSpec> inputtileSpecs = settilespecs(resolvedTilesinput);
-          List<TileSpec> originputtileSpecs = inputtileSpecs;
-          final List<TileSpec> outputtileSpecs = inputtileSpecs; //initialize output
-          List<TileSpec> referencetileSpecs = settilespecs(resolvedTilesref);
-
-          System.out.println("Debug 3");
-          for (int j = 0; j < inputtileSpecs.size(); j++)
-        	{
-        		ListTransformSpec listtspec = inputtileSpecs.get(j).getTransforms();
-        		listtspec.addSpec(modtrans);
-        	}
-
-          //tile pair matching
-          ArrayList<TileBounds> tbl = new ArrayList();
-          Map<String,Integer> tsHashMap = new HashMap<String,Integer> ();
-          for (int i = 0; i < referencetileSpecs.size(); i ++)
-          {
-            TileSpec t =referencetileSpecs.get(i);
-            t.deriveBoundingBox(t.getMeshCellSize(), true);
-            TileBounds tb = new TileBounds(t.getTileId(), t.getLayout().getSectionId(),t.getZ(), t.getMinX(), t.getMinY(), t.getMaxX(), t.getMaxY());
-            tbl.add(tb);
-            tsHashMap.put(t.getTileId(),i);
-          }
+                  //load params
 
 
-          ArrayList<Integer> badindices = new ArrayList<Integer>();
-        	ExecutorService tilePool = Executors.newFixedThreadPool(STD_THREAD_POOL_SIZE);
-        	for (int tempj = 0; tempj < inputtileSpecs.size(); tempj ++)
-        	{
-  					final int j = tempj;
-  					TileBoundsRTree tree = new TileBoundsRTree(referencetileSpecs.get(0).getZ(),tbl);
-  					TileSpec u =inputtileSpecs.get(j);
-  					u.deriveBoundingBox(u.getMeshCellSize(), true);
-  					List<TileBounds> tileBoundsList  = tree.findTilesInBox(u.getMinX(), u.getMinY(), u.getMaxX(), u.getMaxY());
+                  //initialize
+                  r = new RenderDataClient(params.baseDataUrl,params.owner,params.project);
 
-  					//find closest tile
-  					if (tileBoundsList.size() < 1)
-  					{
-  							System.out.println("Tile bounds not found...");
-  							badindices.add(tempj);
-  					}
+                  ResolvedTileSpecCollection resolvedTilesinput = r.getResolvedTiles(params.stack,params.section);
 
-  					else
-  					{
-  						ArrayList <Double> distsq = new ArrayList();
-  						for (int i = 0; i < tileBoundsList.size(); i++)
-  						{
-  							double sum = Math.pow(u.getMinX() - tileBoundsList.get(i).getMinX(),2) + Math.pow(u.getMinY() - tileBoundsList.get(i).getMinY(),2) + Math.pow(u.getMaxX() - tileBoundsList.get(i).getMaxX(),2) + Math.pow(u.getMaxY() - tileBoundsList.get(i).getMaxY(),2);
-  							distsq.add(sum );
-  						}
+                  ResolvedTileSpecCollection resolvedTilesref = r.getResolvedTiles(params.referencestack,params.section);
+                  //System.out.println("Debug 1");
+                  //calculate initial model and invert
+                  AbstractModel <?> model = new RigidModel2D();
+              		//model = calculatetransform(resolvedTilesinput, resolvedTilesref, params,r); //MIGHT NEED TO SWITCH????
+                  model = calculatetransform( resolvedTilesref, resolvedTilesinput,params,r);
+                  String classname = "mpicbg.trakem2.transform.AffineModel2D";
+              		//String modstring = model2datastring_inv(model);
+                  String modstring = model2datastring(model);
+                  LeafTransformSpec modtrans = new LeafTransformSpec(classname,modstring);
+                  //System.out.println("Debug 2");
+                  //createtilespec ArrayList and apply the initial model
+                  List<TileSpec> inputtileSpecs = settilespecs(resolvedTilesinput);
+                  List<TileSpec> originputtileSpecs = inputtileSpecs;
+                  final List<TileSpec> outputtileSpecs = inputtileSpecs; //initialize output
+                  List<TileSpec> referencetileSpecs = settilespecs(resolvedTilesref);
 
-  						int index = distsq.indexOf(Collections.min(distsq));
-  						TileSpec reftile = referencetileSpecs.get(tsHashMap.get(tileBoundsList.get(index).getTileId()));
-  						ArrayList<TileSpec> ref = new ArrayList(); ref.add(reftile);
-  						ArrayList<TileSpec> inp = new ArrayList(); inp.add(inputtileSpecs.get(j));
-  						params.percentSaturated = 0.9f;
-  						params.maxEpsilon = 2.5f;
-  						params.initialSigma = 1.0f;
-  						final Params jparams = params;
-  						final AbstractModel<?> jmodel = model;
-  						final String jclassname = classname;
-  						final TileSpec jreftile = reftile;
-              final TileSpec jinptile = originputtileSpecs.get(j);
-  						final ArrayList<TileSpec> jref = ref;
-  						final ArrayList<TileSpec> jinp = inp;
+                  //System.out.println("Debug 3");
+                  for (int j = 0; j < inputtileSpecs.size(); j++)
+                	{
+                		ListTransformSpec listtspec = inputtileSpecs.get(j).getTransforms();
+                		listtspec.addSpec(modtrans);
+                	}
 
-  						Runnable submissible = new Runnable() {
-  							public void run() {
-
-  								AbstractModel<?> tilemodel = new RigidModel2D();
-  								tilemodel = calculatetransform(jref,jinp, jparams,(RigidModel2D)jmodel,r);
-                  //tilemodel = calculatetransform(jinp,jref, jparams,(RigidModel2D)jmodel,r);
-
-                  String datastring = model2datastring_inv(tilemodel);
-                  //String datastring = "0.9997912589454127 0.020431312643758512 -0.020431312643758512 0.9997912589454127 15.31154847466597957 -41.20356448828608";
-                  //String datastring = "0.999801865031806  0.019905543924326  -0.019905543924326  0.999801865031806  14.922470547064847  -40.79274363653826";
-                  //                    #  0.999801865031806  -0.019905543924326  0.019905543924326  0.999801865031806  14.922470547064847  -40.79274363653826
-  								System.out.println("DATASTRING: "+ datastring);
-  								System.out.println("MYTILELIST1: ");
-  								System.out.println("MYTILELIST11: " + jclassname);
-  								LeafTransformSpec tilelts = new LeafTransformSpec(jclassname, datastring);
-  								System.out.println("MYTILELIST111: " + tilelts.toJson());
-  								System.out.println("MYTILELIST1111: " + jreftile.getLastTransform().toJson());
-  								LeafTransformSpec rfspec = (LeafTransformSpec) jreftile.getLastTransform();
-                  LeafTransformSpec inpspec = (LeafTransformSpec) jinptile.getLastTransform();
-  								System.out.println("MYTILELIST2: ");
-  								//ListTransformSpec mytilelist = new ListTransformSpec(jparams.referenceID,null);
-                  ListTransformSpec mytilelist = new ListTransformSpec("REFID",null);
-
-                  System.out.println("MYTILELIST3: ");
-
-  								mytilelist.addSpec(inpspec);
-                  mytilelist.addSpec(tilelts);
-  								System.out.println("MYTILELIST: ");
-  								System.out.println(mytilelist.toString());
-  								outputtileSpecs.get(j).setTransforms(mytilelist);
-
-  							} //end run
-  						}; //end Runnable
-  						tilePool.submit(submissible);
-  					}//end else
-  				}//end for
-
-  			tilePool.shutdown();
-  			try
-  			{
-  				tilePool.awaitTermination(POOL_TIMEOUT_IN_SECONDS,TimeUnit.SECONDS);
-  			}
-  			catch (Exception ex)
-  			{
-  				throw new RuntimeException(ex);
-  			}
+                  //tile pair matching
+                  ArrayList<TileBounds> tbl = new ArrayList();
+                  Map<String,Integer> tsHashMap = new HashMap<String,Integer> ();
+                  for (int i = 0; i < referencetileSpecs.size(); i ++)
+                  {
+                    TileSpec t =referencetileSpecs.get(i);
+                    t.deriveBoundingBox(t.getMeshCellSize(), true);
+                    TileBounds tb = new TileBounds(t.getTileId(), t.getLayout().getSectionId(),t.getZ(), t.getMinX(), t.getMinY(), t.getMaxX(), t.getMaxY());
+                    tbl.add(tb);
+                    tsHashMap.put(t.getTileId(),i);
+                  }
 
 
-        final StringBuilder json = new StringBuilder(16 * 1024);
-        System.out.println("NOW OUTPUTTING TO FILE: ");
-        int numadded = 0;
-        for (int n = 0; n< outputtileSpecs.size(); n++)
-        {
-
-  				System.out.println(n);
-  				if (badindices.contains(n))
-  					System.out.println("Skipping "+n);
-  				else
-  				{
-  					String myjson =outputtileSpecs.get(n).toJson() ;
-  					if (numadded >0 )
-  						myjson = "," + myjson;
-  					json.append(myjson);
-  					numadded = numadded+1;
-  				}
-        }
+                  ArrayList<Integer> badindices = new ArrayList<Integer>();
+                	ExecutorService tilePool = Executors.newFixedThreadPool(STD_THREAD_POOL_SIZE);
+                	for (int tempj = 0; tempj < inputtileSpecs.size(); tempj ++)
+                	{
+          					final int j = tempj;
+          					TileBoundsRTree tree = new TileBoundsRTree(referencetileSpecs.get(0).getZ(),tbl);
+          					TileSpec u =inputtileSpecs.get(j);
+          					u.deriveBoundingBox(u.getMeshCellSize(), true);
 
 
-        //////////OUTPUT
+                    List<TileBounds> tileBoundsList  = tree.findTilesInBox(u.getMinX(), u.getMinY(), u.getMaxX(), u.getMaxY());
+                    //find closest tile
+          					if (tileBoundsList.size() < 1)
+          					{
+          							System.out.println("Tile bounds not found...");
+          							badindices.add(tempj);
+          					}
+
+          					else
+          					{
+          						ArrayList <Double> distsq = new ArrayList();
+          						for (int i = 0; i < tileBoundsList.size(); i++)
+          						{
+          							double sum = Math.pow(u.getMinX() - tileBoundsList.get(i).getMinX(),2) + Math.pow(u.getMinY() - tileBoundsList.get(i).getMinY(),2) + Math.pow(u.getMaxX() - tileBoundsList.get(i).getMaxX(),2) + Math.pow(u.getMaxY() - tileBoundsList.get(i).getMaxY(),2);
+          							distsq.add(sum );
+          						}
 
 
-      	FileOutputStream jsonStream = null;
-      	String par1 = "[";
-      	String par2 = "]";
+          						int index = distsq.indexOf(Collections.min(distsq));
+                      if (distsq.get(index) < params.tileDistance)
+                      {
+              						TileSpec reftile = referencetileSpecs.get(tsHashMap.get(tileBoundsList.get(index).getTileId()));
+
+              						ArrayList<TileSpec> ref = new ArrayList(); ref.add(reftile);
+              						ArrayList<TileSpec> inp = new ArrayList(); inp.add(inputtileSpecs.get(j));
+              						params.percentSaturated = 0.5f;
+              						params.maxEpsilon = 2.5f;
+              						params.initialSigma = 2.5f;
+              						final Params jparams = params;
+              						final AbstractModel<?> jmodel = model;
+              						final String jclassname = classname;
+              						final TileSpec jreftile = reftile;
+                          final TileSpec jinptile = originputtileSpecs.get(j);
+                          /*System.out.println("TESTING TILESPECS");
+                          System.out.println(params.tileDistance);
+                          System.out.println(jreftile.toJson().toString());
+                          System.out.println(jinptile.toJson().toString());
+                          System.out.println(distsq.toString());
+                          System.out.println(distsq.get(index));*/
+                          //System.exit(0);
+                          final ArrayList<TileSpec> jref = ref;
+              						final ArrayList<TileSpec> jinp = inp;
+
+              						Runnable submissible = new Runnable() {
+              							public void run() {
+
+              								AbstractModel<?> tilemodel = new RigidModel2D();
+              								tilemodel = calculatetransform(jref,jinp, jparams,(RigidModel2D)jmodel,r);
+                              //tilemodel = calculatetransform(jinp,jref, jparams,(RigidModel2D)jmodel,r);
+
+                              //String datastring = model2datastring_inv(tilemodel);
+                              String datastring = model2datastring(tilemodel);
+                              System.out.println("DATASTRING: "+ datastring);
+              								System.out.println("MYTILELIST1: ");
+              								System.out.println("MYTILELIST11: " + jclassname);
+              								LeafTransformSpec tilelts = new LeafTransformSpec(jclassname, datastring);
+              								System.out.println("MYTILELIST111: " + tilelts.toJson());
+              								System.out.println("MYTILELIST1111: " + jreftile.getLastTransform().toJson());
+              								//LeafTransformSpec rfspec = (LeafTransformSpec) jreftile.getLastTransform();
+                              //LeafTransformSpec inpspec = (LeafTransformSpec) jinptile.getLastTransform();
+              								System.out.println("MYTILELIST2: ");
+              								//ListTransformSpec mytilelist = new ListTransformSpec(jparams.referenceID,null);
+                              //ListTransformSpec mytilelist = new ListTransformSpec("REFID",null);
+                              ListTransformSpec mytilelist = jreftile.getTransforms();
+                              //System.out.println("MYTILELIST3: ");
+                              //mytilelist.removeLastSpec();
+              								//mytilelist.addSpec(inpspec);
+                              //mytilelist.addSpec(jinptile.getLastTransform());
+                              mytilelist.addSpec(tilelts);
+              								System.out.println("MYTILELIST: ");
+              								System.out.println(mytilelist.toString());
+              								outputtileSpecs.get(j).setTransforms(mytilelist);
 
 
-      	/*try
-      	{
-      		jsonStream = new FileOutputStream(params.outputtilespec);
-      		jsonStream.write(par1.getBytes());
-          jsonStream.write(json.toString().getBytes());
-          jsonStream.write(par2.getBytes());
-        }
-      	catch (final IOException e)
-      	{
-          throw new RuntimeException("failed to write to JSON stream", e);
-        }*/
+                							} //end run
+                						}; //end Runnable
+                						tilePool.submit(submissible);
+                        }//end if distsq < 5000
+          					}//end else
+          				}//end for
 
-        final List<TransformSpec> trans = new ArrayList();
-        final ResolvedTileSpecCollection resTiles = new ResolvedTileSpecCollection(trans,outputtileSpecs);
+          			tilePool.shutdown();
+          			try
+          			{
+          				tilePool.awaitTermination(POOL_TIMEOUT_IN_SECONDS,TimeUnit.SECONDS);
+          			}
+          			catch (Exception ex)
+          			{
+          				throw new RuntimeException(ex);
+          			}
 
-        //r.createStack()
-        final StackMetaData smd = r.getStackMetaData(params.stack);
-        ensureStackExists(r,params.outputStack,smd);
-        //System.out.println(resTiles.toString());
-        r.setStackState(params.outputStack,StackState.LOADING);
-        r.saveResolvedTiles(resTiles,params.outputStack,null);
-        r.setStackState(params.outputStack,StackState.COMPLETE);
-      }
-      catch ( final Exception e )
-      {
-          return;
-      }
 
-    }
+                final StringBuilder json = new StringBuilder(16 * 1024);
+                System.out.println("NOW OUTPUTTING TO FILE: ");
+                int numadded = 0;
+                for (int n = 0; n< outputtileSpecs.size(); n++)
+                {
+
+          				System.out.println(n);
+          				if (badindices.contains(n))
+          					System.out.println("Skipping "+n);
+          				else
+          				{
+          					String myjson =outputtileSpecs.get(n).toJson() ;
+          					if (numadded >0 )
+          						myjson = "," + myjson;
+          					json.append(myjson);
+          					numadded = numadded+1;
+          				}
+                }
+
+
+                //////////OUTPUT
+
+
+              	FileOutputStream jsonStream = null;
+              	String par1 = "[";
+              	String par2 = "]";
+
+                //This part to comment
+              	try
+              	{
+                  jsonStream = new FileOutputStream("testingoutput.json");
+              		//jsonStream = new FileOutputStream(params.outputtilespec);
+              		jsonStream.write(par1.getBytes());
+                  jsonStream.write(json.toString().getBytes());
+                  jsonStream.write(par2.getBytes());
+                }
+              	catch (final IOException e)
+              	{
+                  throw new RuntimeException("failed to write to JSON stream", e);
+                }
+
+
+                //end commented
+
+                //final List<TransformSpec> trans = new ArrayList();
+                Collection<TransformSpec> trans = resolvedTilesref.getTransformSpecs();
+                ResolvedTileSpecCollection resTiles = new ResolvedTileSpecCollection(trans,outputtileSpecs);
+
+                try
+        				{
+        		        final StackMetaData smd = r.getStackMetaData(params.stack);
+                    System.out.println("NOW OUTPUTTING RESTILES TO JSON");
+                    System.out.println(resTiles.toJson().toString());
+        		        ensureStackExists(r,params.outputStack,smd);
+        		        r.setStackState(params.outputStack,StackState.LOADING);
+        		        r.saveResolvedTiles(resTiles,params.outputStack,null);
+        		        r.setStackState(params.outputStack,StackState.COMPLETE);
+        				}
+        				catch ( final Exception e )
+              	{
+                  	return;
+              	}
+
+
+
+
+
+              }
+              catch ( final Exception e )
+              {
+                  return;
+              }
+
+            }
 }
