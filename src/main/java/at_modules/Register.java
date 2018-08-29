@@ -115,8 +115,8 @@ import org.janelia.alignment.spec.*;
 import org.janelia.alignment.match.*;
 import org.janelia.alignment.util.*;
 import org.janelia.render.client.RenderDataClient;
-import org.janelia.render.client.RenderDataClientParameters;
-import org.janelia.render.client.FileUtil;
+//import org.janelia.render.client.RenderDataClientParameters;
+//import org.janelia.render.client.FileUtil;
 import org.janelia.render.client.TilePairClient;
 import org.janelia.render.client.ImportJsonClient;
 import org.janelia.alignment.spec.stack.StackMetaData.StackState;
@@ -680,7 +680,7 @@ public class Register
   																														z,
   																														(int) (layerBounds.getDeltaX() + 0.5),
   																														(int) (layerBounds.getDeltaY() + 0.5),
-  																														scale);
+  																														scale, null);
 
   			//LOG.debug("generateImageForZ: {}, loading {}", z, parametersUrl);
 
@@ -695,7 +695,7 @@ public class Register
   			final int maxCachedPixels = 50 * 1000000;
   			final ImageProcessorCache imageProcessorCache;
   		  imageProcessorCache = new ImageProcessorCache(maxCachedPixels, false, false);
-  			Render.render(renderParameters, sectionImage, imageProcessorCache);
+  			ShortRenderer.render(renderParameters, sectionImage, imageProcessorCache);
 
   			/*Utils.saveImage(sectionImage, sectionFile.getAbsolutePath(), clientParameters.format, true, 0.85f);
   			LOG.info("generateImageForZ: {}, exit", z);*/
@@ -719,7 +719,7 @@ public class Register
   																														z,
   																														(int) (layerBounds.getDeltaX() + 0.5),
   																														(int) (layerBounds.getDeltaY() + 0.5),
-  																														scale);
+  																														scale,null);
 
   			//LOG.debug("generateImageForZ: {}, loading {}", z, parametersUrl);
 
@@ -734,7 +734,7 @@ public class Register
   			final int maxCachedPixels = 50 * 1000000;
   			final ImageProcessorCache imageProcessorCache;
   		  imageProcessorCache = new ImageProcessorCache(maxCachedPixels, false, false);
-  			Render.render(renderParameters, sectionImage, imageProcessorCache);
+  			ShortRenderer.render(renderParameters, sectionImage, imageProcessorCache);
 
   			/*Utils.saveImage(sectionImage, sectionFile.getAbsolutePath(), clientParameters.format, true, 0.85f);
   			LOG.info("generateImageForZ: {}, exit", z);*/

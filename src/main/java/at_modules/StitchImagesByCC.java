@@ -74,8 +74,8 @@ import org.janelia.alignment.spec.ListTransformSpec;
 import org.janelia.alignment.*;
 import org.janelia.alignment.util.*;
 import org.janelia.render.client.RenderDataClient;
-import org.janelia.render.client.RenderDataClientParameters;
-import org.janelia.render.client.FileUtil;
+//import org.janelia.render.client.RenderDataClientParameters;
+//import org.janelia.render.client.FileUtil;
 import org.janelia.render.client.TilePairClient;
 import org.janelia.render.client.ImportJsonClient;
 import org.janelia.alignment.spec.stack.StackMetaData.StackState;
@@ -154,9 +154,11 @@ public class StitchImagesByCC
 		    for ( final String filepath : filepaths )
 		    {
 		        ImagePlus img = IJ.openImage(filepath);
+
 		        images.add(img);
 		    }
-		    return images;
+
+				return images;
 	}
 
 
@@ -173,7 +175,7 @@ public class StitchImagesByCC
 																															z,
 																															(int) (layerBounds.getDeltaX() + 0.5),
 																															(int) (layerBounds.getDeltaY() + 0.5),
-																															scale);
+																															scale,null);
 
 				final RenderParameters renderParameters = RenderParameters.loadFromUrl(parametersUrl);
 				renderParameters.setDoFilter(false);
@@ -184,7 +186,7 @@ public class StitchImagesByCC
 				final int maxCachedPixels = 50 * 1000000;
 				final ImageProcessorCache imageProcessorCache;
 				imageProcessorCache = new ImageProcessorCache(maxCachedPixels, false, false);
-				Render.render(renderParameters, sectionImage, imageProcessorCache);
+				ShortRenderer.render(renderParameters, sectionImage, imageProcessorCache);
 
 				String fullfilename = t.getFirstMipmapEntry().getValue().getImageFilePath();
 				String delims = "[/]";
@@ -206,13 +208,16 @@ public class StitchImagesByCC
 					try
 					{
 							img = generateImageForZ(r, stack, 1.0,t);
+
 					}
 					catch ( final Exception e )
 					{
 							e.printStackTrace();
 					}
 					images.add(img);
+
 	      }
+
 		    return images;
 	}
 
@@ -237,6 +242,8 @@ public class StitchImagesByCC
 		    		while (i < imagesR.size())
 		    		{
 							ImagePlus ip = 	imagesR.get(i);
+
+
 							images.add(ip);
 							if (connects.containsKey( ip.getTitle() ))
 							{
@@ -263,6 +270,7 @@ public class StitchImagesByCC
 								final ImagePlusTimePoint imt = new ImagePlusTimePoint( element.open( stitchparams.virtual ), element.getIndex(), 1, element.getModel(), element ); //initialize
 								final TranslationModel2D model = (TranslationModel2D)imt.getModel();	// relate the model to the imt
 								tr = modref.apply(pt);
+
 								model.set( rawx.get(k)-rawx.get(r)+tr[0], rawy.get(k) -rawy.get(r)+tr[1]);
 								optimized.add(imt);
 					        	models.add((InvertibleBoundable) imt.getModel());
@@ -437,6 +445,8 @@ public class StitchImagesByCC
 				Map<String,Integer> rawelementshash = new HashMap<String,Integer> ();
 				params.files= readandsetinput(tileSpecs, elements,rawelementshash,rawx,rawy);
 
+
+
 				//registration
 				ImageCollectionandHashContainer cont =new ImageCollectionandHashContainer();
 				cont = CollectionStitchingImgLibCC.stitchCollectionandcalculateconnections( elements, stitchparams );
@@ -465,12 +475,15 @@ public class StitchImagesByCC
 					i++;
 				}
 
+
 				calculatediffs(elements, imagesR, images, connects, filehash, rawelementshash, originaloptimized, optimized,models,params, stitchparams, rawx, rawy);
 
 				// add translation models
 				final ArrayList<TranslationModel2D> translation_models = new ArrayList();
 				for (final InvertibleBoundable model : models)
-				translation_models.add((TranslationModel2D) model);
+					translation_models.add((TranslationModel2D) model);
+
+
 
 				if (params.outputImage != null)
 				{
@@ -500,8 +513,15 @@ public class StitchImagesByCC
 					throw new RuntimeException(ex);
 				}
 
+
+
 				List<TileSpec> tileSpecs = settilespecs(resTileSpecs);
+
+				//System.out.println(tileSpecs.get(0).getAllChannels());
+				//System.exit(0);
 				ArrayList<ImagePlus> imagesR = read_images(r,params.stack,resTileSpecs);
+
+
 				ResolvedTileSpecCollection resTiles = stitch_tilespecs(tileSpecs,imagesR,params);
 
 				try
