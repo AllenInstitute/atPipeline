@@ -7,18 +7,9 @@ import subprocess
 import posixpath
 import atutils
 
-def parse_session_folder(line):
-    proj = line.split("raw")
-    projectdirectory = proj[0]
-    tok = line.split(os.sep)
-    ribbondir = tok[len(tok)-2]
-    sessiondir = tok[len(tok)-1]
-    ribbon = int(ribbondir[6:])
-    session = int(sessiondir[7:])
-    return [projectdirectory, ribbon, session]
-
 def run(sessionFolder, firstsection, lastsection, dockerContainer):
-    [projectroot, ribbon, session] = parse_session_folder(sessionFolder)
+
+    [projectroot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
 
     print ("Processing session folder: " + sessionFolder)
     for sectnum in range(firstsection,lastsection+1):
@@ -46,7 +37,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
             cmd = cmd + " --outputFile %s"%(atutils.toPosixPath(statetablefile, "/mnt"))
             cmd = cmd + " --ribbon %d"%ribbon
             cmd = cmd + " --session %d"%session
-            cmd = cmd + " --section %d"%sectnum
+            cmd = cmd + " --section %d"%(sectnum - 1) #Start at 0
             cmd = cmd + " --oneribbononly True"
             print ("Running: " + cmd)
 
@@ -57,8 +48,8 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
 
 
 if __name__ == "__main__":
-    firstsection = 0
-    lastsection = 23
+    firstsection = 1
+    lastsection = 24
     sessionFolder = "F:\\data\\M33\\raw\\data\\Ribbon0004\\session01"
     dockerContainer = "renderapps_multchan"
 
