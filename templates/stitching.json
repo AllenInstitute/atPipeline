@@ -1,0 +1,13 @@
+{
+        "baseDataUrl":"http://W10DTMJ03EG6Z.corp.alleninstitute.org/render-ws/v1",
+        "owner":"",
+        "project":"",
+        "stack": "",
+        "outputStack":"",
+        "section": 0,
+        "steps":3,
+        "initialSigma":2.5,
+        "percentSaturated": 0.9,
+        "maxEpsilon":2.5,
+        "modelType": 1
+}
