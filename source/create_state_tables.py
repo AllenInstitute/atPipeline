@@ -10,13 +10,13 @@ import atutils
 def run(sessionFolder, firstsection, lastsection, dockerContainer):
 
     [projectroot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
-
     print ("Processing session folder: " + sessionFolder)
-    for sectnum in range(firstsection,lastsection+1):
+
+    for sectnum in range(firstsection, lastsection+1):
         print("Processing section: " + str(sectnum))
 
         #create state table file name
-        statetablefile = projectroot + os.path.join("scripts", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon,session,sectnum))
+        statetablefile = projectroot + os.path.join("scripts", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon,session,sectnum -1 ))
 
         if os.path.exists(statetablefile):
            print("The statetable: " + statetablefile + " already exists. Continuing..")
@@ -44,7 +44,6 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             for line in p.stdout.readlines():
                 print (line)
-
 
 
 if __name__ == "__main__":
