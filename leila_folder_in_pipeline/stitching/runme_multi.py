@@ -157,15 +157,16 @@ if __name__ == "__main__":
 
 	for i in range (0,1):
 
-                with open("/pipeline/leila/stitching/confirm_data2process") as f:
-                        alldirnames = f.readlines()
+        with open("/pipeline/leila/stitching/confirm_data2process") as f:
+             alldirnames = f.readlines()
 
-                for dirname in alldirnames:
+        for dirname in alldirnames:
 			flatfield_dirname =  "%s/../../../../processed/Flatfield_Test" %dirname.strip('\n')
 			print "thiis is dirname: " + dirname
 			print flatfield_dirname
 			if not os.path.exists(flatfield_dirname):
 				os.makedirs(flatfield_dirname)
+
             for sectnum in range(firstsection,lastsection+1):
 				close_stack = False
 
@@ -179,15 +180,11 @@ if __name__ == "__main__":
 				z = ribbon*100+sectnum
 				print  "this is your projectroot: " + projectroot
 
-
-
 				#create file that consists of celery job commands
 				filename = "log/runme_sect_%s_%d_%d_%s.sh"%(project, ribbon,session,sectnum)
 				f = open(filename,'w')
 
-
 				#create state table
-
 				#projectroot = "/nas/data/M246930_Scnn1a_4/"
 				statetablefile =projectroot+ "scripts/statetable_ribbon_%d_session_%d_section_%d"%(ribbon,session,sectnum)
 				#statetablefile = "/nas/data/M246930_Scnn1a_4/scripts/statetable_ribbon_%d_session_%d_section_%d"%(ribbon,session,sectnum)
@@ -224,9 +221,6 @@ if __name__ == "__main__":
 
 
 				#print channels
-
-
-
 				medianfile = "%s/log/median_%s_%s_%s_%d.json"%(curdir,project,ribbon,session,sectnum)
 				flatfieldfile = "%s/log/flatfield_%s_%s_%s_%d.json"%(curdir,project,ribbon,session,sectnum)
 				deconvfile = "%s/log/deconv_%s_%s_%s_%d.json"%(curdir,project,ribbon,session,sectnum)
@@ -308,8 +302,8 @@ if __name__ == "__main__":
 					for sectnum in range(firstsection,lastsection+1):
 						ff_z = ribbon*100+sectnum
 						with open(flatfieldtemplate) as json_data:
-                                        		ff = json.load(json_data)
-                                		saveflatfieldjson(ff,flatfieldfile,owner, project, acq_stack,median_stack,flatfield_stack,flatfield_dir,ff_z,close_stack)
+                      		ff = json.load(json_data)
+                        saveflatfieldjson(ff,flatfieldfile,owner, project, acq_stack,median_stack,flatfield_stack,flatfield_dir,ff_z,close_stack)
 						print ff_z
 						cmd2 = "docker exec renderapps_multchan python -m rendermodules.intensity_correction.apply_multiplicative_correction --render.port 80 --input_json %s"%flatfieldfile
 						#cmd3 = "docker exec renderapps_develop python -m renderapps.intensity_correction.apply_deconvolution --render.port 8988 --input_json %s"%deconvfile

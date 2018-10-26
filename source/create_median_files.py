@@ -10,37 +10,27 @@ def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject
 
     [dataRootFolder, ribbon, session] = atutils.parse_session_folder(sessionFolder)
 
-    json_prefix = os.path.join("%s"%(dataRootFolder), "logs")
-    json_postfix = "_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, firstsection)
-
-    medianfile       = os.path.join(json_prefix, "median"    + json_postfix)
+    #Output directories
+    median_dir       = os.path.join("%s"%dataRootFolder, "processed", "medians")
+    median_json       = os.path.join(median_dir, "median_%s_%s_%d_%d.json"%(ribbon, session, firstsection-1, lastsection-1))
 
     #stacks
     acq_stack        = "ACQ_Session%d"%(session)
     median_stack     = "MED_Session%d"%(session)
-    #flatfield_stack  = "FF_Session%d"%(session)
-    #stitched_stack   = "STI_FF_Session%d"%(session)
 
-    #Output directories
-    median_dir       = os.path.join("%s"%dataRootFolder, "processed", "Medians_Test")
-
-##        with open(stitchingtemplate) as json_data:
-##             sti = json.load(json_data)
-
-    #Create 'logs' folder
-    logsFolder=os.path.join(dataRootFolder, "logs")
-    if os.path.isdir(logsFolder) == False:
-       os.mkdir(logsFolder)
+    #Make sure output folder exist
+    if os.path.isdir(median_dir) == False:
+       os.mkdir(median_dir)
 
     with open(atutils.mediantemplate) as json_data:
          med = json.load(json_data)
 
-    atutils.savemedianjson(med, medianfile, render_host, renderProject.owner, renderProject.name, acq_stack, median_stack, atutils.toPosixPath(median_dir, "/mnt"), ribbon*100 + firstsection -1, ribbon*100 + lastsection -1, True)
+    atutils.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, atutils.toPosixPath(median_dir, "/mnt"), ribbon*100 + firstsection -1, ribbon*100 + lastsection -1, True)
 
     #Run =============
     cmd = "docker exec " + dockerContainer + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
     cmd = cmd + " --render.port 80"
-    cmd = cmd + " --input_json %s"%(atutils.toPosixPath(medianfile, "/mnt"))
+    cmd = cmd + " --input_json %s"%(atutils.toPosixPath(median_json, "/mnt"))
     print ("Running: " + cmd)
 
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -50,7 +40,7 @@ def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
     firstsection = 1
-    lastsection = 24
+    lastsection = 2
 
     render_host = "W10DTMJ03EG6Z.corp.alleninstitute.org"
     dataRootFolder = "F:\\data\\M33"
@@ -58,7 +48,7 @@ if __name__ == "__main__":
 
     dockerContainer = "renderapps_multchan"
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = atutils.RenderProject("ATExplorer", "W10DTMJ03EG6Z.corp.alleninstitute.org", renderProjectName)
+    renderProject     = atutils.RenderProject("ATExplorer", render_host, renderProjectName)
 
     projectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
     run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject)
