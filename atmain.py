@@ -48,4 +48,4 @@ if __name__ == '__main__':
         create_flatfield_corrected_data.run(startSection, endSection, sessionFolder, dockerContainer, renderProject)
 
     timeEnd = timeit.default_timer()
-    print("Elapsed time in apply_medians: " + str(timeEnd - timeStart))
+    print("Elapsed time: " + str((timeEnd - timeStart)/60.0) + " minutes" )

@@ -85,6 +85,16 @@ def saveflatfieldjson(template, outFile, render_host, owner, project, acq_stack,
     template['close_stack']       = close_stack
     dump_json(template, outFile)
 
+def savestitchingjson(template, outfile, owner, project, flatfield_stack, stitched_stack, sectnum):
+    template['owner']                  = owner
+    template['project']                = project
+    template['stack']                  = flatfield_stack
+    template['outputStack']            = stitched_stack
+    template['section']                = sectnum
+    dump_json(template, outfile)
+
+
+
 def main():
     pass
 
