@@ -10,6 +10,13 @@
 import os
 import posixpath
 import sys
+import json
+
+#Some hardcoded paths..
+templates_folder = "p:\\atExplorer\\ThirdParty\\atPipeline\\templates"
+mediantemplate    = os.path.join(templates_folder, "median.json")
+stitchingtemplate = os.path.join(templates_folder, "stitching.json")
+
 
 class RenderProject:
     def __init__(self, owner, host, name):
@@ -50,6 +57,22 @@ def toPosixPath(winpath, prefix):
     if len(prefix):
        p = prefix + p
     return p
+
+def dump_json(data, fileName):
+    with open(fileName, 'w') as outfile:
+         json.dump(data, outfile, indent=4)
+
+def savemedianjson(med, medianfile, render_host, owner, project, acq_stack, median_stack, median_dir, minz, maxz, close_stack):
+    med['render']['host']    = render_host
+    med['render']['owner']   = owner
+    med['render']['project'] = project
+    med['input_stack']       = acq_stack
+    med['output_stack']      = median_stack
+    med['minZ']              = minz
+    med['maxZ']              = maxz
+    med['output_directory']  = median_dir
+    med['close_stack']       = close_stack
+    dump_json(med, medianfile)
 
 def main():
     pass

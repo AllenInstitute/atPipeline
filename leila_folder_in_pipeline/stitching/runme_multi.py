@@ -17,7 +17,7 @@ def parse_project_directory(line):
 	sessiondir = tok[len(tok)-1]
 	ribbon = int(ribbondir[6:])
 	session = int(sessiondir[7:])
-	
+
 	return [projectdirectory, ribbon, session]
 
 
@@ -78,7 +78,7 @@ def parsefile(fname):
                 return [projectdirectory, ribbon, session, section, owner,fullline]
 
 def savemedianjson(med,medianfile,owner, project,acq_stack,median_stack,median_dir,minz,maxz,close_stack):
-	
+
 	med['render']['owner'] = owner
 	med['render']['project'] = project
 	med['input_stack'] = acq_stack
@@ -97,7 +97,7 @@ def saveflatfieldjson(ff,flatfieldfile,owner, project, acq_stack,median_stack,fl
 	ff['correction_stack'] = median_stack
         ff['output_stack'] = flatfield_stack
         ff['z_index'] = sectnum
-        ff['output_directory'] = flatfield_dir  
+        ff['output_directory'] = flatfield_dir
 	ff['close_stack'] = close_stack
         with open(flatfieldfile, 'w') as outfile:
                 json.dump(ff, outfile,indent=4)
@@ -112,7 +112,7 @@ def savedeconvjson(dd,deconvfile,owner, project, flatfield_stack,deconv_stack,de
 	dd['num_iter']=num_iter
 	dd['bgrd_size'] = bgrd_size
         dd['z_index'] = sectnum
-        dd['output_directory'] = deconv_dir  
+        dd['output_directory'] = deconv_dir
 	dd['scale_factor'] = scale_factor
 	dd['close_stack'] = close_stack
 	dd['pool_size'] = 21
@@ -154,7 +154,7 @@ if __name__ == "__main__":
 	#bgrd_size = 50
 
 	curdir = os.getcwd()
-	
+
 	for i in range (0,1):
 
                 with open("/pipeline/leila/stitching/confirm_data2process") as f:
@@ -166,19 +166,19 @@ if __name__ == "__main__":
 			print flatfield_dirname
 			if not os.path.exists(flatfield_dirname):
 				os.makedirs(flatfield_dirname)
-                        for sectnum in range(firstsection,lastsection+1):
+            for sectnum in range(firstsection,lastsection+1):
 				close_stack = False
 
 				if sectnum==lastsection:
 					close_stack = True
-				
+
 				projectdirectory = dirname.strip()
 				project = parseprojectroot(projectdirectory)
 				channels = get_channel_names(projectdirectory)
 				[projectroot, ribbon,session] = parse_project_directory(projectdirectory)
 				z = ribbon*100+sectnum
 				print  "this is your projectroot: " + projectroot
-				
+
 
 
 				#create file that consists of celery job commands
@@ -204,7 +204,7 @@ if __name__ == "__main__":
 				cmd = cmd + "--section %d "%sectnum
 				#f.write(cmd+"\n")
 				os.system(cmd)
-				
+
 				#upload acquisition stacks
 				dcmd = "docker exec renderapps_multchan python -m renderapps.dataimport.create_fast_stacks_multi "
 				dcmd = dcmd + "--render.host ibs-forrestc-ux1 "
@@ -227,7 +227,7 @@ if __name__ == "__main__":
 
 
 
-				medianfile = "%s/log/median_%s_%s_%s_%d.json"%(curdir,project,ribbon,session,sectnum)					
+				medianfile = "%s/log/median_%s_%s_%s_%d.json"%(curdir,project,ribbon,session,sectnum)
 				flatfieldfile = "%s/log/flatfield_%s_%s_%s_%d.json"%(curdir,project,ribbon,session,sectnum)
 				deconvfile = "%s/log/deconv_%s_%s_%s_%d.json"%(curdir,project,ribbon,session,sectnum)
 				stitchingfile = "%s/log/stitching_%s_%s_%s_%d.json"%(curdir,project,ribbon,session,sectnum)
@@ -236,9 +236,9 @@ if __name__ == "__main__":
 				acq_stack = "1_ACQ_Session%d"%(int(session))
 				median_stack = "1_MED_Session%d"%(int(session))
 				flatfield_stack = "1_FF_Session%d"%(int(session))
-				deconv_stack = "DCV_FF_Session%d"%(int(session))				
+				deconv_stack = "DCV_FF_Session%d"%(int(session))
 				stitched_stack = "STI_FF_Session%d"%(int(session))
-					
+
 				#directories
 				median_dir = "%s/processed/Medians_Test/"%projectroot
 				flatfield_dir = "%s/processed/Flatfield_Test/"%projectroot
@@ -246,7 +246,7 @@ if __name__ == "__main__":
 
 				#psf file, scale factor, and background size for deconvolution
 				#print ch
-					
+
 				#if ch=="TdTomato":
 					#print "Im gfp"
 				#	psf_file = "/nas5/data/M362218_CSATlx3_small_volume/processed/psfs/psf_MBP.tif"
@@ -290,20 +290,21 @@ if __name__ == "__main__":
 				#savedeconvjson(dd,deconvfile,owner, project, flatfield_stack,deconv_stack,deconv_dir,z,psf_file, num_iter,bgrd_size,scale_factor)
 
 				with open(stitchingtemplate) as json_data:
-                                        sti = json.load(json_data)
-                                savestitchingjson(sti,stitchingfile,owner, project, flatfield_stack,stitched_stack,z)
+                     sti = json.load(json_data)
+                savestitchingjson(sti,stitchingfile,owner, project, flatfield_stack,stitched_stack,z)
 
 
 				if close_stack:
 					with open(mediantemplate) as json_data:
-                                        	med = json.load(json_data)
-                                	savemedianjson(med,medianfile,owner, project,acq_stack,median_stack,median_dir,ribbon*100+firstsection,ribbon*100+lastsection,close_stack)	
+                   	     med = json.load(json_data)
+                   	savemedianjson(med,medianfile,owner, project,acq_stack,median_stack,median_dir,ribbon*100+firstsection,ribbon*100+lastsection,close_stack)
+
 				#run
 					mystr = "DAPI"
 					cmd1 = "docker exec renderapps_multchan python -m rendermodules.intensity_correction.calculate_multiplicative_correction --render.port 80 --input_json %s"%medianfile
 					os.system(cmd1)
 					#f.write(cmd1+"\n")
-					
+
 					for sectnum in range(firstsection,lastsection+1):
 						ff_z = ribbon*100+sectnum
 						with open(flatfieldtemplate) as json_data:
@@ -314,7 +315,7 @@ if __name__ == "__main__":
 						#cmd3 = "docker exec renderapps_develop python -m renderapps.intensity_correction.apply_deconvolution --render.port 8988 --input_json %s"%deconvfile
 						#os.system(cmd2)
 						#f.write(cmd2+"\n")
-						
+
 
 
 
@@ -329,7 +330,7 @@ if __name__ == "__main__":
 				#else:
 				#	cmd4 = ""
 
-			
+
 				#for ch in channels:
 					#if ch.find("DAPI")>-1:
 						#print "Do Nothing"
