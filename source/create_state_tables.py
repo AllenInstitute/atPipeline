@@ -49,7 +49,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
 if __name__ == "__main__":
     firstsection = 1
     lastsection = 24
-    sessionFolder = "F:\\data\\M33\\raw\\data\\Ribbon0004\\session01"
+    sessionFolder = os.path.join("F:"," data", "M33", "raw" , "data", "Ribbon0004", "session01")
     dockerContainer = "renderapps_multchan"
 
     run(sessionFolder, firstsection, lastsection, dockerContainer)

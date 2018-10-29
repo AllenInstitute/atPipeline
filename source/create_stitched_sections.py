@@ -33,9 +33,9 @@ def run(firstsection, lastsection, sessionFolder, renderProject):
         stitching_json    = os.path.join(stitching_dir, "flatfield""_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))
         atutils.savestitchingjson(stitching_template, stitching_json, renderProject.owner, renderProject.name, flatfield_stack, stitched_stack, z)
 
-        cmd = "java -cp /pipeline/sharmi/at_modules/allen/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
-        cmd = cmd + " --input_json %s"%stitchingfile
-
+        ##cmd4 = "java -cp /pipeline/sharmi/at_modules/allen/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC --input_json %s"%stitchingfile
+        cmd = "java -cp F:\\atExplorer\\ThirdParty\\at_modules\\allen\\target\\allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
+        cmd = cmd + " --input_json %s"%stitching_json
 
         #Run =============
         print ("Running: " + cmd)
