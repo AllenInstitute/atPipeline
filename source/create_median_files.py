@@ -43,7 +43,7 @@ if __name__ == "__main__":
     lastsection = 2
 
     render_host = "W10DTMJ03EG6Z.corp.alleninstitute.org"
-    dataRootFolder = "F:\\data\\M33"
+    dataRootFolder = os.path.join("F:", "data", "M33")
     sessionFolder= os.path.join(dataRootFolder, "raw", "data", "Ribbon0004", "session01")
 
     dockerContainer = "renderapps_multchan"

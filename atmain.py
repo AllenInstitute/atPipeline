@@ -45,7 +45,7 @@ if __name__ == '__main__':
         create_median_files.run(startSection, endSection, sessionFolder, dockerContainer, renderProject)
 
         #Calculate median files
-        create_flatfield_corrected_data.run(startSection, endSection, sessionFolder, dockerContainer, renderProject)
+        #create_flatfield_corrected_data.run(startSection, endSection, sessionFolder, dockerContainer, renderProject)
 
     timeEnd = timeit.default_timer()
     print("Elapsed time: " + str((timeEnd - timeStart)/60.0) + " minutes" )
