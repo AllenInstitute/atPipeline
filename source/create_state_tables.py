@@ -9,7 +9,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
 
     [projectroot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
     print ("Processing session folder: " + sessionFolder)
-    print projectroot
+    
     for sectnum in range(firstsection, lastsection+1):
         print("Processing section: " + str(sectnum))
 
