@@ -49,8 +49,8 @@ def getChannelNamesInSessionFolder(directory):
             directory_list.append(os.path.join(root, name))
     return dirs
 
-def toPosixPath(winpath, prefix):
-    p = posixpath.normpath(winpath.replace('\\', '/'))
+def toPosixPath(path, prefix):
+    p = posixpath.normpath(path.replace('\\', '/'))
     p = p[p.index(':') + 1:]
 
     if len(prefix):
