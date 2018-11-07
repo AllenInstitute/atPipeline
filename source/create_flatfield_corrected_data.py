@@ -2,6 +2,7 @@ import os
 import json
 import sys
 import subprocess
+import platform
 import posixpath
 import atutils
 import timeit
@@ -28,10 +29,12 @@ def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject
              ff = json.load(json_data)
 
         flatfield_json    = os.path.join(flatfield_dir, "flatfield""_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))
+        if platform.system() == 'Linux':
+                input_json = atutils.toPosixPath(flatfield_json,  "/mnt")
         atutils.saveflatfieldjson(ff, flatfield_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, flatfield_stack, atutils.toPosixPath(flatfield_dir, "/mnt"), z, True)
         cmd = "docker exec " + dockerContainer + " python -m rendermodules.intensity_correction.apply_multiplicative_correction"
         cmd = cmd + " --render.port 80"
-        cmd = cmd + " --input_json %s"%(atutils.toPosixPath(flatfield_json, "/mnt"))
+        cmd = cmd + " --input_json %s"%input_json
 
         #Run =============
         print ("Running: " + cmd)

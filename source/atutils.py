@@ -13,7 +13,7 @@ import sys
 import json
 
 #Some hardcoded paths..
-templates_folder = "p:\\atExplorer\\ThirdParty\\atPipeline\\templates"
+templates_folder = "/Users/synbio/ATExplorer/ThirdParty/atPipeline/templates"
 mediantemplate    = os.path.join(templates_folder, "median.json")
 stitchingtemplate = os.path.join(templates_folder, "stitching.json")
 flatfieldtemplate = os.path.join(templates_folder, "flatfield.json")
