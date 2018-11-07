@@ -14,7 +14,8 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
         print("Processing section: " + str(sectnum))
 
         #create state table file name
-        statetablefile = projectroot + os.path.join("scripts", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon,session,sectnum -1 ))
+        statetablefile =  "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum -1)
+        statetablefile = projectroot + os.path.join("scripts", statetablefile)
 
         if os.path.exists(statetablefile):
            print("The statetable: " + statetablefile + " already exists. Continuing..")
@@ -38,9 +39,10 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
 
             #make state table
             #Need to pass posix paths to docker
-            cmd = "docker exec " + dockerContainer + " python /pipeline/luigi-scripts/make_state_table_ext_multi_pseudoz.py"
-            cmd = cmd + " --projectDirectory %s"%project_dir
-            cmd = cmd + " --outputFile %s"%out_file
+            cmd = "docker exec " + dockerContainer
+            cmd = cmd + " python /pipeline/make_state_table_ext_multi_pseudoz.py"
+            cmd = cmd + " --projectDirectory %s"%(atutils.toPosixPath(projectroot,  "/mnt"))
+            cmd = cmd + " --outputFile %s"%(atutils.toPosixPath(statetablefile, "/mnt"))
             cmd = cmd + " --ribbon %d"%ribbon
             cmd = cmd + " --session %d"%session
             cmd = cmd + " --section %d"%(sectnum - 1) #Start at 0
