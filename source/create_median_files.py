@@ -2,6 +2,7 @@ import os
 import json
 import sys
 import subprocess
+import platform
 import posixpath
 import atutils
 import timeit
@@ -27,10 +28,15 @@ def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject
 
     atutils.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, atutils.toPosixPath(median_dir, "/mnt"), ribbon*100 + firstsection -1, ribbon*100 + lastsection -1, True)
 
+    if platform.system() == 'Linux':
+            input_json = atutils.toPosixPath(median_json,  "/mnt")
+    
+
+
     #Run =============
     cmd = "docker exec " + dockerContainer + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
     cmd = cmd + " --render.port 80"
-    cmd = cmd + " --input_json %s"%(atutils.toPosixPath(median_json, "/mnt"))
+    cmd = cmd + " --input_json %s"%input_json
     print ("Running: " + cmd)
 
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

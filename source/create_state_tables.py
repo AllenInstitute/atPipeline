@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess
+import platform
 import posixpath
 import atutils
 
@@ -8,7 +9,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
 
     [projectroot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
     print ("Processing session folder: " + sessionFolder)
-
+    
     for sectnum in range(firstsection, lastsection+1):
         print("Processing section: " + str(sectnum))
 
@@ -27,6 +28,14 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
             #--ribbon 4
             #--session 1
             #--section 0
+
+            #if os is Linux, convert path
+            if platform.system() == 'Linux':
+                project_dir = atutils.toPosixPath(projectroot,  "/mnt")
+                out_file = atutils.toPosixPath(statetablefile, "/mnt")
+            else:
+                project_dir = projectroot
+                out_file = statetablefile
 
             #make state table
             #Need to pass posix paths to docker
@@ -48,7 +57,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
 if __name__ == "__main__":
     firstsection = 1
     lastsection = 24
-    sessionFolder = os.path.join("F:", "data", "M33", "raw" , "data", "Ribbon0004", "session01")
+    sessionFolder = os.path.join("/data", "M33", "raw" , "data", "Ribbon0004", "session01")
     dockerContainer = "renderapps_multchan"
 
     run(sessionFolder, firstsection, lastsection, dockerContainer)
