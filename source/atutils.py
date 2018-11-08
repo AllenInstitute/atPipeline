@@ -11,9 +11,18 @@ import os
 import posixpath
 import sys
 import json
+import platform
 
 #Some hardcoded paths..
-templates_folder = "/Users/synbio/ATExplorer/ThirdParty/atPipeline/templates"
+templates_folder_mac = "/Users/synbio/ATExplorer/ThirdParty/atPipeline/templates"
+templates_folder_win = "c:\\pDisk\\ATExplorer\\ThirdParty\\atPipeline\\templates"
+dockerMountName = "/mnt"
+
+if platform.system() == "Windows":
+   templates_folder = templates_folder_win
+else:
+   templates_folder = templates_folder_mac
+
 mediantemplate    = os.path.join(templates_folder, "median.json")
 stitchingtemplate = os.path.join(templates_folder, "stitching.json")
 flatfieldtemplate = os.path.join(templates_folder, "flatfield.json")
@@ -49,13 +58,11 @@ def getChannelNamesInSessionFolder(directory):
             directory_list.append(os.path.join(root, name))
     return dirs
 
-def toPosixPath(path, prefix):
-    p = posixpath.normpath(path.replace('\\', '/'))
-    p = p[p.index(':') + 1:]
-
-    if len(prefix):
-       p = prefix + p
-    return p
+def toDockerMountedPath(path, prefix):
+    #Remove prefix
+    p = path.split(prefix)[1]
+    p = posixpath.normpath(p.replace('\\', '/'))
+    return posixpath.join(dockerMountName, p[1:])
 
 def dump_json(data, fileName):
     with open(fileName, 'w') as outfile:
@@ -65,7 +72,7 @@ def savemedianjson(template, outFile, render_host, owner, project, acq_stack, me
     template['render']['host']    = render_host
     template['render']['owner']   = owner
     template['render']['project'] = project
-    template['input_stack']       = acq_stack
+    template['input_stack']    = acq_stack
     template['output_stack']      = median_stack
     template['minZ']              = minz
     template['maxZ']              = maxz

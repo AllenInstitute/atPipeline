@@ -7,7 +7,7 @@ import posixpath
 import atutils
 import timeit
 
-def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject):
+def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject, prefixPath):
 
     [dataRootFolder, ribbon, session] = atutils.parse_session_folder(sessionFolder)
 
@@ -26,17 +26,12 @@ def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject
     with open(atutils.mediantemplate) as json_data:
          med = json.load(json_data)
 
-    atutils.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, atutils.toPosixPath(median_dir, "/mnt"), ribbon*100 + firstsection -1, ribbon*100 + lastsection -1, True)
-
-    if platform.system() == 'Linux':
-            input_json = atutils.toPosixPath(median_json,  "/mnt")
-    
-
+    atutils.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, atutils.toDockerMountedPath(median_dir, prefixPath), ribbon*100 + firstsection -1, ribbon*100 + lastsection -1, True)
 
     #Run =============
     cmd = "docker exec " + dockerContainer + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
     cmd = cmd + " --render.port 80"
-    cmd = cmd + " --input_json %s"%input_json
+    cmd = cmd + " --input_json %s"%(atutils.toDockerMountedPath(median_json,  prefixPath))
     print ("Running: " + cmd)
 
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -49,15 +44,16 @@ if __name__ == "__main__":
     lastsection = 2
 
     render_host = "W10DTMJ03EG6Z.corp.alleninstitute.org"
-    dataRootFolder = os.path.join("F:", "data", "M33")
-    sessionFolder= os.path.join(dataRootFolder, "raw", "data", "Ribbon0004", "session01")
+
+    prefixPath = "e:\\Documents"
+    sessionFolder = os.path.join(prefixPath, "data\\M33\\raw\\data\\Ribbon0004\\session01")
 
     dockerContainer = "renderapps_multchan"
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
     renderProject     = atutils.RenderProject("ATExplorer", render_host, renderProjectName)
 
     projectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-    run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject)
+    run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject, prefixPath)
     timeEnd = timeit.default_timer()
 
     print("Elapsed time in time create_median_files: " + str(timeEnd - timeStart))

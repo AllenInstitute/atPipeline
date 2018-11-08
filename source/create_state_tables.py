@@ -9,7 +9,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
 
     [projectroot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
     print ("Processing session folder: " + sessionFolder)
-    
+
     for sectnum in range(firstsection, lastsection+1):
         print("Processing section: " + str(sectnum))
 
@@ -29,20 +29,12 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
             #--session 1
             #--section 0
 
-            #if os is Linux, convert path
-            if platform.system() == 'Linux':
-                project_dir = atutils.toPosixPath(projectroot,  "/mnt")
-                out_file = atutils.toPosixPath(statetablefile, "/mnt")
-            else:
-                project_dir = projectroot
-                out_file = statetablefile
-
             #make state table
             #Need to pass posix paths to docker
             cmd = "docker exec " + dockerContainer
             cmd = cmd + " python /pipeline/make_state_table_ext_multi_pseudoz.py"
-            cmd = cmd + " --projectDirectory %s"%(atutils.toPosixPath(projectroot,  "/mnt"))
-            cmd = cmd + " --outputFile %s"%(atutils.toPosixPath(statetablefile, "/mnt"))
+            cmd = cmd + " --projectDirectory %s"%(atutils.toDockerMountedPath(projectroot,  "/mnt"))
+            cmd = cmd + " --outputFile %s"%(atutils.toDockerMountedPath(statetablefile, "/mnt"))
             cmd = cmd + " --ribbon %d"%ribbon
             cmd = cmd + " --session %d"%session
             cmd = cmd + " --section %d"%(sectnum - 1) #Start at 0
@@ -57,8 +49,9 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
 if __name__ == "__main__":
     firstsection = 1
     lastsection = 24
-    sessionFolder = os.path.join("/data", "M33", "raw" , "data", "Ribbon0004", "session01")
+    prefixPath = "e:\\Documents"
+    sessionFolder = os.path.join(prefixPath, "\\data\\M33\\raw\\data\\Ribbon0004\\session01")
     dockerContainer = "renderapps_multchan"
 
-    run(sessionFolder, firstsection, lastsection, dockerContainer)
+    run(sessionFolder, firstsection, lastsection, dockerContainer, prefixPath)
     print ("Finished creation of state tables")
