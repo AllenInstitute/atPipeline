@@ -54,6 +54,7 @@ if __name__ == "__main__":
     sessionFolder = os.path.join(prefixPath, "data\\M33\\raw\\data\\Ribbon0004\\session01")
 
     dockerContainer = "renderapps_multchan"
+
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
     renderProject     = atutils.RenderProject("ATExplorer", render_host, renderProjectName)
 
