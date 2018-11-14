@@ -7,7 +7,7 @@ import platform
 import posixpath
 import atutils
 
-def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject):
+def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject, prefixPath):
 
     [projectroot, ribbon,session] = atutils.parse_session_folder(sessionFolder)
     print  ("Project root folder: " + projectroot)
@@ -15,13 +15,9 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject
     for sectnum in range(firstsection,lastsection+1):
         print("Processing section: " + str(sectnum))
 
-        #create state table
-        
+        #State table file
         statetablefile = projectroot + os.path.join("scripts", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon,session,sectnum -1 ))
 
-        if platform.system() == 'Linux':
-                project_dir = atutils.toPosixPath(projectroot,  "/mnt")
-                out_file = atutils.toPosixPath(statetablefile, "/mnt")
         #Example
         #docker exec renderapps python -m renderapps.dataimport.create_fast_stacks_multi
         #--render.host localhost
@@ -44,8 +40,8 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject
         cmd = cmd + " --render.port 8080"
         cmd = cmd + " --render.memGB 5G"
         cmd = cmd + " --log_level INFO"
-        cmd = cmd + " --statetableFile %s"%out_file
-        cmd = cmd + " --projectDirectory %s"%project_dir
+        cmd = cmd + " --statetableFile %s"%(atutils.toDockerMountedPath(statetablefile,  prefixPath))
+        cmd = cmd + " --projectDirectory %s"%(atutils.toDockerMountedPath(projectroot,  prefixPath))
         cmd = cmd + " --outputStackPrefix ACQ_"
         print ("Running: " + cmd)
 
@@ -57,11 +53,17 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject
 if __name__ == "__main__":
 
     firstsection = 1
-    lastsection = 24
-    sessionFolder = "/Users/synbio/Documents/data/M33/raw/data/Ribbon0004/session01"
+    lastsection = 2
+    prefixPath = "e:\\Documents"
+    sessionFolder = os.path.join(prefixPath, "data\\M33\\raw\\data\\Ribbon0004\\session01")
+    #sessionFolder = "/Users/synbio/Documents/data/M33/raw/data/Ribbon0004/session01"
+
     dockerContainer = "renderapps_multchan"
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = atutils.RenderProject("ATExplorer", "OSXLTSG3QP.local", renderProjectName)
+    host = "W10DTMJ03EG6Z.corp.alleninstitute.org"
+    #host = OSXLTSG3QP.local
 
-    run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject)
+    renderProject     = atutils.RenderProject("ATExplorer", host, renderProjectName)
+
+    run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject, prefixPath)
     print ("done")

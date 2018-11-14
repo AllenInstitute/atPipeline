@@ -5,7 +5,7 @@ import platform
 import posixpath
 import atutils
 
-def run(sessionFolder, firstsection, lastsection, dockerContainer):
+def run(sessionFolder, firstsection, lastsection, dockerContainer, prefixPath):
 
     [projectroot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
     print ("Processing session folder: " + sessionFolder)
@@ -33,8 +33,8 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
             #Need to pass posix paths to docker
             cmd = "docker exec " + dockerContainer
             cmd = cmd + " python /pipeline/make_state_table_ext_multi_pseudoz.py"
-            cmd = cmd + " --projectDirectory %s"%(atutils.toDockerMountedPath(projectroot,  "/mnt"))
-            cmd = cmd + " --outputFile %s"%(atutils.toDockerMountedPath(statetablefile, "/mnt"))
+            cmd = cmd + " --projectDirectory %s"%(atutils.toDockerMountedPath(projectroot,  prefixPath))
+            cmd = cmd + " --outputFile %s"%(atutils.toDockerMountedPath(statetablefile, prefixPath))
             cmd = cmd + " --ribbon %d"%ribbon
             cmd = cmd + " --session %d"%session
             cmd = cmd + " --section %d"%(sectnum - 1) #Start at 0
@@ -48,9 +48,9 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer):
 
 if __name__ == "__main__":
     firstsection = 1
-    lastsection = 24
+    lastsection = 2
     prefixPath = "e:\\Documents"
-    sessionFolder = os.path.join(prefixPath, "\\data\\M33\\raw\\data\\Ribbon0004\\session01")
+    sessionFolder = os.path.join(prefixPath, "data\\M33\\raw\\data\\Ribbon0004\\session01")
     dockerContainer = "renderapps_multchan"
 
     run(sessionFolder, firstsection, lastsection, dockerContainer, prefixPath)

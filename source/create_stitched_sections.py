@@ -34,7 +34,7 @@ def run(firstsection, lastsection, sessionFolder, renderProject):
         atutils.savestitchingjson(stitching_template, stitching_json, renderProject.owner, renderProject.name, flatfield_stack, stitched_stack, z)
 
         ##cmd4 = "java -cp /pipeline/sharmi/at_modules/allen/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC --input_json %s"%stitchingfile
-        cmd = "java -cp F:\\atExplorer\\ThirdParty\\at_modules\\allen\\target\\allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
+        cmd = "docker exec atmodules java -cp /usr/local/at_modules/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
         cmd = cmd + " --input_json %s"%stitching_json
 
         #Run =============
@@ -47,13 +47,12 @@ def run(firstsection, lastsection, sessionFolder, renderProject):
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
     firstsection = 1
-    lastsection = 24
+    lastsection = 2
 
     render_host     = "W10DTMJ03EG6Z.corp.alleninstitute.org"
-    dataRootFolder  = "F:\\data\\M33"
+    dataRootFolder  = "E:\\data\\M33"
     sessionFolder   = os.path.join(dataRootFolder, "raw", "data", "Ribbon0004", "session01")
 
-    dockerContainer = "renderapps_multchan"
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
     renderProject     = atutils.RenderProject("ATExplorer", render_host, renderProjectName)
 
