@@ -6,7 +6,7 @@ import posixpath
 import atutils
 import timeit
 
-def run(firstsection, lastsection, sessionFolder, renderProject):
+def run(firstsection, lastsection, sessionFolder, renderProject, prefixPath):
 
     [dataRootFolder, ribbon, session] = atutils.parse_session_folder(sessionFolder)
 
@@ -46,17 +46,18 @@ def run(firstsection, lastsection, sessionFolder, renderProject):
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
+
     firstsection = 1
     lastsection = 2
 
     render_host     = "W10DTMJ03EG6Z.corp.alleninstitute.org"
-    dataRootFolder  = "E:\\data\\M33"
-    sessionFolder   = os.path.join(dataRootFolder, "raw", "data", "Ribbon0004", "session01")
+    prefixPath = "e:\\Documents"
+    sessionFolder = os.path.join(prefixPath, "data\\M33\\raw\\data\\Ribbon0004\\session01")
 
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
     renderProject     = atutils.RenderProject("ATExplorer", render_host, renderProjectName)
 
-    run(firstsection, lastsection, sessionFolder, renderProject)
+    run(firstsection, lastsection, sessionFolder, renderProject, prefixPath)
 
     timeEnd = timeit.default_timer()
-    print("Elapsed time in create_flatfield_corrected_data: " + str(timeEnd - timeStart))
+    print("Elapsed time in create_stitched_sections.py: " + str(timeEnd - timeStart))
