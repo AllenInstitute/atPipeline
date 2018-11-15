@@ -26,7 +26,7 @@ def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject
     with open(atutils.mediantemplate) as json_data:
          med = json.load(json_data)
 
-    atutils.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, atutils.toDockerMountedPath(median_dir, prefixPath), ribbon*100 + firstsection -1, ribbon*100 + lastsection -1, True)
+    atutils.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, atutils.toDockerMountedPath(median_dir, prefixPath), ribbon*100 + firstsection, ribbon*100 + lastsection, True)
 
     #Run =============
     cmd = "docker exec " + dockerContainer + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
@@ -40,13 +40,13 @@ def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
-    firstsection = 1
-    lastsection = 2
+    firstsection = 0
+    lastsection = 23
 
-    render_host = "W10DTMJ03EG6Z.corp.alleninstitute.org"
+    render_host = "OSXLTSG3QP.local"
 
-    prefixPath = "e:\\Documents"
-    sessionFolder = os.path.join(prefixPath, "data\\M33\\raw\\data\\Ribbon0004\\session01")
+    prefixPath = "/Users/synbio/Documents"
+    sessionFolder = os.path.join(prefixPath, "data/M33/raw/data/Ribbon0004/session01")
 
     dockerContainer = "renderapps_multchan"
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
