@@ -9,6 +9,6 @@ docker run -d --name atmodules \
 -v /data:/data \
 -v /pipeline:/pipeline \
 -v /etc/hosts:/etc/hosts \
--p 7778:7778 \
+-p 7770:7770 \
 -i -t sharmi/at_modules \
 /bin/bash 
