@@ -15,8 +15,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject
     for sectnum in range(firstsection,lastsection+1):
         print("Processing section: " + str(sectnum))
 
-        #create state table
-        
+        #State table file
         statetablefile = projectroot + os.path.join("scripts", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon,session,sectnum -1 ))
 
         #Example
@@ -58,10 +57,13 @@ if __name__ == "__main__":
 
     prefixPath = "/Users/synbio/Documents"
     sessionFolder = os.path.join(prefixPath, "data/M33/raw/data/Ribbon0004/session01")
-    
+
     dockerContainer = "renderapps_multchan"
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = atutils.RenderProject("ATExplorer", "OSXLTSG3QP.local", renderProjectName)
+    host = "W10DTMJ03EG6Z.corp.alleninstitute.org"
+    #host = OSXLTSG3QP.local
+
+    renderProject     = atutils.RenderProject("ATExplorer", host, renderProjectName)
 
     run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject, prefixPath)
     print ("done")
