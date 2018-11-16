@@ -9,13 +9,14 @@ import create_state_tables
 import create_rawdata_render_multi_stacks
 import create_median_files
 import create_flatfield_corrected_data
-import timeit 
+import timeit
 
 if __name__ == '__main__':
     timeStart = timeit.default_timer()
 
     #What data to process??
-    dataRootFolder = "F:\\data\\M33"
+    prefixPath = "e:\\Documents"
+    dataRootFolder = os.path.join(prefixPath, "data/M33")
     ribbons = ["Ribbon0004"]
     sessions = ["Session01",
                 "Session02",
@@ -36,16 +37,16 @@ if __name__ == '__main__':
     renderProject  = atutils.RenderProject("ATExplorer", "W10DTMJ03EG6Z.corp.alleninstitute.org", renderProjectName)
     for sessionFolder in sessionFolders:
         #Start with the creation of state table files
-        create_state_tables.run(sessionFolder, startSection, endSection, dockerContainer)
+        create_state_tables.run(sessionFolder, startSection, endSection, dockerContainer, prefixPath)
 
         #Create Renderstacks (multi) for the raw data
-        create_rawdata_render_multi_stacks.run(sessionFolder, startSection, endSection, dockerContainer, renderProject)
+        create_rawdata_render_multi_stacks.run(sessionFolder, startSection, endSection, dockerContainer, renderProject, prefixPath)
 
         #Calculate median files
-        create_median_files.run(startSection, endSection, sessionFolder, dockerContainer, renderProject)
+        create_median_files.run(startSection, endSection, sessionFolder, dockerContainer, renderProject, prefixPath)
 
         #Calculate median files
-        #create_flatfield_corrected_data.run(startSection, endSection, sessionFolder, dockerContainer, renderProject)
+        create_flatfield_corrected_data.run(startSection, endSection, sessionFolder, dockerContainer, renderProject, prefixPath)
 
     timeEnd = timeit.default_timer()
     print("Elapsed time: " + str((timeEnd - timeStart)/60.0) + " minutes" )
