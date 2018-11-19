@@ -52,7 +52,10 @@ if __name__ == "__main__":
 
     prefixPath = "/Users/synbio/Documents"
     sessionFolder = os.path.join(prefixPath, "data/M33/raw/data/Ribbon0004/session01")
+<<<<<<< HEAD
     
+=======
+>>>>>>> d17a48eea72b1a01e17955eed18e06f3b1cf3994
     dockerContainer = "renderapps_multchan"
 
     run(sessionFolder, firstsection, lastsection, dockerContainer, prefixPath)

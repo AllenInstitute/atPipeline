@@ -41,7 +41,11 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject
         cmd = cmd + " --render.port 8080"
         cmd = cmd + " --render.memGB 5G"
         cmd = cmd + " --log_level INFO"
+<<<<<<< HEAD
         cmd = cmd + " --statetableFile %s"%(atutils.toDockerMountedPath(statetablefile, prefixPath))
+=======
+        cmd = cmd + " --statetableFile %s"%(atutils.toDockerMountedPath(statetablefile,  prefixPath))
+>>>>>>> d17a48eea72b1a01e17955eed18e06f3b1cf3994
         cmd = cmd + " --projectDirectory %s"%(atutils.toDockerMountedPath(projectroot,  prefixPath))
         cmd = cmd + " --outputStackPrefix ACQ_"
         print ("Running: " + cmd)
@@ -54,11 +58,19 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject
 if __name__ == "__main__":
 
     firstsection = 1
+<<<<<<< HEAD
     lastsection = 24
 
     prefixPath = "/Users/synbio/Documents"
     sessionFolder = os.path.join(prefixPath, "data/M33/raw/data/Ribbon0004/session01")
     
+=======
+    lastsection = 23
+
+    prefixPath = "/Users/synbio/Documents"
+    sessionFolder = os.path.join(prefixPath, "data/M33/raw/data/Ribbon0004/session01")
+
+>>>>>>> d17a48eea72b1a01e17955eed18e06f3b1cf3994
     dockerContainer = "renderapps_multchan"
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
     #host = "W10DTMJ03EG6Z.corp.alleninstitute.org"

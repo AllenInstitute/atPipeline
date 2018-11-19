@@ -40,13 +40,13 @@ def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
-    firstsection = 0
-    lastsection = 23
+    firstsection = 1
+    lastsection = 2
 
-    render_host = "OSXLTSG3QP.local"
+    render_host = "W10DTMJ03EG6Z.corp.alleninstitute.org"
 
-    prefixPath = "/Users/synbio/Documents"
-    sessionFolder = os.path.join(prefixPath, "data/M33/raw/data/Ribbon0004/session01")
+    prefixPath = "e:\\Documents"
+    sessionFolder = os.path.join(prefixPath, "data\\M33\\raw\\data\\Ribbon0004\\session01")
 
     dockerContainer = "renderapps_multchan"
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
