@@ -40,7 +40,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject
         cmd = cmd + " --render.port 8080"
         cmd = cmd + " --render.memGB 5G"
         cmd = cmd + " --log_level INFO"
-        cmd = cmd + " --statetableFile %s"%(atutils.toDockerMountedPath(statetablefile, prefixPath))
+        cmd = cmd + " --statetableFile %s"%(atutils.toDockerMountedPath(statetablefile,  prefixPath))
         cmd = cmd + " --projectDirectory %s"%(atutils.toDockerMountedPath(projectroot,  prefixPath))
         cmd = cmd + " --outputStackPrefix ACQ_"
         print ("Running: " + cmd)
@@ -53,7 +53,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject
 if __name__ == "__main__":
 
     firstsection = 1
-    lastsection = 24
+    lastsection = 23
 
     prefixPath = "/Users/synbio/Documents"
     sessionFolder = os.path.join(prefixPath, "data/M33/raw/data/Ribbon0004/session01")
