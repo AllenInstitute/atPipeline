@@ -25,4 +25,5 @@ COPY src .
 
 WORKDIR /usr/local/at_modules
 
+ENV _JAVA_OPTIONS -Djdk.net.URLClassPath.disableClassPathURLCheck=true
 RUN mvn install
