@@ -23,12 +23,12 @@ def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject
        os.mkdir(flatfield_dir)
 
 	#Create json files and apply median.
-    for sectnum in range(firstsection -1, lastsection):
+    for sectnum in range(firstsection, lastsection):
 
         with open(atutils.flatfieldtemplate) as json_data:
              ff = json.load(json_data)
 
-        flatfield_json    = os.path.join(flatfield_dir, "flatfield""_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))
+        flatfield_json = os.path.join(flatfield_dir, "flatfield""_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))
 
         z = ribbon*100 + sectnum
 
@@ -46,7 +46,7 @@ def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
-    firstsection = 1
+    firstsection = 0
     lastsection = 23
 
     render_host     = "W10DTMJ03EG6Z.corp.alleninstitute.org"

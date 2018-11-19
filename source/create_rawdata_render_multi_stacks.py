@@ -16,7 +16,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject
         print("Processing section: " + str(sectnum))
 
         #State table file
-        statetablefile = projectroot + os.path.join("scripts", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon,session,sectnum -1 ))
+        statetablefile = projectroot + os.path.join("scripts", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
 
         #Example
         #docker exec renderapps python -m renderapps.dataimport.create_fast_stacks_multi
@@ -52,7 +52,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject
 
 if __name__ == "__main__":
 
-    firstsection = 1
+    firstsection = 0
     lastsection = 23
 
     prefixPath = "/Users/synbio/Documents"

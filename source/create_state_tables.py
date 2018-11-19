@@ -14,7 +14,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, prefixPath):
         print("Processing section: " + str(sectnum))
 
         #create state table file name
-        statetablefile =  "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum -1)
+        statetablefile =  "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum)
         statetablefile = projectroot + os.path.join("scripts", statetablefile)
 
         if os.path.exists(statetablefile):
@@ -37,7 +37,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, prefixPath):
             cmd = cmd + " --outputFile %s"%(atutils.toDockerMountedPath(statetablefile, prefixPath))
             cmd = cmd + " --ribbon %d"%ribbon
             cmd = cmd + " --session %d"%session
-            cmd = cmd + " --section %d"%(sectnum - 1) #Start at 0
+            cmd = cmd + " --section %d"%(sectnum)
             cmd = cmd + " --oneribbononly True"
             print ("Running: " + cmd)
 
@@ -47,8 +47,8 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, prefixPath):
 
 
 if __name__ == "__main__":
-    firstsection = 1
-    lastsection = 24
+    firstsection = 0
+    lastsection = 23
 
     prefixPath = "/Users/synbio/Documents"
     sessionFolder = os.path.join(prefixPath, "data/M33/raw/data/Ribbon0004/session01")

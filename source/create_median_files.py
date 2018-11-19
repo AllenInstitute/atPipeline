@@ -13,7 +13,7 @@ def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject
 
     #Output directories
     median_dir       = os.path.join("%s"%dataRootFolder, "processed", "medians")
-    median_json       = os.path.join(median_dir, "median_%s_%s_%d_%d.json"%(ribbon, session, firstsection-1, lastsection-1))
+    median_json       = os.path.join(median_dir, "median_%s_%s_%d_%d.json"%(ribbon, session, firstsection, lastsection))
 
     #stacks
     acq_stack        = "ACQ_Session%d"%(session)
