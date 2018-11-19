@@ -54,6 +54,6 @@ if __name__ == "__main__":
 
     projectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
     run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject, prefixPath)
-    timeEnd = timeit.default_timer()
 
+    timeEnd = timeit.default_timer()
     print("Elapsed time in time create_median_files: " + str(timeEnd - timeStart))

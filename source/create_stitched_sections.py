@@ -5,8 +5,9 @@ import subprocess
 import posixpath
 import atutils
 import timeit
+import time
 
-def run(firstsection, lastsection, sessionFolder, renderProject):
+def run(firstsection, lastsection, sessionFolder, renderProject, prefixPath):
 
     [dataRootFolder, ribbon, session] = atutils.parse_session_folder(sessionFolder)
 
@@ -33,9 +34,9 @@ def run(firstsection, lastsection, sessionFolder, renderProject):
         stitching_json    = os.path.join(stitching_dir, "flatfield""_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))
         atutils.savestitchingjson(stitching_template, stitching_json, renderProject.owner, renderProject.name, flatfield_stack, stitched_stack, z)
 
-        ##cmd4 = "java -cp /pipeline/sharmi/at_modules/allen/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC --input_json %s"%stitchingfile
-        cmd = "java -cp F:\\atExplorer\\ThirdParty\\at_modules\\allen\\target\\allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
-        cmd = cmd + " --input_json %s"%stitching_json
+
+        cmd = "docker exec atmodules java -cp ./target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
+        cmd = cmd + " --input_json %s"%(atutils.toDockerMountedPath(stitching_json, prefixPath))
 
         #Run =============
         print ("Running: " + cmd)
@@ -45,19 +46,20 @@ def run(firstsection, lastsection, sessionFolder, renderProject):
             print (line)
 
 if __name__ == "__main__":
+
     timeStart = timeit.default_timer()
+
     firstsection = 1
-    lastsection = 24
+    lastsection = 2
 
     render_host     = "W10DTMJ03EG6Z.corp.alleninstitute.org"
-    dataRootFolder  = "F:\\data\\M33"
-    sessionFolder   = os.path.join(dataRootFolder, "raw", "data", "Ribbon0004", "session01")
+    prefixPath      = "e:\\Documents"
+    sessionFolder   = os.path.join(prefixPath, "data\\M33\\raw\\data\\Ribbon0004\\session01")
 
-    dockerContainer = "renderapps_multchan"
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
     renderProject     = atutils.RenderProject("ATExplorer", render_host, renderProjectName)
 
-    run(firstsection, lastsection, sessionFolder, renderProject)
+    run(firstsection, lastsection, sessionFolder, renderProject, prefixPath)
 
-    timeEnd = timeit.default_timer()
-    print("Elapsed time in create_flatfield_corrected_data: " + str(timeEnd - timeStart))
+    timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
+    print("Elapsed time in create_stitched_sections.py: " + timeDuration + " minutes")

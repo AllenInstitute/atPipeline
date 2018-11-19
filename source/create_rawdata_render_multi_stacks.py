@@ -61,7 +61,10 @@ if __name__ == "__main__":
     
     dockerContainer = "renderapps_multchan"
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = atutils.RenderProject("ATExplorer", "OSXLTSG3QP.local", renderProjectName)
+    #host = "W10DTMJ03EG6Z.corp.alleninstitute.org"
+    host = "OSXLTSG3QP.local"
+
+    renderProject     = atutils.RenderProject("ATExplorer", host, renderProjectName)
 
     run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject, prefixPath)
     print ("done")
