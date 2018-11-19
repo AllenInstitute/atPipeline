@@ -53,7 +53,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject
 if __name__ == "__main__":
 
     firstsection = 1
-    lastsection = 2
+    lastsection = 23
     prefixPath = "e:\\Documents"
     sessionFolder = os.path.join(prefixPath, "data\\M33\\raw\\data\\Ribbon0004\\session01")
     #sessionFolder = "/Users/synbio/Documents/data/M33/raw/data/Ribbon0004/session01"

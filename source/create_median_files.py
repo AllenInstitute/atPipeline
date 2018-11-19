@@ -41,7 +41,7 @@ def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
     firstsection = 1
-    lastsection = 2
+    lastsection = 23
 
     render_host = "W10DTMJ03EG6Z.corp.alleninstitute.org"
 

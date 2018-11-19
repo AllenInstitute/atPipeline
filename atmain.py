@@ -27,7 +27,7 @@ if __name__ == '__main__':
     for session in sessions:
         sessionFolders.append(os.path.join(dataRootFolder, "raw", "data", ribbons[0], session))
     startSection = 1
-    endSection   = 24
+    endSection   = 6
 
     #Process with what?
     dockerContainer = "renderapps_multchan"
