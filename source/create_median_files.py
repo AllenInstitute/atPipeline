@@ -2,58 +2,57 @@ import os
 import json
 import sys
 import subprocess
-import platform
 import posixpath
 import atutils
 import timeit
 
-def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject, prefixPath):
+def run(p, sessionFolder):
 
-    [dataRootFolder, ribbon, session] = atutils.parse_session_folder(sessionFolder)
+    print ("Processing session folder: " + sessionFolder)
+    [projectroot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
 
     #Output directories
-    median_dir       = os.path.join("%s"%dataRootFolder, "processed", "medians")
-    median_json       = os.path.join(median_dir, "median_%s_%s_%d_%d.json"%(ribbon, session, firstsection, lastsection))
+    median_dir       = os.path.join("%s"%projectroot, "processed", "medians")
+    median_json       = os.path.join(median_dir, "median_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
+    #Make sure output folder exist
+    if os.path.isdir(median_dir) == False:
+       os.mkdir(median_dir)
 
     #stacks
     acq_stack        = "ACQ_Session%d"%(session)
     median_stack     = "MED_Session%d"%(session)
 
-    #Make sure output folder exist
-    if os.path.isdir(median_dir) == False:
-       os.mkdir(median_dir)
+    renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
+    renderProject     = atutils.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+
+
 
     with open(atutils.mediantemplate) as json_data:
          med = json.load(json_data)
 
-    atutils.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, atutils.toDockerMountedPath(median_dir, prefixPath), ribbon*100 + firstsection, ribbon*100 + lastsection, True)
+    atutils.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, atutils.toDockerMountedPath(median_dir, p.prefixPath), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
 
-    #Run =============
-    cmd = "docker exec " + dockerContainer + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
+
+    cmd = "docker exec " + p.rpaContainer
+	cmd = cmd + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
     cmd = cmd + " --render.port 80"
-    cmd = cmd + " --input_json %s"%(atutils.toDockerMountedPath(median_json,  prefixPath))
+    cmd = cmd + " --input_json %s"%(atutils.toDockerMountedPath(median_json,  p.prefixPath))
+	
+    #Run =============
     print ("Running: " + cmd)
 
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for line in p.stdout.readlines():
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in proc.stdout.readlines():
         print (line)
+
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
-    firstsection = 0
-    lastsection = 23
 
-    render_host = "OSXLTSG3QP.local"
+    p = atutils.ATDataIni('..\\Tottes.ini')
 
-    prefixPath = "/Users/synbio/Documents"
-    sessionFolder = os.path.join(prefixPath, "data/M33/raw/data/Ribbon0004/session01")
+    for sessionFolder in p.sessionFolders:
+        run(p, sessionFolder)
 
-    dockerContainer = "renderapps_multchan"
-    renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = atutils.RenderProject("ATExplorer", render_host, renderProjectName)
-
-    projectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-    run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject, prefixPath)
-
-    timeEnd = timeit.default_timer()
-    print("Elapsed time in time create_median_files: " + str(timeEnd - timeStart))
+    timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
+    print("Elapsed time: " + timeDuration + " minutes")

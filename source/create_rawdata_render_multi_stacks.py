@@ -1,38 +1,29 @@
 import os
-import time
 import json
 import sys
 import subprocess
-import platform
 import posixpath
 import atutils
+import timeit
 
-def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject, prefixPath):
+def run(p, sessionFolder):
 
-    [projectroot, ribbon,session] = atutils.parse_session_folder(sessionFolder)
-    print  ("Project root folder: " + projectroot)
+    print ("Processing session folder: " + sessionFolder)
+    [projectroot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
 
-    for sectnum in range(firstsection,lastsection+1):
+
+    renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
+    renderProject     = atutils.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+
+    for sectnum in range(p.firstSection, p.lastSection + 1):
         print("Processing section: " + str(sectnum))
 
         #State table file
         statetablefile = projectroot + os.path.join("scripts", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
 
-        #Example
-        #docker exec renderapps python -m renderapps.dataimport.create_fast_stacks_multi
-        #--render.host localhost
-        #--render.client_scripts /shared/render/render-ws-java-client/src/main/scripts
-        #--render.port 8080
-        #--render.memGB 5G
-        #--log_level INFO
-        #--statetableFile /data/test
-        #--render.project test_project
-        #--projectDirectory /data/M33
-        #--outputStackPrefix ACQ_Session01
-        # --render.owner test
-
         #upload acquisition stacks
-        cmd = "docker exec " + dockerContainer + " python -m renderapps.dataimport.create_fast_stacks_multi"
+        cmd = "docker exec " + p.rpaContainer
+        cmd = cmd + " python -m renderapps.dataimport.create_fast_stacks_multi"
         cmd = cmd + " --render.host %s"        %renderProject.host
         cmd = cmd + " --render.owner %s "      %renderProject.owner
         cmd = cmd + " --render.project %s"     %renderProject.name
@@ -40,30 +31,25 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject
         cmd = cmd + " --render.port 8080"
         cmd = cmd + " --render.memGB 5G"
         cmd = cmd + " --log_level INFO"
-        cmd = cmd + " --statetableFile %s"%(atutils.toDockerMountedPath(statetablefile,  prefixPath))
-        cmd = cmd + " --projectDirectory %s"%(atutils.toDockerMountedPath(projectroot,  prefixPath))
+        cmd = cmd + " --statetableFile %s"%(atutils.toDockerMountedPath(statetablefile,  p.prefixPath))
+        cmd = cmd + " --projectDirectory %s"%(atutils.toDockerMountedPath(projectroot,   p.prefixPath))
         cmd = cmd + " --outputStackPrefix ACQ_"
+        
+		#Run =============
         print ("Running: " + cmd)
 
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        for line in p.stdout.readlines():
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in proc.stdout.readlines():
             print (line)
 
 
 if __name__ == "__main__":
+    timeStart = timeit.default_timer()
 
-    firstsection = 0
-    lastsection = 23
+    p = atutils.ATDataIni('..\\Tottes.ini')
 
-    prefixPath = "/Users/synbio/Documents"
-    sessionFolder = os.path.join(prefixPath, "data/M33/raw/data/Ribbon0004/session01")
+    for sessionFolder in p.sessionFolders:
+        run(p, sessionFolder)
 
-    dockerContainer = "renderapps_multchan"
-    renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-    host = "W10DTMJ03EG6Z.corp.alleninstitute.org"
-    #host = OSXLTSG3QP.local
-
-    renderProject     = atutils.RenderProject("ATExplorer", host, renderProjectName)
-
-    run(sessionFolder, firstsection, lastsection, dockerContainer, renderProject, prefixPath)
-    print ("done")
+    timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
+    print("Elapsed time: " + timeDuration + " minutes")
