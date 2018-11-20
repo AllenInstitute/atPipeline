@@ -101,7 +101,6 @@ def savestitchingjson(template, outfile, owner, project, flatfield_stack, stitch
     dump_json(template, outfile)
 
 
-
 def main():
     pass
 

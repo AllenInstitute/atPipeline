@@ -10,7 +10,7 @@ def run(sessionFolder, firstsection, lastsection, dockerContainer, prefixPath):
     [projectroot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
     print ("Processing session folder: " + sessionFolder)
 
-    for sectnum in range(firstsection, lastsection+1):
+    for sectnum in range(firstsection, lastsection + 1):
         print("Processing section: " + str(sectnum))
 
         #create state table file name

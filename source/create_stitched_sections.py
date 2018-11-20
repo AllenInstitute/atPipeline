@@ -7,7 +7,7 @@ import atutils
 import timeit
 import time
 
-def run(firstsection, lastsection, sessionFolder, renderProject, prefixPath):
+def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject, prefixPath):
 
     [dataRootFolder, ribbon, session] = atutils.parse_session_folder(sessionFolder)
 
@@ -25,7 +25,7 @@ def run(firstsection, lastsection, sessionFolder, renderProject, prefixPath):
     stitched_stack   = "STI_FF_Session%d"%(session)
 
 	#Create json files and start stitching...
-    for sectnum in range(firstsection -1, lastsection):
+    for sectnum in range(firstsection, lastsection + 1):
         z = ribbon*100 + sectnum
 
         with open(atutils.stitchingtemplate) as json_data:
@@ -34,8 +34,9 @@ def run(firstsection, lastsection, sessionFolder, renderProject, prefixPath):
         stitching_json    = os.path.join(stitching_dir, "flatfield""_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))
         atutils.savestitchingjson(stitching_template, stitching_json, renderProject.owner, renderProject.name, flatfield_stack, stitched_stack, z)
 
-
-        cmd = "docker exec atmodules java -cp ./target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
+        cmd = "docker exec "
+        cmd = cmd + dockerContainer
+        cmd = cmd + " java -cp ./target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
         cmd = cmd + " --input_json %s"%(atutils.toDockerMountedPath(stitching_json, prefixPath))
 
         #Run =============
@@ -49,17 +50,18 @@ if __name__ == "__main__":
 
     timeStart = timeit.default_timer()
 
-    firstsection = 1
+    firstsection = 0
     lastsection = 23
 
     render_host     = "W10DTMJ03EG6Z.corp.alleninstitute.org"
+    dockerContainer = atmodules
     prefixPath      = "e:\\Documents"
     sessionFolder   = os.path.join(prefixPath, "data\\M33\\raw\\data\\Ribbon0004\\session01")
 
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
     renderProject     = atutils.RenderProject("ATExplorer", render_host, renderProjectName)
 
-    run(firstsection, lastsection, sessionFolder, renderProject, prefixPath)
+    run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject, prefixPath)
 
     timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
     print("Elapsed time in create_stitched_sections.py: " + timeDuration + " minutes")
