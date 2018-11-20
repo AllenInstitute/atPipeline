@@ -23,7 +23,7 @@ def run(firstsection, lastsection, sessionFolder, dockerContainer, renderProject
        os.mkdir(flatfield_dir)
 
 	#Create json files and apply median.
-    for sectnum in range(firstsection, lastsection):
+    for sectnum in range(firstsection, lastsection + 1):
 
         with open(atutils.flatfieldtemplate) as json_data:
              ff = json.load(json_data)
