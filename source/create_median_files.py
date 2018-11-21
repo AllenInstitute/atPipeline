@@ -46,8 +46,8 @@ def run(p, sessionFolder):
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
-
-    p = atutils.ATDataIni('..\\Tottes.ini')
+    f = os.path.join('..', 'ATData_params.ini')
+    p = atutils.ATDataIni(f)
 
     for sessionFolder in p.sessionFolders:
         run(p, sessionFolder)
