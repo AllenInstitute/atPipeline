@@ -14,6 +14,7 @@ def run(p, sessionFolder):
     #Output directories
     median_dir       = os.path.join("%s"%projectroot, "processed", "medians")
     median_json       = os.path.join(median_dir, "median_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
+
     #Make sure output folder exist
     if os.path.isdir(median_dir) == False:
        os.mkdir(median_dir)
@@ -25,19 +26,16 @@ def run(p, sessionFolder):
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
     renderProject     = atutils.RenderProject("ATExplorer", p.renderHost, renderProjectName)
 
-
-
     with open(atutils.mediantemplate) as json_data:
          med = json.load(json_data)
 
     atutils.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, atutils.toDockerMountedPath(median_dir, p.prefixPath), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
 
-
     cmd = "docker exec " + p.rpaContainer
-	cmd = cmd + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
+    cmd = cmd + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
     cmd = cmd + " --render.port 80"
     cmd = cmd + " --input_json %s"%(atutils.toDockerMountedPath(median_json,  p.prefixPath))
-	
+
     #Run =============
     print ("Running: " + cmd)
 
