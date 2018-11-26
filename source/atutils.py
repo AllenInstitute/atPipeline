@@ -119,12 +119,13 @@ def saveflatfieldjson(template, outFile, render_host, owner, project, acq_stack,
     template['close_stack']       = close_stack
     dump_json(template, outFile)
 
-def savestitchingjson(template, outfile, owner, project, flatfield_stack, stitched_stack, sectnum):
+def savestitchingjson(template, outfile, owner, project, flatfield_stack, stitched_stack, sectnum, render_host):
     template['owner']                  = owner
     template['project']                = project
     template['stack']                  = flatfield_stack
     template['outputStack']            = stitched_stack
     template['section']                = sectnum
+    template['baseDataUrl']            = "http://%s/render-ws/v1"%(render_host)
     dump_json(template, outfile)
 
 

@@ -34,7 +34,7 @@ def run(p, sessionFolder):
         stitching_json    = os.path.join(stitching_dir, "flatfield""_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))
         z = ribbon*100 + sectnum
 
-        atutils.savestitchingjson(stitching_template, stitching_json, renderProject.owner, renderProject.name, flatfield_stack, stitched_stack, z)
+        atutils.savestitchingjson(stitching_template, stitching_json, renderProject.owner, renderProject.name, flatfield_stack, stitched_stack, z, p.renderHost)
 
         cmd = "docker exec " + p.atmContainer
         cmd = cmd + " java -cp ./target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
