@@ -12,6 +12,8 @@ import posixpath
 import sys
 import json
 import platform
+import configparser
+import ast
 
 #Some hardcoded paths..
 templates_folder_mac = "/Users/synbio/ATExplorer/ThirdParty/atPipeline/templates"
@@ -26,6 +28,31 @@ else:
 mediantemplate    = os.path.join(templates_folder, "median.json")
 stitchingtemplate = os.path.join(templates_folder, "stitching.json")
 flatfieldtemplate = os.path.join(templates_folder, "flatfield.json")
+
+class ATDataIni:
+      def __init__(self, iniFile):
+          config = configparser.ConfigParser()
+          config.read(iniFile)
+          ini = config['GENERAL']
+          self.renderProjectOwner = ini['RENDER_PROJECT_OWNER']
+
+          #What data to process??
+          self.prefixPath         = ini['PREFIX_PATH']
+          self.dataRootFolder     = ini['DATA_ROOT_FOLDER']
+          self.dataRootFolder     = os.path.join(self.prefixPath, self.dataRootFolder)
+
+          #Process with what?
+          self.rpaContainer       = ini['RENDER_PYTHON_APPS_CONTAINER']
+          self.atmContainer       = ini['AT_MODULES_CONTAINER']
+          self.renderHost         = ini['RENDER_HOST']
+          self.ribbons            = ast.literal_eval(ini['RIBBONS'])
+          self.sessions           = ast.literal_eval(ini['SESSIONS'])
+          self.firstSection       = int(ini['START_SECTION'])
+          self.lastSection        = int(ini['END_SECTION'])
+          self.sessionFolders     = []
+
+          for session in self.sessions:
+              self.sessionFolders.append(os.path.join(self.dataRootFolder, "raw", "data", self.ribbons[0], session))
 
 class RenderProject:
     def __init__(self, owner, host, name):
@@ -92,14 +119,14 @@ def saveflatfieldjson(template, outFile, render_host, owner, project, acq_stack,
     template['close_stack']       = close_stack
     dump_json(template, outFile)
 
-def savestitchingjson(template, outfile, owner, project, flatfield_stack, stitched_stack, sectnum):
+def savestitchingjson(template, outfile, owner, project, flatfield_stack, stitched_stack, sectnum, render_host):
     template['owner']                  = owner
     template['project']                = project
     template['stack']                  = flatfield_stack
     template['outputStack']            = stitched_stack
     template['section']                = sectnum
+    template['baseDataUrl']            = "http://%s/render-ws/v1"%(render_host)
     dump_json(template, outfile)
-
 
 
 def main():

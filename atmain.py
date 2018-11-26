@@ -9,44 +9,33 @@ import create_state_tables
 import create_rawdata_render_multi_stacks
 import create_median_files
 import create_flatfield_corrected_data
+import create_stitched_sections
 import timeit
 
 if __name__ == '__main__':
     timeStart = timeit.default_timer()
+    p = atutils.ATDataIni('Tottes.ini')
 
-    #What data to process??
-    prefixPath = "e:\\Documents"
-    dataRootFolder = os.path.join(prefixPath, "data/M33")
-    ribbons = ["Ribbon0004"]
-    sessions = ["Session01",
-                "Session02",
-                "Session03"
-                ]
-
-    sessionFolders = []
-    for session in sessions:
-        sessionFolders.append(os.path.join(dataRootFolder, "raw", "data", ribbons[0], session))
-    startSection = 1
-    endSection   = 6
-
-    #Process with what?
-    dockerContainer = "renderapps_multchan"
-
-    #Render info
-    renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolders[0])
-    renderProject  = atutils.RenderProject("ATExplorer", "W10DTMJ03EG6Z.corp.alleninstitute.org", renderProjectName)
-    for sessionFolder in sessionFolders:
+    for sessionFolder in p.sessionFolders:
         #Start with the creation of state table files
-        create_state_tables.run(sessionFolder, startSection, endSection, dockerContainer, prefixPath)
+        print("Creating statetables for session: " + sessionFolder)
+        create_state_tables.run(p, sessionFolder)
 
         #Create Renderstacks (multi) for the raw data
-        create_rawdata_render_multi_stacks.run(sessionFolder, startSection, endSection, dockerContainer, renderProject, prefixPath)
+        print("Creating ACQ Stacks for session: " + sessionFolder)
+        create_rawdata_render_multi_stacks.run(p, sessionFolder)
 
         #Calculate median files
-        create_median_files.run(startSection, endSection, sessionFolder, dockerContainer, renderProject, prefixPath)
+        print("Calculating Median Files for session: " + sessionFolder)
+        create_median_files.run(p, sessionFolder)
 
-        #Calculate median files
-        create_flatfield_corrected_data.run(startSection, endSection, sessionFolder, dockerContainer, renderProject, prefixPath)
+        #Creating Flatfiled corrected data
+        print("Creating FlatField corrected data for session: " + sessionFolder)
+        create_flatfield_corrected_data.run(p, sessionFolder)
 
-    timeEnd = timeit.default_timer()
-    print("Elapsed time: " + str((timeEnd - timeStart)/60.0) + " minutes" )
+        #Stitch the data
+        print("Stitching data for session: " + sessionFolder)
+        create_stitched_sections.run(p, sessionFolder)
+
+    timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
+    print("Elapsed time: " + timeDuration + " minutes")
