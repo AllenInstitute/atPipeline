@@ -21,7 +21,7 @@ def run(p, sessionFolder):
     acq_stack        = "ACQ_Session%d"%(session)
     median_stack     = "MED_Session%d"%(session)
     flatfield_stack  = "FF_Session%d"%(session)
-    stitched_stack   = "STI_FF_Session%d"%(session)
+    stitched_stack   = "STI_Session%d"%(session)
 
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
     renderProject     = atutils.RenderProject("ATExplorer", p.renderHost, renderProjectName)

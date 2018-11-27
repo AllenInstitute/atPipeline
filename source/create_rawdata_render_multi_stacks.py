@@ -27,7 +27,7 @@ def run(p, sessionFolder):
         cmd = cmd + " --render.host %s"        %renderProject.host
         cmd = cmd + " --render.owner %s "      %renderProject.owner
         cmd = cmd + " --render.project %s"     %renderProject.name
-        cmd = cmd + " --render.client_scripts /shared/render/render-ws-java-client/src/main/scripts"
+        cmd = cmd + " --render.client_scripts %s" %p.clientScripts
         cmd = cmd + " --render.port 8080"
         cmd = cmd + " --render.memGB 5G"
         cmd = cmd + " --log_level INFO"
