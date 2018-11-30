@@ -32,21 +32,21 @@ def run(p, sessionFolder):
 	# docker commands
 	cmd = "docker exec " + p.rpaContainer
 	cmd = cmd + " python -m renderapps.materialize.make_downsample_image_stack_multi"
-	cmd = cmd + " --render.port %s"%p.port
-	cmd = cmd + " --render.host %s"%renderProject.host
-	cmd = cmd + " --render.client_scripts %s"%p.clientScripts
-	cmd = cmd + " --render.memGB %s"%p.memGB
-	cmd = cmd + " --render.log_level %s"%p.logLevel
-	cmd = cmd + " --render.project %s"%renderProject.name
-	cmd = cmd + " --render.owner %s"%renderProject.owner
-	cmd = cmd + " --input_stack %s"%dropped_dapi_Stack
-	cmd = cmd + " --output_stack %s"%lowres_stack
-	cmd = cmd + " --image_directory %s"%(atutils.toDockerMountedPath(downsample_dir, p.prefixPath))
-	cmd = cmd + " --pool_size %s"%p.poolSize
-	cmd = cmd + " --scale %s"%p.scale
-	cmd = cmd + " --minZ %s"%firstRibbon*100
-	cmd = cmd + " --maxZ %s"%((lastRibbon+1)*100 - 1)
-	cmd = cmd + " --numsectionsfile %s"%(atutils.toDockerMountedPath(numsections_file, p.prefixPath))
+	cmd = cmd + " --render.port %s"								%p.port
+	cmd = cmd + " --render.host %s"								%renderProject.host
+	cmd = cmd + " --render.client_scripts %s"					%p.clientScripts
+	cmd = cmd + " --render.memGB %s"							%p.memGB
+	cmd = cmd + " --log_level %s"						%p.logLevel
+	cmd = cmd + " --render.project %s"							%renderProject.name
+	cmd = cmd + " --render.owner %s"							%renderProject.owner
+	cmd = cmd + " --input_stack %s"								%dropped_dapi_Stack
+	cmd = cmd + " --output_stack %s"							%lowres_stack
+	cmd = cmd + " --image_directory %s"							%(atutils.toDockerMountedPath(downsample_dir, p.prefixPath))
+	cmd = cmd + " --pool_size %s"								%p.poolSize
+	cmd = cmd + " --scale %s"									%p.scale
+	cmd = cmd + " --minZ %s"									%(firstRibbon*100)
+	cmd = cmd + " --maxZ %s"									%((lastRibbon+1)*100 - 1)
+	cmd = cmd + " --numsectionsfile %s"							%(atutils.toDockerMountedPath(numsections_file, p.prefixPath))
 
 
 	# Run =============
@@ -60,7 +60,7 @@ def run(p, sessionFolder):
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
-    f = os.path.join('..', 'ATData_params.ini')
+    f = os.path.join('..', 'ATData_template.ini')
     p = atutils.ATDataIni(f)
 
     for sessionFolder in p.sessionFolders:

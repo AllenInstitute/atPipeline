@@ -63,6 +63,12 @@ class ATDataIni:
           self.distance           = int(align['DISTANCE'])
           self.deltaZ             = int(align['DELTAZ'])
           self.minZ               = int(align['MINZ'])
+          self.siftMin            = float(align['SIFTMIN'])
+          self.siftMax            = float(align['SIFTMAX'])
+          self.siftSteps          = int(align['SIFTSTEPS'])
+          self.renderScale        = float(align['RENDERSCALE'])
+
+
 
           for session in self.sessions:
               self.sessionFolders.append(os.path.join(self.dataRootFolder, "raw", "data", self.ribbons[0], session))
