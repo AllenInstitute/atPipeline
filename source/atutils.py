@@ -28,35 +28,43 @@ else:
 mediantemplate    = os.path.join(templates_folder, "median.json")
 stitchingtemplate = os.path.join(templates_folder, "stitching.json")
 flatfieldtemplate = os.path.join(templates_folder, "flatfield.json")
+def toBool(v):
+  return  v.lower() in ("yes", "true", "t", "1")
 
 class ATDataIni:
       def __init__(self, iniFile):
           config = configparser.ConfigParser()
           config.read(iniFile)
-          ini = config['GENERAL']
+          general= config['GENERAL']
           align = config['ALIGN']
-          self.renderProjectOwner = ini['RENDER_PROJECT_OWNER']
+          self.renderProjectOwner = general['RENDER_PROJECT_OWNER']
 
           #What data to process??
-          self.prefixPath         = ini['PREFIX_PATH']
-          self.dataRootFolder     = ini['DATA_ROOT_FOLDER']
-          self.dataRootFolder     = os.path.join(self.prefixPath, self.dataRootFolder)
+          self.prefixPath      = general['PREFIX_PATH']
+          self.dataRootFolder  = general['DATA_ROOT_FOLDER']
+          self.dataRootFolder  = os.path.join(self.prefixPath, self.dataRootFolder)
 
           #Process with what?
-          self.rpaContainer       = ini['RENDER_PYTHON_APPS_CONTAINER']
-          self.atmContainer       = ini['AT_MODULES_CONTAINER']
-          self.renderHost         = ini['RENDER_HOST']
-          self.clientScripts      = ini['CLIENT_SCRIPTS']
-          self.port               = int(ini['PORT'])
-          self.memGB              = ini['MEM_GB']
-          self.logLevel           = ini['LOG_LEVEL']
-          self.ribbons            = ast.literal_eval(ini['RIBBONS'])
-          self.sessions           = ast.literal_eval(ini['SESSIONS'])
-          self.firstSection       = int(ini['START_SECTION'])
-          self.lastSection        = int(ini['END_SECTION'])
-          self.sessionFolders     = []
+          self.rpaContainer                     = general['RENDER_PYTHON_APPS_CONTAINER']
+          self.atmContainer                     = general['AT_MODULES_CONTAINER']
+          self.renderHost                       = general['RENDER_HOST']
+          self.clientScripts                    = general['CLIENT_SCRIPTS']
+          self.port                             = int(general['PORT'])
+          self.memGB                            = general['MEM_GB']
+          self.logLevel                         = general['LOG_LEVEL']
+          self.ribbons                          = ast.literal_eval(general['RIBBONS'])
+          self.sessions                         = ast.literal_eval(general['SESSIONS'])
+          self.sessionFolders                   = []
+          self.firstSection                     = int(general['START_SECTION'])
+          self.lastSection                      = int(general['END_SECTION'])
+          self.createStateTables                = toBool(general['CREATE_STATE_TABLES'])
+          self.createRawDataRenderMultiStacks   = toBool(general['CREATE_RAWDATA_RENDER_MULTI_STACKS'])
+          self.createMedianFiles                = toBool(general['CREATE_MEDIAN_FILES'])
+          self.createFlatFieldCorrectedData     = toBool(general['CREATE_FLATFIELD_CORRECTED_DATA'])
+          self.createStitchedSections           = toBool(general['CREATE_STITCHED_SECTIONS'])
+          self.dropStitchingMistakes            = toBool(general['DROP_STITCHING_MISTAKES'])
 
-          #alignment parameters
+          #Alignment parameters
           self.poolSize           = int(align['POOL_SIZE'])
           self.edgeThreshold      = int(align['EDGE_THRESHOLD'])
           self.scale              = float(align['SCALE'])
