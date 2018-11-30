@@ -34,6 +34,7 @@ class ATDataIni:
           config = configparser.ConfigParser()
           config.read(iniFile)
           ini = config['GENERAL']
+          align = config['ALIGN']
           self.renderProjectOwner = ini['RENDER_PROJECT_OWNER']
 
           #What data to process??
@@ -45,11 +46,23 @@ class ATDataIni:
           self.rpaContainer       = ini['RENDER_PYTHON_APPS_CONTAINER']
           self.atmContainer       = ini['AT_MODULES_CONTAINER']
           self.renderHost         = ini['RENDER_HOST']
+          self.clientScripts      = ini['CLIENT_SCRIPTS']
+          self.port               = int(ini['PORT'])
+          self.memGB              = ini['MEM_GB']
+          self.logLevel           = ini['LOG_LEVEL']
           self.ribbons            = ast.literal_eval(ini['RIBBONS'])
           self.sessions           = ast.literal_eval(ini['SESSIONS'])
           self.firstSection       = int(ini['START_SECTION'])
           self.lastSection        = int(ini['END_SECTION'])
           self.sessionFolders     = []
+
+          #alignment parameters
+          self.poolSize           = int(align['POOL_SIZE'])
+          self.edgeThreshold      = int(align['EDGE_THRESHOLD'])
+          self.scale              = float(align['SCALE'])
+          self.distance           = int(align['DISTANCE'])
+          self.deltaZ             = int(align['DELTAZ'])
+          self.minZ               = int(align['MINZ'])
 
           for session in self.sessions:
               self.sessionFolders.append(os.path.join(self.dataRootFolder, "raw", "data", self.ribbons[0], session))
@@ -129,6 +142,20 @@ def savestitchingjson(template, outfile, owner, project, flatfield_stack, stitch
     dump_json(template, outfile)
 
 
+def saveroughalignjson(template, outFile, render_host, owner, project, lowres_stack, lowres_pm_collection, roughaligned_stack, client, degree, nfirst, nlast, close_stack):
+    template['render']['host']    = render_host
+    template['render']['owner']   = owner
+    template['render']['project'] = project
+    template['input_stack']       = lowres_stack
+    template['pointmatch_collection_append1']  = lowres_pm_collection
+    template['pointmatch_collection_append2']  = lowres_pm_collection
+    template['output_stack']      = roughaligned_stack
+    template['degree']           = degree
+    template['nfirst']           = nfirst
+    template['nlast']           = nlast
+    template['client_scripts']  = client
+    template['close_stack']       = close_stack
+    dump_json(template, outFile)
 def main():
     pass
 

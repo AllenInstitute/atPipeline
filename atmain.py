@@ -10,6 +10,8 @@ import create_rawdata_render_multi_stacks
 import create_median_files
 import create_flatfield_corrected_data
 import create_stitched_sections
+import drop_stitching_mistakes
+
 import timeit
 
 if __name__ == '__main__':
@@ -22,8 +24,8 @@ if __name__ == '__main__':
         #create_state_tables.run(p, sessionFolder)
 
         #Create Renderstacks (multi) for the raw data
-        print("Creating ACQ Stacks for session: " + sessionFolder)
-        create_rawdata_render_multi_stacks.run(p, sessionFolder)
+        #print("Creating ACQ Stacks for session: " + sessionFolder)
+        #create_rawdata_render_multi_stacks.run(p, sessionFolder)
 
         #Calculate median files
         #print("Calculating Median Files for session: " + sessionFolder)
@@ -36,6 +38,10 @@ if __name__ == '__main__':
         #Stitch the data
         #print("Stitching data for session: " + sessionFolder)
         #create_stitched_sections.run(p, sessionFolder)
+
+        #Drop stitching mistakes
+        drop_stitching_mistakes.run(p, sessionFolder)
+
 
     timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
     print("Elapsed time: " + timeDuration + " minutes")
