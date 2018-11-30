@@ -18,8 +18,6 @@ def run(p, sessionFolder):
        os.mkdir(stitching_dir)
 
     #stacks
-    acq_stack        = "ACQ_Session%d"%(session)
-    median_stack     = "MED_Session%d"%(session)
     flatfield_stack  = "FF_Session%d"%(session)
     stitched_stack   = "STI_Session%d"%(session)
 
