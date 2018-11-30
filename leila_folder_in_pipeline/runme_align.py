@@ -4,23 +4,23 @@ import time
 
 #Params to change
 #render params
-host = "ibs-forrestc-ux1"
-client_scripts = "/var/www/render/render-ws-java-client/src/main/scripts"
+host = "OSXLTSG3QP.local"
+client_scripts = "/shared/render/render-ws-java-client/src/main/scripts"
 port = 80
 memGB = "5G"
 loglevel = "INFO"
 
 #project params
-owner = "Antibody_testing_2018"
-project = "M367240_B_SSTPV_Lamin_B1"
-firstribbon = 5
-lastribbon = 5
-ribbon = 'R5'
+owner = "ATExplorer"
+project = "M33"
+firstribbon = 4
+lastribbon = 4
+ribbon = 'R4'
 
 #stack params
 acquisition_Stack = "ACQ_S01_DAPI_1"
 stitched_dapi_Stack = "STI_S01_DAPI_1"
-dropped_dapi_Stack = "DRP_STI_S01_DAPI_1"
+dropped_dapi_Stack = "DRP_STI_Session1"
 #channelnames = ["3_DAPI_3", "3_VGlut1", "3_GABA","3_Synapsin1"]
 #channelnames = ["2_GABA", "2_Synapsin1", "2_SAP102_2", "2_DAPI_2"]
 #channelnames = ["3_DAPI_3", "3_GABA","3_Synapsin" , "3_MBP"]
@@ -60,20 +60,14 @@ numsectionsfile = "%s/numsections"%downsample_dir
 
 
 #stacks
-#lowres_stack = "Stitched_DAPI_1_Lowres_%d_to_%d"%(firstribbon,lastribbon)
 lowres_stack = "LR_DRP_STI_S01_DAPI_1_%s"%(ribbon)
-#lowres_stack = "Stitched_DAPI_1_Lowres_R4"
 lowres_roughalign_stack = "RA_LR_DRP_STI_S01_DAPI_1_%s"%(ribbon)
-#lowres_pm_collection = "%s_%d_to_%d_DAPI_1_lowres" %(project,firstribbon,lastribbon)
 lowres_pm_collection = "%s_DAPI_Lowres_3D_%s"%(project,ribbon)
-#lowres_pm_collection = "%s_DAPI_lowres_R4"%(project)
-#lowres_pm_collection2 = "%s_DAPI_lowres_R5"%(project)
-#highres_pm_collection = "%s_DAPI_1_highres_R2"%(project)
 highres_pm_collection = "%s_DAPI_1_3D_%s"%(project,ribbon)
 roughaligned_stack = "RA_%s"%lowres_stack
 
 #docker string
-d_str = "docker exec renderapps_develop "
+d_str = "docker exec renderapps_multchan "
 render_str = "--render.host %s --render.client_scripts %s --render.port %d --render.memGB %s --log_level %s "%(host,client_scripts,port,memGB,loglevel)
 project_str = "--render.project %s --render.owner %s" %(project, owner)
 dropstitchmistakes_str = "--prestitchedStack %s --poststitchedStack %s --outputStack %s --jsonDirectory %s --edge_threshold %d --pool_size %d --distance_threshold %d"%(acquisition_Stack,stitched_dapi_Stack,dropped_dapi_Stack,dropped_dir,edge_threshold,pool_size,distance)
@@ -95,10 +89,10 @@ print cmd_drop
 #downsample
 cmd_downsample = "%s python -m renderapps.materialize.make_downsample_image_stack %s %s %s"%(d_str,render_str,project_str,downsample_str)
 print cmd_downsample
-#for i in range(0,2):
-#    os.system(cmd_downsample)
+for i in range(0,2):
+    os.system(cmd_downsample)
 #due to pool size issue, it doesn't always finish in the first round two runs are usually enough. need to update code to deal with this bug
-#exit(0)
+exit(0)
 
 #calculate the number of sections
 f = open(numsectionsfile)
@@ -210,111 +204,4 @@ for ch in channelnames:
 
 #exit(0)
 
-
-##############FINE ALIGNMENT#################forre
-
-#apply scale parameter
-#cmd_sc = "%s python -m renderapps.stack.apply_global_affine_to_stack %s %s "%(d_str,render_str,project_str)
-#cmd_sc = cmd_sc + "--input_stack Rough_Aligned_1_DAPI_1 --output_stack Rough_Aligned_DAPI_1_fullscale "
-#cmd_sc = cmd_sc + "--M00 20.0 --M11 20.0 "
-#print cmd_sc
-#os.system(cmd_sc)
-#exit(0)
-
-#consolidate
-cmd_cons = "%s python -m renderapps.stack.consolidate_render_transforms %s %s "%(d_str,render_str,project_str)
-cmd_cons = cmd_cons + "--stack RA00_STI_S01_DAPI_1_R5 --output_stack CONS_RA00_STI_S01_DAPI_1_R5 --postfix CONS  "
-cmd_cons = cmd_cons + "--output_directory %s/processed/json_tilespecs_consolidation_master --pool_size 20"%project_root_dir
-print cmd_cons
-os.system(cmd_cons)
-exit(0)
-
-#2D point matches
-delta = 150
-minZ = 0
-maxZ = 5
-#maxZ = numberofsections
-pm2dstack = "Rough_Aligned_1_DAPI_1_R0"
-highres_pm_collection_2D = "%s_DAPI_1_highres_2D_R0"%(project)
-
-twoD_str = "--minZ %d --maxZ %d --delta %d --dataRoot %s --stack %s --matchCollection %s"%(minZ, maxZ, delta, rootdir, pm2dstack, highres_pm_collection_2D)
-cmd_2D = "%s python -m renderapps.stitching.create_montage_pointmatches_in_place %s %s %s"%(d_str, render_str,project_str, twoD_str)
-print cmd_2D
-#os.system(cmd_2D)
-#exit(0)
-
-#3D point matches
-#json_file = "/nas4/data/%s/processed/tilepairfiles1/tilepairs-10-%d-%d-nostitch-EDIT.json"%(project,minZ,maxZ)
-#cmd_ex1 = "/pipeline/forrestrender/render-ws-spark-client/src/main/scripts/run_tilepair_only.sh --owner %s --project %s --stack Rough_Aligned_1_DAPI_1_deconv_masked_CONS --minZ %d --maxZ  %d --collection %s --deltaZ 10 --renderWithFilter true"%#(owner,project,minZ,maxZ,highres_pm_collection)
-#cmd_ex2 = "/pipeline/forrestrender/render-ws-spark-client/src/main/scripts/run_sift_on_tilepair_client.sh --owner %s --project %s --stack Rough_Aligned_1_DAPI_1_deconv_masked_CONS --minZ %d --maxZ %d --collection %s --deltaZ 10  --jsonFile %s --renderWithFilter true --siftsteps 3 --#renderScale .5 --SIFTminScale .5 --SIFTmaxScale .8 --mininliers 8"%(owner,project,minZ, maxZ, highres_pm_collection,json_file)
-#print json_file
-#os.system(cmd_ex1)
-#os.system(cmd_ex2)
-
-mychannel = "DAPI_1"
-
-beg_indices = [0]
-end_indices = [5]
-
-for i in range(0, len(beg_indices)):
-	minZ = beg_indices[i]
-	maxZ = end_indices[i]
-	json_file = "/nas5/data/%s/processed/tilepairfiles1/tilepairs-10-%d-%d-nostitch-EDIT.json"%(project,minZ,maxZ)
-	cmd_ex1 = "%s/run_tilepair_only.sh --owner %s --project %s --stack Rough_Aligned_1_DAPI_1_R0_CONS --minZ %d --maxZ  %d --collection %s_%s --deltaZ 10 --renderWithFilter true --jsonFile %s"%(pm_script_dir,owner,project,minZ,maxZ,highres_pm_collection,mychannel,json_file)
-	cmd_ex2 = "%s/run_sift_on_tilepair_client.sh --owner %s --project %s --stack Rough_Aligned_1_DAPI_1_R0_CONS --minZ %d --maxZ %d --collection %s_%s --deltaZ 10  --jsonFile %s --renderWithFilter true --siftsteps 5 --renderScale .5 --SIFTminScale .5 --SIFTmaxScale .8 --mininliers 8"%(pm_script_dir,owner,project,minZ, maxZ, highres_pm_collection,mychannel,json_file)
-	print json_file
-	print cmd_ex1
-	print cmd_ex2
-	#os.system(cmd_ex1)
-	#os.system(cmd_ex2)
-
-#exit(0)
-############apply fine alignment
-	
-
-for ch in channelnames:
-	#ch = "PSD95"
-	#if ch == "1_DAPI_1":
-        # 	print "Do Nothing"
-	#else:
-	cmdappalign = "docker exec renderapps_develop python -m renderapps.registration.apply_transforms_by_frame %s %s --cyclenumber 200 --alignedStack  Fine_Aligned_DAPI_1_R0 --inputStack  Rough_Aligned_%s_R0 --outputStack Fine_Aligned_%s_R0 --pool_size 20"%(render_str,project_str,ch,ch)
-        #cmdappalignbyID = "docker exec renderapps_develop python -m renderapps.registration.apply_transforms_by_tileId %s %s --alignedStack  Fine_Aligned_DAPI_1 --inputStack  Rough_Aligned_Deconvolved_%s --outputStack Fine_Aligned_Deconvolved_%s --pool_size 20"%(render_str,project_str,ch,ch)
-	
-	print cmdappalign
-	#print cmdappalignbyID
-	os.system(cmdappalign)
-	#os.system(cmdappalignbyID)
-exit(0)
-
-for ch in channelnames:
-	#if ch == "1_DAPI_1":
-	#	print "Do Nothing"
-	#else:
-	#ch = "PSD95"
-#for i in range (0,1):
-#	ch = "3_MBP"
-	cmdappalign = "docker exec renderapps_develop python -m renderapps.registration.apply_alignment_transform_from_registered_stack %s %s --prealigned_stack Rough_Aligned_1_DAPI_1_CONS --postaligned_stack  Fine_Aligned_DAPI_1 --source_stack  Rough_Aligned_registered_%s --output_stack Fine_Aligned_registered_%s --pool_size 20"%(render_str,project_str,ch,ch)
-        
-	
-	print cmdappalign
-	os.system(cmdappalign)
-
-
-
-
- 	cmdsetstackstate = "docker exec renderapps_smallvol python -m renderapps.stack.set_stack_metadata \
-                                       --render.host ibs-forrestc-ux1 \
-                                       --render.port 8080 \
-                                       --render.client_scripts /var/www/render/render-ws-java-client/src/main/scripts \
-                                       --render.memGB 5G \
-                                       --log_level INFO \
-                                       --render.project M246930_Scnn1a_4_f1 \
-                                       --render.owner Forrest \
-                                      --input_stack  Fine_Aligned_Deconvolved_%s \
-                                       --cycleNumber 200"%ch
-	os.system(cmdsetstackstate)
-
-
-
-exit(0)
 

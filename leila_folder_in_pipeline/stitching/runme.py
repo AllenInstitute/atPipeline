@@ -1,11 +1,11 @@
-import paramiko
+#import paramiko
 import os
 import time
 import json
 import sys
 sys.path.insert(0,'/pipeline/sharmi/allen_SB_code/celery/')
-from celery import Celery
-from tasks import run_celerycommand
+#from celery import Celery
+#from tasks import run_celerycommand
 
 def parse_project_directory(line):
 
@@ -143,13 +143,13 @@ def saveapplystitchingjson(appsti,applystitchingfile,owner, project, flatfield_s
 
 if __name__ == "__main__":
 
-	owner = "multchan"
+	owner = "ATExplorer"
 	mediantemplate = "template/median.json"
 	flatfieldtemplate = "template/flatfield.json"
 	deconvtemplate = "template/deconvolution.json"
 	stitchingtemplate = "template/stitching.json"
 	firstsection = 0
-	lastsection = 24
+	lastsection = 2
 	num_iter = 20
 	#bgrd_size = 50
 
@@ -157,7 +157,7 @@ if __name__ == "__main__":
 	
 	for i in range (0,1):
 
-                with open("/pipeline/leila/stitching/confirm_data2process") as f:
+                with open("/Users/synbio/ATExplorer/ThirdParty/atPipeline/leila_folder_in_pipeline/stitching/confirm_data2process") as f:
                         alldirnames = f.readlines()
 
                 for dirname in alldirnames:
