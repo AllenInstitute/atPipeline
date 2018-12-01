@@ -5,13 +5,15 @@
 
 import os
 import atutils
-import create_state_tables
-import create_rawdata_render_multi_stacks
-import create_median_files
-import create_flatfield_corrected_data
-import create_stitched_sections
-import drop_stitching_mistakes
-import timeit
+from . import source
+##import create_state_tables
+##import create_rawdata_render_multi_stacks
+##import create_median_files
+##import create_flatfield_corrected_data
+##import create_stitched_sections
+##import drop_stitching_mistakes
+##import create_lowres_stacks
+##import timeit
 
 if __name__ == '__main__':
     timeStart = timeit.default_timer()
@@ -47,6 +49,12 @@ if __name__ == '__main__':
         if p.dropStitchingMistakes == True:
            print("Stitching data for session: " + sessionFolder)
            drop_stitching_mistakes.run(p, sessionFolder)
+
+        #Create_lowres stacks
+        if p.createLowResStacks == True:
+           print("Create Lowres Stacks for Session: "+ sessionFolder)
+           create_lowres_stacks.run(p, sessionFolder)
+
 
 
     timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
