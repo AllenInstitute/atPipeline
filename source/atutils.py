@@ -63,6 +63,7 @@ class ATDataIni:
           self.createFlatFieldCorrectedData     = toBool(general['CREATE_FLATFIELD_CORRECTED_DATA'])
           self.createStitchedSections           = toBool(general['CREATE_STITCHED_SECTIONS'])
           self.dropStitchingMistakes            = toBool(general['DROP_STITCHING_MISTAKES'])
+          self.createLowResStacks               = toBool(general['CREATE_LOWRES_STACKS'])
 
           #Alignment parameters
           self.poolSize           = int(align['POOL_SIZE'])
@@ -75,7 +76,6 @@ class ATDataIni:
           self.siftMax            = float(align['SIFTMAX'])
           self.siftSteps          = int(align['SIFTSTEPS'])
           self.renderScale        = float(align['RENDERSCALE'])
-
 
 
           for session in self.sessions:
