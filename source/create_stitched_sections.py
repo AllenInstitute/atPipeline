@@ -27,7 +27,7 @@ def run(p, sessionFolder):
 	#Create json files and start stitching...
     for sectnum in range(p.firstSection, p.lastSection + 1):
 
-        with open(atutils.stitchingtemplate) as json_data:
+        with open(atutils.stitching_template) as json_data:
              stitching_template = json.load(json_data)
 
         stitching_json = os.path.join(stitching_dir, "flatfield""_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))

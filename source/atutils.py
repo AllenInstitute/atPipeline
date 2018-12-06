@@ -25,9 +25,10 @@ if platform.system() == "Windows":
 else:
    templates_folder = templates_folder_mac
 
-mediantemplate    = os.path.join(templates_folder, "median.json")
-stitchingtemplate = os.path.join(templates_folder, "stitching.json")
-flatfieldtemplate = os.path.join(templates_folder, "flatfield.json")
+median_template    = os.path.join(templates_folder, "median.json")
+stitching_template = os.path.join(templates_folder, "stitching.json")
+flatfield_template = os.path.join(templates_folder, "flatfield.json")
+deconvolution_template = os.path.join(templates_folder, "deconvolution.json")
 def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")
 
@@ -36,6 +37,7 @@ class ATDataIni:
           config = configparser.ConfigParser()
           config.read(iniFile)
           general= config['GENERAL']
+          deconv = config['DECONV']
           align = config['ALIGN']
           self.renderProjectOwner = general['RENDER_PROJECT_OWNER']
 
@@ -44,7 +46,7 @@ class ATDataIni:
           self.dataRootFolder  = general['DATA_ROOT_FOLDER']
           self.dataRootFolder  = os.path.join(self.prefixPath, self.dataRootFolder)
 
-          #Process with what?
+          #Process parameters
           self.rpaContainer                     = general['RENDER_PYTHON_APPS_CONTAINER']
           self.atmContainer                     = general['AT_MODULES_CONTAINER']
           self.renderHost                       = general['RENDER_HOST']
@@ -63,6 +65,12 @@ class ATDataIni:
           self.createFlatFieldCorrectedData     = toBool(general['CREATE_FLATFIELD_CORRECTED_DATA'])
           self.createStitchedSections           = toBool(general['CREATE_STITCHED_SECTIONS'])
           self.dropStitchingMistakes            = toBool(general['DROP_STITCHING_MISTAKES'])
+
+          #Deconvolution parameters
+          self.channels                         = ast.literal_eval(deconv['CHANNELS'])
+          self.bgrdSize                         = ast.literal_eval(deconv['BGRD_SIZE'])
+          self.scaleFactor                      = ast.literal_eval(deconv['SCALE_FACTOR'])
+          self.numIter                          = int(deconv['NUM_ITER'])
 
           #Alignment parameters
           self.poolSize           = int(align['POOL_SIZE'])
@@ -144,6 +152,20 @@ def saveflatfieldjson(template, outFile, render_host, owner, project, acq_stack,
     template['z_index']           = sectnum
     template['output_directory']  = flatfield_dir
     template['close_stack']       = close_stack
+    dump_json(template, outFile)
+
+def savedeconvjson(template,outFile,owner, project, flatfield_stack,deconv_stack,deconv_dir,sectnum,psf_file, num_iter,bgrd_size,scale_factor,close_stack):
+    template['render']['owner'] = owner
+    template['render']['project'] = project
+    template['input_stack'] = flatfield_stack
+    template['output_stack'] = deconv_stack
+    template['psf_file'] = psf_file
+    template['num_iter']=num_iter
+    template['bgrd_size'] = bgrd_size
+    template['z_index'] = sectnum
+    template['output_directory'] = deconv_dir  
+    template['scale_factor'] = scale_factor
+    template['close_stack'] = close_stack
     dump_json(template, outFile)
 
 def savestitchingjson(template, outfile, owner, project, flatfield_stack, stitched_stack, sectnum, render_host):

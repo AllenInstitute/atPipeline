@@ -60,7 +60,7 @@ def run(p, sessionFolder):
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
-    f = os.path.join('..', 'ATData_template.ini')
+    f = os.path.join('..', 'ATData.ini')
     p = atutils.ATDataIni(f)
 
     for sessionFolder in p.sessionFolders:

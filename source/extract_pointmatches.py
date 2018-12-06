@@ -24,7 +24,7 @@ def run(p, sessionFolder):
 	renderProject = atutils.RenderProject("ATExplorer", p.renderHost, renderProjectName)
 
 	#point match collections
-	lowres_pm_collection = "%s_DAPI_Lowres_3D"%renderProject.name
+	lowres_pm_collection = "%s_Lowres_3D"%renderProject.name
 
 	#get numsections
 	f = open(numsections_file)
@@ -65,7 +65,7 @@ def run(p, sessionFolder):
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
-    f = os.path.join('..', 'ATData_template.ini')
+    f = os.path.join('..', 'ATData.ini')
     p = atutils.ATDataIni(f)
 
     for sessionFolder in p.sessionFolders:
