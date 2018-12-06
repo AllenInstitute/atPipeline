@@ -31,7 +31,7 @@ def run(p, sessionFolder):
     #Create json files and apply median.
     for sectnum in range(p.firstSection, p.lastSection + 1):
 
-        with open(atutils.flatfieldtemplate) as json_data:
+        with open(atutils.flatfield_template) as json_data:
              ff = json.load(json_data)
 
         flatfield_json = os.path.join(flatfield_dir, "flatfield""_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))

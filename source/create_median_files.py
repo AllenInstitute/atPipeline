@@ -26,7 +26,7 @@ def run(p, sessionFolder):
     renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
     renderProject     = atutils.RenderProject("ATExplorer", p.renderHost, renderProjectName)
 
-    with open(atutils.mediantemplate) as json_data:
+    with open(atutils.median_template) as json_data:
          med = json.load(json_data)
 
     atutils.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, atutils.toDockerMountedPath(median_dir, p.prefixPath), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
