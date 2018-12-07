@@ -2,7 +2,7 @@ import os
 import sys
 import subprocess
 import posixpath
-import atutils
+import lib.atutils
 import timeit
 
 def run(p, sessionFolder):
@@ -29,7 +29,7 @@ def run(p, sessionFolder):
             cmd = cmd + " --session %d"%session
             cmd = cmd + " --section %d"%(sectnum)
             cmd = cmd + " --oneribbononly True"
-        
+
 		    #Run =============
             print ("Running: " + cmd)
 

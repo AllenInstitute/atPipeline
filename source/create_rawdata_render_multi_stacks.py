@@ -3,7 +3,7 @@ import json
 import sys
 import subprocess
 import posixpath
-import atutils
+import lib.atutils
 import timeit
 
 def run(p, sessionFolder):
@@ -34,7 +34,7 @@ def run(p, sessionFolder):
         cmd = cmd + " --statetableFile %s"%(atutils.toDockerMountedPath(statetablefile,  p.prefixPath))
         cmd = cmd + " --projectDirectory %s"%(atutils.toDockerMountedPath(projectroot,   p.prefixPath))
         cmd = cmd + " --outputStackPrefix ACQ_"
-        
+
 		#Run =============
         print ("Running: " + cmd)
 

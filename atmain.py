@@ -1,18 +1,6 @@
-#------------------------------------------------
-# Name:        atMain
-# Purpose:     Run multiple AT processing scripts
-#------------------------------------------------
-
 import os
-import atutils
-
-import create_state_tables
-import create_rawdata_render_multi_stacks
-import create_median_files
-import create_flatfield_corrected_data
-import create_stitched_sections
-import drop_stitching_mistakes
-import create_lowres_stacks
+from source import *
+import lib.atutils as atutils
 import timeit
 
 if __name__ == '__main__':

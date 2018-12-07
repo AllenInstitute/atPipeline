@@ -3,7 +3,7 @@ import json
 import sys
 import subprocess
 import posixpath
-import atutils
+import lib.atutils
 import timeit
 
 def run(p, sessionFolder):
@@ -46,7 +46,7 @@ def run(p, sessionFolder):
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
-    f = os.path.join('..', 'ATData_params.ini')
+    f = os.path.join('..', 'ATData.ini')
     p = atutils.ATDataIni(f)
 
     for sessionFolder in p.sessionFolders:
