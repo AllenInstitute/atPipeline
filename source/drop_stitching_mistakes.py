@@ -3,12 +3,12 @@ import json
 import sys
 import subprocess
 import posixpath
-import atutils
+import atutils as u
 import timeit
 
 def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
-    [projectroot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
+    [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
 	# output directories
     dropped_dir = "%s/processed/dropped" %(projectroot)
@@ -22,8 +22,8 @@ def run(p, sessionFolder):
     stitched_dapi_Stack     = "STI_Session%d"     %(session)
     dropped_dapi_Stack      = "DRP_STI_Session%d" %(session)
 
-    renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = atutils.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+    renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
+    renderProject     = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
 
     # command string
     cmd = "docker exec " + p.rpaContainer
@@ -38,7 +38,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --prestitchedStack %s"                    %(acquisition_Stack)
     cmd = cmd + " --poststitchedStack %s"                   %(stitched_dapi_Stack)
     cmd = cmd + " --outputStack %s"                         %(dropped_dapi_Stack)
-    cmd = cmd + " --jsonDirectory %s"                       %(atutils.toDockerMountedPath(dropped_dir, p.prefixPath))
+    cmd = cmd + " --jsonDirectory %s"                       %(u.toDockerMountedPath(dropped_dir, p.prefixPath))
     cmd = cmd + " --edge_threshold %d"                      %(p.edgeThreshold)
     cmd = cmd + " --pool_size %d"                           %(p.poolSize)
     cmd = cmd + " --distance_threshold %d"                  %(p.distance)
@@ -54,7 +54,7 @@ def run(p, sessionFolder):
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
     f = os.path.join('..', 'ATData.ini')
-    p = atutils.ATDataIni(f)
+    p = u.ATDataIni(f)
 
     for sessionFolder in p.sessionFolders:
         run(p, sessionFolder)

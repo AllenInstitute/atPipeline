@@ -1,16 +1,14 @@
 import os
-import json
-import sys
 import subprocess
 import posixpath
-import atutils
+import lib.atutils as u
 import timeit
 
 
 def run(p, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
-    [projectRoot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
+    [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     # output directories
     downsample_dir = "%s/processed/Low_res"%(projectRoot)
@@ -20,8 +18,8 @@ def run(p, sessionFolder):
     # stacks
     lowres_stack = "LR_DRP_STI_Session%d"%(session)
 
-    renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject = atutils.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+    renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
+    renderProject = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
 
     #point match collections
     lowres_pm_collection = "%s_Lowres_3D"%renderProject.name
@@ -34,24 +32,27 @@ def run(p, sessionFolder):
     # docker commands
     #Extract point matches
     cmd = "docker exec " + p.rpaContainer
-    cmd = cmd + " sh %s/test_spark.sh"        %(pm_script_dir)
-##    cmd = cmd + " --owner " + renderProject.owner
-##    cmd = cmd + " --port %s" %(p.port)
-##    cmd = cmd + " --host %s"                         %renderProject.host
-####    cmd = cmd + " --render.client_scripts %s"               %p.clientScripts
-####    cmd = cmd + " --render.memGB %s"                        %p.memGB
-####    cmd = cmd + " --render.log_level %s"                    %p.logLevel
-##    cmd = cmd + " --project %s"                      %renderProject.name
-##
-##    cmd = cmd + " --stack %s"                               %lowres_stack
-##    cmd = cmd + " --collection %s"                          %lowres_pm_collection
-##    cmd = cmd + " --minZ 0"
-##    cmd = cmd + " --maxZ %d"                                %numSections - 1)
-##    cmd = cmd + " --deltaZ %s"                              %p.deltaZ
-##    cmd = cmd + " --renderScale %s"                         %p.renderScale
-##    cmd = cmd + " --SIFTminScale %s"                        %p.siftMin
-##    cmd = cmd + " --SIFTmaxScale %s"                        %p.siftMax
-##    cmd = cmd + " --SIFTsteps %s"                           %p.siftSteps
+    cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
+    cmd = cmd + " --conf spark.default.parallelism=4750"
+    cmd = cmd + " --driver-memory 19g"
+    cmd = cmd + " --executor-memory 50g"
+    cmd = cmd + " --executor-cores 44"
+    cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
+    cmd = cmd + " --name PointMatchFull"
+    cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.0.1-SNAPSHOT-standalone.jar"
+    cmd = cmd + " --baseDataUrl http://ibs-forrestc-ux1:8988/render-ws/v1"
+    cmd = cmd + " --collection M33_lowres_round1"
+    cmd = cmd + " --owner 6_ribbon_experiments"
+    cmd = cmd + " --pairJson /mnt/data/M33/processed/tilepairfiles1/tilepairs-10-0-95-nostitch-EDIT.json"
+    cmd = cmd + " --renderWithFilter true"
+    cmd = cmd + " --maxFeatureCacheGb 40"
+    cmd = cmd + " --matchModelType RIGID"
+    cmd = cmd + " --matchMinNumInliers 8"
+    cmd = cmd + " --SIFTmaxScale 1.0"
+    cmd = cmd + " --SIFTminScale 0.8"
+    cmd = cmd + " --SIFTsteps 7"
+    cmd = cmd + " --renderScale 1.0"
+
     #Run =============
     print ("Running: " + cmd)
 
@@ -59,11 +60,10 @@ def run(p, sessionFolder):
     for line in proc.stdout.readlines():
         print (line)
 
-
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
     f = os.path.join('..', 'ATData.ini')
-    p = atutils.ATDataIni(f)
+    p = u.ATDataIni(f)
 
     for sessionFolder in p.sessionFolders:
         run(p, sessionFolder)

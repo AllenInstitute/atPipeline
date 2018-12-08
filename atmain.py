@@ -1,11 +1,11 @@
 import os
 from source import *
-import lib.atutils as atutils
+import lib.atutils as u
 import timeit
 
 if __name__ == '__main__':
     timeStart = timeit.default_timer()
-    p = atutils.ATDataIni('ATData.ini')
+    p = u.ATDataIni('ATData.ini')
 
     for sessionFolder in p.sessionFolders:
         #Start with the creation of state table files
@@ -38,12 +38,15 @@ if __name__ == '__main__':
            print("Stitching data for session: " + sessionFolder)
            drop_stitching_mistakes.run(p, sessionFolder)
 
-        #Create_lowres stacks
+        #Create lowres stacks
         if p.createLowResStacks == True:
            print("Create Lowres Stacks for Session: "+ sessionFolder)
            create_lowres_stacks.run(p, sessionFolder)
 
-
+        #Create PointMatches
+        if p.createPointMatches == True:
+           print("Create Pointmatches: "+ sessionFolder)
+           create_pointmatches.run(p, sessionFolder)
 
     timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
     print("Elapsed time: " + timeDuration + " minutes")

@@ -3,13 +3,13 @@ import json
 import sys
 import subprocess
 import posixpath
-import atutils
+import atutils as u
 import timeit
 import time
 def run(p, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
-    [projectroot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
+    [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
     deconv_dir    = os.path.join("%s"%projectroot, "processed", "deconvolved")
@@ -22,15 +22,15 @@ def run(p, sessionFolder):
     ffStack   = "FF_Session%d"%(session)
     dcvStack      = "DCV_Session%d"%(session)
 
-    renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = atutils.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+    renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
+    renderProject     = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
 	
     #Create json files and apply median.
     for sectnum in range(p.firstSection, p.lastSection + 1):
 
         for i, ch in enumerate(p.channels):
 
-            with open(atutils.deconvolution_template) as json_data:
+            with open(u.deconvolution_template) as json_data:
                 dd = json.load(json_data)
 
             deconv_json = os.path.join(deconv_dir, "deconvolved""_%s_%s_%s_%d_%s.json"%(renderProject.name, ribbon, session, sectnum, ch))
@@ -38,14 +38,14 @@ def run(p, sessionFolder):
             psfFile = psf_dir + "psf_%s.tiff"%ch
             z = ribbon*100 + sectnum
 
-            atutils.savedeconvjson(dd, deconv_json, renderProject.owner, renderProject.name, ffStack, 
-                                        dcvStack, atutils.toDockerMountedPath(deconv_dir, p.prefixPath), z, psfFile, p.numIter, 
+            u.savedeconvjson(dd, deconv_json, renderProject.owner, renderProject.name, ffStack, 
+                                        dcvStack, u.toDockerMountedPath(deconv_dir, p.prefixPath), z, psfFile, p.numIter, 
                                         p.bgrdSize[i], p.scaleFactor[i], True)
                                         
             cmd = "docker exec " + p.rpaContainer
             cmd = cmd + " python -m renderapps.intensity_correction.apply_deconvolution_multi"
             cmd = cmd + " --render.port 80"
-            cmd = cmd + " --input_json %s"%(atutils.toDockerMountedPath(deconv_json, p.prefixPath))
+            cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(deconv_json, p.prefixPath))
 
             #Run =============
             print ("Running: " + cmd)
@@ -55,8 +55,8 @@ def run(p, sessionFolder):
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
-    f = os.path.join('..', 'ATData_params.ini')
-    p = atutils.ATDataIni(f)
+    f = os.path.join('..', 'ATData.ini')
+    p = u.ATDataIni(f)
 
     for sessionFolder in p.sessionFolders:
         run(p, sessionFolder)
