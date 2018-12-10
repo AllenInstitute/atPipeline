@@ -3,6 +3,7 @@ import subprocess
 import posixpath
 import lib.atutils as u
 import timeit
+from shutil import copyfile
 
 def run(p, sessionFolder):
 
@@ -13,10 +14,11 @@ def run(p, sessionFolder):
     renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
     renderProject = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
 
-    JSONDIR="/mnt/data/M33/processed/tilepairfiles1"
-    #JSONFILE=JSONDIR/tilepairs-dz$DELTAZ-$MINZ-$MAXZ-nostitch.json
-    JSONFILE=JSONDIR  + "/tilepairs-dz10-0-23-nostitch.json"
-    JSONFILEEDIT=JSONDIR + "/tilepairs-dz10-0-23-nostitch-EDIT.json"
+
+    JSONDIR = "%s/processed/tilepairfiles1"%(projectRoot)
+
+    JSONFILE=    JSONDIR  + "/tilepairs-%d-%d-%d-nostitch.json"%(p.)
+    JSONFILEEDIT=JSONDIR + "/tilepairs-10-0-23-nostitch-EDIT.json"
 
     #Run the TilePairClient
     cmd = "docker exec " + p.rpaContainer
@@ -24,10 +26,10 @@ def run(p, sessionFolder):
     cmd = cmd + " org.janelia.render.client.TilePairClient"
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
     cmd = cmd + " --owner %s"							    %renderProject.owner
-    cmd = cmd + " --project %s"%renderProject.name
+    cmd = cmd + " --project %s"                             %renderProject.name
     cmd = cmd + " --stack %s"%(lowres_stack)
-    cmd = cmd + " --minZ 0.0"
-    cmd = cmd + " --maxZ 23.0"
+    cmd = cmd + " --minZ %d"%(p.firstSection)
+    cmd = cmd + " --maxZ  %d"%(p.lastSection)
     cmd = cmd + " --toJson %s"%JSONFILE
     cmd = cmd + " --excludeCornerNeighbors true"
     cmd = cmd + " --zNeighborDistance 1"
@@ -39,6 +41,8 @@ def run(p, sessionFolder):
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in proc.stdout.readlines():
         print (line)
+
+    #copyfile(JSONFILE, JSONFILEEDIT)
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
