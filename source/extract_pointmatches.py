@@ -3,14 +3,14 @@ import json
 import sys
 import subprocess
 import posixpath
-import atutils
+import atutils as u
 import timeit
 
 
 def run(p, sessionFolder):
 
 	print ("Processing session folder: " + sessionFolder)
-	[projectRoot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
+	[projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
 	# output directories
 	downsample_dir = "%s/processed/Low_res"%(projectRoot)
@@ -20,11 +20,11 @@ def run(p, sessionFolder):
 	# stacks
 	lowres_stack = "LR_DRP_STI_Session%d"%(session)
 
-	renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-	renderProject = atutils.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+	renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
+	renderProject = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
 
 	#point match collections
-	lowres_pm_collection = "%s_DAPI_Lowres_3D"%renderProject.name
+	lowres_pm_collection = "%s_Lowres_3D"%renderProject.name
 
 	#get numsections
 	f = open(numsections_file)
@@ -65,8 +65,8 @@ def run(p, sessionFolder):
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
-    f = os.path.join('..', 'ATData_template.ini')
-    p = atutils.ATDataIni(f)
+    f = os.path.join('..', 'ATData.ini')
+    p = u.ATDataIni(f)
 
     for sessionFolder in p.sessionFolders:
         run(p, sessionFolder)

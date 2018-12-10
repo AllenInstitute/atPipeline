@@ -3,13 +3,13 @@ import json
 import sys
 import subprocess
 import posixpath
-import atutils
+import lib.atutils
 import timeit
 
 def run(p, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
-    [projectroot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
+    [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
     median_dir       = os.path.join("%s"%projectroot, "processed", "medians")
@@ -23,18 +23,18 @@ def run(p, sessionFolder):
     acq_stack        = "ACQ_Session%d"%(session)
     median_stack     = "MED_Session%d"%(session)
 
-    renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = atutils.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+    renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
+    renderProject     = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
 
-    with open(atutils.mediantemplate) as json_data:
+    with open(u.median_template) as json_data:
          med = json.load(json_data)
 
-    atutils.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, atutils.toDockerMountedPath(median_dir, p.prefixPath), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
+    u.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, u.toDockerMountedPath(median_dir, p.prefixPath), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
 
     cmd = "docker exec " + p.rpaContainer
     cmd = cmd + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
     cmd = cmd + " --render.port 80"
-    cmd = cmd + " --input_json %s"%(atutils.toDockerMountedPath(median_json,  p.prefixPath))
+    cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(median_json,  p.prefixPath))
 
     #Run =============
     print ("Running: " + cmd)
@@ -46,8 +46,8 @@ def run(p, sessionFolder):
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
-    f = os.path.join('..', 'ATData_params.ini')
-    p = atutils.ATDataIni(f)
+    f = os.path.join('..', 'ATData.ini')
+    p = u.ATDataIni(f)
 
     for sessionFolder in p.sessionFolders:
         run(p, sessionFolder)

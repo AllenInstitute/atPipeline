@@ -1,0 +1,19 @@
+{
+    "input_stack": "STIsynapsin", 
+    "z_index":21, 
+    "render": {
+        "owner": "Forrest", 
+        "project": "M247514_Rorb_1", 
+        "host": "ibs-forrestc-ux1", 
+        "port": 8080, 
+        "client_scripts": "/var/www/render/render-ws-java-client/src/main/scripts"
+    }, 
+    "bgrd_size": 20, 
+    "close_stack": false, 
+    "output_stack": "Deconvolved_STIsynapsin_LEILA", 
+    "pool_size": 20, 
+    "psf_file": "/nas/data/M247514_Rorb_1/processed/psfs/psf_synapsin.tif", 
+    "scale_factor": 5, 
+    "output_directory": "/nas3/data/M247514_Rorb_1/processed/deconvolveddata_new/Ribbon0001/Session0003/synapsin/", 
+    "num_iter": 20
+}

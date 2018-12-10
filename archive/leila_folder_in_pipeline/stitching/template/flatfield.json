@@ -1,0 +1,17 @@
+{
+    "render": {
+        "host": "ibs-forrestc-ux1",
+        "port": 8080,
+        "owner": "",
+        "project": "",
+        "client_scripts": "/pipeline/render/render-ws-java-client/src/main/scripts"
+    },
+    "input_stack": "",
+    "correction_stack": "",
+    "output_stack": "",
+    "output_directory": "",
+    "z_index": 0,
+    "close_stack": false,
+    "pool_size": 20
+}
+

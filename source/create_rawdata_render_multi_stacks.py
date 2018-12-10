@@ -3,17 +3,17 @@ import json
 import sys
 import subprocess
 import posixpath
-import atutils
+import lib.atutils
 import timeit
 
 def run(p, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
-    [projectroot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
+    [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
 
-    renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = atutils.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+    renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
+    renderProject     = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
 
     for sectnum in range(p.firstSection, p.lastSection + 1):
         print("Processing section: " + str(sectnum))
@@ -31,10 +31,10 @@ def run(p, sessionFolder):
         cmd = cmd + " --render.port 8080"
         cmd = cmd + " --render.memGB 5G"
         cmd = cmd + " --log_level INFO"
-        cmd = cmd + " --statetableFile %s"%(atutils.toDockerMountedPath(statetablefile,  p.prefixPath))
-        cmd = cmd + " --projectDirectory %s"%(atutils.toDockerMountedPath(projectroot,   p.prefixPath))
+        cmd = cmd + " --statetableFile %s"%(u.toDockerMountedPath(statetablefile,  p.prefixPath))
+        cmd = cmd + " --projectDirectory %s"%(u.toDockerMountedPath(projectroot,   p.prefixPath))
         cmd = cmd + " --outputStackPrefix ACQ_"
-        
+
 		#Run =============
         print ("Running: " + cmd)
 
@@ -45,8 +45,8 @@ def run(p, sessionFolder):
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
-    f = os.path.join('..', 'ATData_params.ini')
-    p = atutils.ATDataIni(f)
+    f = os.path.join('..', 'ATData.ini')
+    p = u.ATDataIni(f)
 
     for sessionFolder in p.sessionFolders:
         run(p, sessionFolder)

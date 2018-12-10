@@ -3,13 +3,13 @@ import json
 import sys
 import subprocess
 import posixpath
-import atutils
+import atutils as u
 import timeit
 import time
 def run(p, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
-    [projectroot, ribbon, session] = atutils.parse_session_folder(sessionFolder)
+    [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
     flatfield_dir    = os.path.join("%s"%projectroot, "processed", "flatfield")
@@ -23,26 +23,24 @@ def run(p, sessionFolder):
     median_stack     = "MED_Session%d"%(session)
     flatfield_stack  = "FF_Session%d"%(session)
 
-   
+    renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
+    renderProject     = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
 
-    renderProjectName = atutils.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = atutils.RenderProject("ATExplorer", p.renderHost, renderProjectName)
-	
     #Create json files and apply median.
     for sectnum in range(p.firstSection, p.lastSection + 1):
 
-        with open(atutils.flatfieldtemplate) as json_data:
+        with open(u.flatfield_template) as json_data:
              ff = json.load(json_data)
 
         flatfield_json = os.path.join(flatfield_dir, "flatfield""_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))
 
         z = ribbon*100 + sectnum
 
-        atutils.saveflatfieldjson(ff, flatfield_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, flatfield_stack, atutils.toDockerMountedPath(flatfield_dir, p.prefixPath), z, True)
+        u.saveflatfieldjson(ff, flatfield_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, flatfield_stack, u.toDockerMountedPath(flatfield_dir, p.prefixPath), z, True)
         cmd = "docker exec " + p.rpaContainer
         cmd = cmd + " python -m rendermodules.intensity_correction.apply_multiplicative_correction"
         cmd = cmd + " --render.port 80"
-        cmd = cmd + " --input_json %s"%(atutils.toDockerMountedPath(flatfield_json, p.prefixPath))
+        cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(flatfield_json, p.prefixPath))
 
         #Run =============
         print ("Running: " + cmd)
@@ -52,8 +50,8 @@ def run(p, sessionFolder):
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
-    f = os.path.join('..', 'ATData_params.ini')
-    p = atutils.ATDataIni(f)
+    f = os.path.join('..', 'ATData.ini')
+    p = u.ATDataIni(f)
 
     for sessionFolder in p.sessionFolders:
         run(p, sessionFolder)
