@@ -1,7 +1,7 @@
 import os
 import subprocess
 import posixpath
-import lib.atutils as u
+import atutils as u
 import timeit
 
 
