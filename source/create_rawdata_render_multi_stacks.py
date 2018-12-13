@@ -1,8 +1,5 @@
 import os
-import json
-import sys
 import subprocess
-import posixpath
 import atutils as u
 import timeit
 
@@ -10,7 +7,6 @@ def run(p, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
-
 
     renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
     renderProject     = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
