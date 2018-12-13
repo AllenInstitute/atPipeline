@@ -9,10 +9,13 @@ import ast
 #Some hardcoded paths..
 templates_folder_mac = "/Users/synbio/ATExplorer/ThirdParty/atPipeline/templates"
 templates_folder_win = "c:\\pDisk\\ATExplorer\\ThirdParty\\atPipeline\\templates"
+templates_folder_linux = "/nas/atDeploy/ThirdParty/atPipeline/templates"
 dockerMountName = "/mnt"
 
 if platform.system() == "Windows":
    templates_folder = templates_folder_win
+elif platform.system() == "Linux":
+   templates_folder = templates_folder_linux
 else:
    templates_folder = templates_folder_mac
 

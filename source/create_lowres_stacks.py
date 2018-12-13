@@ -6,6 +6,7 @@ import posixpath
 import atutils as u
 import timeit
 
+
 def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)

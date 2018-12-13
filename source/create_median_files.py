@@ -3,7 +3,7 @@ import json
 import sys
 import subprocess
 import posixpath
-import atutils
+import atutils as u
 import timeit
 
 def run(p, sessionFolder):
