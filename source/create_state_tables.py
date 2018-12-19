@@ -1,7 +1,7 @@
 import os
 import subprocess
 import timeit
-import lib.atutils as u
+import atutils as u
 
 def run(p, sessionFolder):
 

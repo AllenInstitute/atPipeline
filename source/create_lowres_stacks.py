@@ -3,7 +3,7 @@ import json
 import sys
 import subprocess
 import posixpath
-import lib.atutils as u
+import atutils as u
 import timeit
 
 
@@ -30,7 +30,7 @@ def run(p, sessionFolder):
 
     # docker commands
     cmd = "docker exec " + p.rpaContainer
-    cmd = cmd + " python -m renderapps.materialize.make_downsample_image_stack_multi"
+    cmd = cmd + " python -m renderapps.materialize.make_downsample_image_stack"
     #cmd = cmd + " python -m renderapps.materialize.make_downsample_image_stack"
     cmd = cmd + " --render.port %s"                                %p.port
     cmd = cmd + " --render.host %s"                                %renderProject.host
