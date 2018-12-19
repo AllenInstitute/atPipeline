@@ -29,7 +29,7 @@ def run(p, sessionFolder):
     with open(u.alignment_template) as json_data:
          ra = json.load(json_data)
 
-    u.saveroughalignjson(ra, ra_json, renderProject.host, renderProject.port, renderProject.owner, renderProject.name, lowresStack, lowresPmCollection, roughalignedStack, p.clientScripts, p.logLevel, p.nFirst, p.nLast)
+    u.saveroughalignjson(ra, ra_json, renderProject.host, renderProject.port, renderProject.owner, renderProject.name, lowresStack, lowresPmCollection, roughalignedStack, p.clientScripts, p.logLevel, p.firstSection, p.lastSection)
     
     #Run docker command 
     cmd = "docker exec " + p.rpaContainer
