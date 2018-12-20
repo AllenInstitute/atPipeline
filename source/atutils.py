@@ -32,6 +32,10 @@ class ATDataIni:
           general= config['GENERAL']
           deconv = config['DECONV']
           align = config['ALIGN']
+          self.ch405 = config['DECONV_405']
+          self.ch488 = config['DECONV_488']
+          self.ch594 = config['DECONV_594']
+          self.ch647 = config['DECONV_647']
           self.renderProjectOwner = general['RENDER_PROJECT_OWNER']
 
           #What data to process??
