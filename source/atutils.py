@@ -32,9 +32,11 @@ class ATDataIni:
       def __init__(self, iniFile):
           config = configparser.ConfigParser()
           config.read(iniFile)
-          general= config['GENERAL']
-          deconv = config['DECONV']
-          align = config['ALIGN']
+          general        = config['GENERAL']
+          deconv         = config['DECONV']
+          align          = config['ALIGN']
+		  tp_client      = config['TILE_PAIR_CLIENT']
+		  
           self.ch405 = config['DECONV_405']
           self.ch488 = config['DECONV_488']
           self.ch594 = config['DECONV_594']
@@ -45,11 +47,13 @@ class ATDataIni:
           self.prefixPath      = general['PREFIX_PATH']
           self.dataRootFolder  = general['DATA_ROOT_FOLDER']
           self.dataRootFolder  = os.path.join(self.prefixPath, self.dataRootFolder)
+          self.dataOutputFolder                 = os.path.join(general['PROCESSED_DATA_FOLDER'])
 
           #Process parameters
           self.rpaContainer                     = general['RENDER_PYTHON_APPS_CONTAINER']
           self.atmContainer                     = general['AT_MODULES_CONTAINER']
           self.renderHost                       = general['RENDER_HOST']
+          self.renderProjectOwner               = general['RENDER_PROJECT_OWNER']
           self.clientScripts                    = general['CLIENT_SCRIPTS']
           self.port                             = int(general['PORT'])
           self.memGB                            = general['MEM_GB']
@@ -68,6 +72,11 @@ class ATDataIni:
           self.createLowResStacks               = toBool(general['CREATE_LOWRES_STACKS'])
           self.createPointMatches               = toBool(general['CREATE_POINT_MATCHES'])
 
+          #Tilepair client
+          self.excludeCornerNeighbors           = toBool(tp_client['EXCLUDE_CORNER_NEIGHBOURS'])
+          self.excludeSameSectionNeighbors      = toBool(tp_client['EXCLUDE_SAME_SECTION_NEIGHBOR'])
+          self.zNeighborDistance                = int(tp_client['Z_NEIGHBOR_DISTANCE'])
+          self.xyNeighborFactor                 = float(tp_client['XY_NEIGHBOR_FACTOR'])
           #Deconvolution parameters
           self.channels                         = ast.literal_eval(deconv['CHANNELS'])
           self.bgrdSize                         = ast.literal_eval(deconv['BGRD_SIZE'])
@@ -79,8 +88,6 @@ class ATDataIni:
           self.edgeThreshold      = int(align['EDGE_THRESHOLD'])
           self.scale              = float(align['SCALE'])
           self.distance           = int(align['DISTANCE'])
-          self.deltaZ             = int(align['DELTAZ'])
-          self.minZ               = int(align['MINZ'])
           self.siftMin            = float(align['SIFTMIN'])
           self.siftMax            = float(align['SIFTMAX'])
           self.siftSteps          = int(align['SIFTSTEPS'])
@@ -89,6 +96,9 @@ class ATDataIni:
 
           for session in self.sessions:
               self.sessionFolders.append(os.path.join(self.dataRootFolder, "raw", "data", self.ribbons[0], session))
+      def getStateTableFileName(self, ribbon, session, sectnum):
+          return os.path.join(self.dataRootFolder, self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
+
 
 class RenderProject:
     def __init__(self, owner, host, name):

@@ -19,11 +19,11 @@ def run(p, sessionFolder):
        os.mkdir(deconv_dir)
 
     #stacks
-    ffStack       = "FF_Session%d"%(session)
+    ffStack   = "FF_Session%d"%(session)
     dcvStack      = "DCV_Session%d"%(session)
 
     renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
 	
     channels = [p.ch405,p.ch488,p.ch594,p.ch647]
     #Create json files and apply median.
