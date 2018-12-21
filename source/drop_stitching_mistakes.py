@@ -11,7 +11,7 @@ def run(p, sessionFolder):
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
 	# output directories
-    dropped_dir = "%s/processed/dropped" %(projectroot)
+    dropped_dir = os.path.join(projectroot, p.dataOutputFolder, "dropped")
 
 	# Make sure output folder exist
     if os.path.isdir(dropped_dir) == False:
@@ -23,7 +23,7 @@ def run(p, sessionFolder):
     dropped_dapi_Stack      = "DRP_STI_Session%d" %(session)
 
     renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
 
     # command string
     cmd = "docker exec " + p.rpaContainer

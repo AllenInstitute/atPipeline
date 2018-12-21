@@ -1,8 +1,9 @@
 import os
 import subprocess
 import posixpath
-import lib.atutils as u
+import atutils as u
 import timeit
+import fileinput
 from shutil import copyfile
 
 def run(p, sessionFolder):
@@ -12,29 +13,31 @@ def run(p, sessionFolder):
     lowres_stack = "LR_DRP_STI_Session%d"%(session)
 
     renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
 
+    jsondir           = os.path.join(projectRoot, p.dataOutputFolder, "tilepairfiles")
 
-    JSONDIR = "%s/processed/tilepairfiles1"%(projectRoot)
+    # Make sure output folder exist
+    if os.path.isdir(jsondir) == False:
+        os.mkdir(jsondir)
 
-    JSONFILE=    JSONDIR  + "/tilepairs-%d-%d-%d-nostitch.json"%(p.)
-    JSONFILEEDIT=JSONDIR + "/tilepairs-10-0-23-nostitch-EDIT.json"
+    jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
 
     #Run the TilePairClient
     cmd = "docker exec " + p.rpaContainer
     cmd = cmd + " java -cp /shared/render/render-ws-java-client/target/render-ws-java-client-2.0.1-SNAPSHOT-standalone.jar"
     cmd = cmd + " org.janelia.render.client.TilePairClient"
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
-    cmd = cmd + " --owner %s"							    %renderProject.owner
-    cmd = cmd + " --project %s"                             %renderProject.name
-    cmd = cmd + " --stack %s"%(lowres_stack)
-    cmd = cmd + " --minZ %d"%(p.firstSection)
-    cmd = cmd + " --maxZ  %d"%(p.lastSection)
-    cmd = cmd + " --toJson %s"%JSONFILE
-    cmd = cmd + " --excludeCornerNeighbors true"
-    cmd = cmd + " --zNeighborDistance 1"
-    cmd = cmd + " --excludeSameSectionNeighbors true"
-    cmd = cmd + " --xyNeighborFactor 0.01"
+    cmd = cmd + " --owner %s"							    %(renderProject.owner)
+    cmd = cmd + " --project %s"                             %(renderProject.name)
+    cmd = cmd + " --stack %s"                               %(lowres_stack)
+    cmd = cmd + " --minZ %d"                                %(p.firstSection)
+    cmd = cmd + " --maxZ %d"                                %(p.lastSection)
+    cmd = cmd + " --toJson %s"                              %(u.toDockerMountedPath(jsonfile, p.prefixPath))
+    cmd = cmd + " --excludeCornerNeighbors %s"              %(p.excludeCornerNeighbors)
+    cmd = cmd + " --excludeSameSectionNeighbors %s"         %(p.excludeSameSectionNeighbors)
+    cmd = cmd + " --zNeighborDistance %s"                   %(p.zNeighborDistance)
+    cmd = cmd + " --xyNeighborFactor %s"                    %(p.xyNeighborFactor)
 
     #Run =============
     print ("Running: " + cmd)
@@ -42,7 +45,11 @@ def run(p, sessionFolder):
     for line in proc.stdout.readlines():
         print (line)
 
-    #copyfile(JSONFILE, JSONFILEEDIT)
+    #Prepare json file for the SIFTPointMatch Client
+    jsonfileedit      = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"%(p.zNeighborDistance, p.firstSection, p.lastSection))
+    copyfile(jsonfile, jsonfileedit)
+    for line in fileinput.input(jsonfileedit, inplace=True):
+      print (line.replace("render-parameters", "render-parameters?removeAllOption=true"), end="")
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
@@ -53,4 +60,3 @@ if __name__ == "__main__":
         run(p, sessionFolder)
     timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
     print("Elapsed time: " + timeDuration + " minutes")
-

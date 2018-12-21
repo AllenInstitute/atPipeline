@@ -11,7 +11,7 @@ def run(p, sessionFolder):
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
-    stitching_dir    = os.path.join("%s"%projectroot, "processed", "stitching")
+    stitching_dir    = os.path.join(projectroot, p.dataOutputFolder, "stitching")
 
     #Make sure output folder exist
     if os.path.isdir(stitching_dir) == False:
@@ -22,7 +22,7 @@ def run(p, sessionFolder):
     stitched_stack   = "STI_Session%d"%(session)
 
     renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
 
 	#Create json files and start stitching...
     for sectnum in range(p.firstSection, p.lastSection + 1):
