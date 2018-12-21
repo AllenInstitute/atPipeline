@@ -25,27 +25,28 @@ def run(p, sessionFolder):
     renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
 	
+    channels = [p.ch405,p.ch488,p.ch594,p.ch647]
     #Create json files and apply median.
     for sectnum in range(p.firstSection, p.lastSection + 1):
 
-        for i, ch in enumerate(p.channels):
+        for ch in channels:
+            if ch["LABEL"] != None:
+                with open(u.deconvolution_template) as json_data:
+                    dd = json.load(json_data)
 
-            with open(u.deconvolution_template) as json_data:
-                dd = json.load(json_data)
+                deconv_json = os.path.join(deconv_dir, "deconvolved""_%s_%s_%s_%d_%s.json"%(renderProject.name, ribbon, session, sectnum, ch["LABEL"]))
+                psf_dir = os.path.join("%s"%deconv_dir, "psfs")
+                psfFile = psf_dir + "psf_%s.tiff"%ch["CHANNEL"]
+                z = ribbon*100 + sectnum
 
-            deconv_json = os.path.join(deconv_dir, "deconvolved""_%s_%s_%s_%d_%s.json"%(renderProject.name, ribbon, session, sectnum, ch))
-            psf_dir = os.path.join("%s"%deconv_dir, "psfs")
-            psfFile = psf_dir + "psf_%s.tiff"%ch
-            z = ribbon*100 + sectnum
-
-            u.savedeconvjson(dd, deconv_json, renderProject.owner, renderProject.name, ffStack, 
-                                        dcvStack, u.toDockerMountedPath(deconv_dir, p.prefixPath), z, psfFile, p.numIter, 
-                                        p.bgrdSize[i], p.scaleFactor[i], True)
-                                        
-            cmd = "docker exec " + p.rpaContainer
-            cmd = cmd + " python -m renderapps.intensity_correction.apply_deconvolution_multi"
-            cmd = cmd + " --render.port 80"
-            cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(deconv_json, p.prefixPath))
+                u.savedeconvjson(dd, deconv_json, renderProject.owner, renderProject.name, ffStack, 
+                                            dcvStack, u.toDockerMountedPath(deconv_dir, p.prefixPath), z, psfFile, ch["NUM_ITER"], 
+                                            ch["BGRD_SIZE"], ch["SCALE_FACTOR"], True)
+                                            
+                cmd = "docker exec " + p.rpaContainer
+                cmd = cmd + " python -m renderapps.intensity_correction.apply_deconvolution_multi"
+                cmd = cmd + " --render.port 80"
+                cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(deconv_json, p.prefixPath))
 
             #Run =============
             print ("Running: " + cmd)
