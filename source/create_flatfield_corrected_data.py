@@ -12,7 +12,7 @@ def run(p, sessionFolder):
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
-    flatfield_dir    = os.path.join("%s"%projectroot, "processed", "flatfield")
+    flatfield_dir    = os.path.join(projectroot, p.dataOutputFolder, "flatfield")
 
     #Make sure output folder exists
     if os.path.isdir(flatfield_dir) == False:

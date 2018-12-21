@@ -30,9 +30,10 @@ class ATDataIni:
     def __init__(self, iniFile):
         config = configparser.ConfigParser()
         config.read(iniFile)
-        general= config['GENERAL']
-        deconv = config['DECONV']
-        align = config['ALIGN']
+        general        = config['GENERAL']
+        deconv         = config['DECONV']
+        align          = config['ALIGN']
+        tp_client      = config['TILE_PAIR_CLIENT']
 
         #What data to process??
         self.prefixPath                       = general['PREFIX_PATH']
@@ -63,6 +64,13 @@ class ATDataIni:
         self.createLowResStacks               = toBool(general['CREATE_LOWRES_STACKS'])
         self.createPointMatches               = toBool(general['CREATE_POINT_MATCHES'])
 
+        #Tilepair client
+        self.excludeCornerNeighbors           = toBool(tp_client['EXCLUDE_CORNER_NEIGHBOURS'])
+        self.excludeSameSectionNeighbors      = toBool(tp_client['EXCLUDE_SAME_SECTION_NEIGHBOR'])
+        self.zNeighborDistance                = int(tp_client['Z_NEIGHBOR_DISTANCE'])
+        self.xyNeighborFactor                 = float(tp_client['XY_NEIGHBOR_FACTOR'])
+
+
         #Deconvolution parameters
         self.channels                         = ast.literal_eval(deconv['CHANNELS'])
         self.bgrdSize                         = ast.literal_eval(deconv['BGRD_SIZE'])
@@ -70,16 +78,14 @@ class ATDataIni:
         self.numIter                          = int(deconv['NUM_ITER'])
 
         #Alignment parameters
-        self.poolSize           = int(align['POOL_SIZE'])
-        self.edgeThreshold      = int(align['EDGE_THRESHOLD'])
-        self.scale              = float(align['SCALE'])
-        self.distance           = int(align['DISTANCE'])
-        self.deltaZ             = int(align['DELTAZ'])
-        self.minZ               = int(align['MINZ'])
-        self.siftMin            = float(align['SIFTMIN'])
-        self.siftMax            = float(align['SIFTMAX'])
-        self.siftSteps          = int(align['SIFTSTEPS'])
-        self.renderScale        = float(align['RENDERSCALE'])
+        self.poolSize                         = int(        align['POOL_SIZE'])
+        self.edgeThreshold                    = int(        align['EDGE_THRESHOLD'])
+        self.scale                            = float(      align['SCALE'])
+        self.distance                         = int(        align['DISTANCE'])
+        self.siftMin                          = float(      align['SIFTMIN'])
+        self.siftMax                          = float(      align['SIFTMAX'])
+        self.siftSteps                        = int(        align['SIFTSTEPS'])
+        self.renderScale                      = float(      align['RENDERSCALE'])
 
         for session in self.sessions:
           self.sessionFolders.append(os.path.join(self.dataRootFolder, "raw", "data", self.ribbons[0], session))

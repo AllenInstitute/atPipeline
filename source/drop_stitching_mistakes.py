@@ -11,7 +11,7 @@ def run(p, sessionFolder):
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
 	# output directories
-    dropped_dir = "%s/processed/dropped" %(projectroot)
+    dropped_dir = os.path.join(projectroot, p.dataOutputFolder, "dropped")
 
 	# Make sure output folder exist
     if os.path.isdir(dropped_dir) == False:

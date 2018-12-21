@@ -14,16 +14,16 @@ def run(p, sessionFolder):
     lastRibbon = int(p.ribbons[-1][6:])
 
     # output directories
-    downsample_dir = "%s/processed/Low_res"%(projectRoot)
-    numsections_file = "%s/numsections"%downsample_dir
+    downsample_dir   = os.path.join(projectRoot, p.dataOutputFolder, "low_res")
+    numsections_file = os.path.join(downsample_dir,                   "numsections")
 
     # Make sure output folder exist
     if os.path.isdir(downsample_dir) == False:
         os.mkdir(downsample_dir)
 
     # stacks
-    dropped_dapi_Stack = "DRP_STI_Session%d" % (session)
-    lowres_stack = "LR_DRP_STI_Session%d"%(session)
+    dropped_dapi_Stack = "DRP_STI_Session%d"   %(session)
+    lowres_stack       = "LR_DRP_STI_Session%d"%(session)
 
     renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
     renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
@@ -31,7 +31,6 @@ def run(p, sessionFolder):
     # docker commands
     cmd = "docker exec " + p.rpaContainer
     cmd = cmd + " python -m renderapps.materialize.make_downsample_image_stack"
-    #cmd = cmd + " python -m renderapps.materialize.make_downsample_image_stack"
     cmd = cmd + " --render.port %s"                                %p.port
     cmd = cmd + " --render.host %s"                                %renderProject.host
     cmd = cmd + " --render.client_scripts %s"                      %p.clientScripts
@@ -52,9 +51,8 @@ def run(p, sessionFolder):
     print ("Running: " + cmd)
 
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for i in range(0,2):
-        for line in proc.stdout.readlines():
-            print (line)
+    for line in proc.stdout.readlines():
+        print (line)
 
 
 if __name__ == "__main__":

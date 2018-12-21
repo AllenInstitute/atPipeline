@@ -10,15 +10,14 @@ def run(p, sessionFolder):
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     # output directories
-    downsample_dir = "%s/processed/Low_res"%(projectRoot)
-    pm_script_dir = "/pipeline"
-    numsections_file = "%s/numsections"%downsample_dir
+    downsample_dir   = os.path.join(projectRoot, p.dataOutputFolder, "low_res")
+    numsections_file = os.path.join(downsample_dir, "numsections")
 
     # stacks
     lowres_stack = "LR_DRP_STI_Session%d"%(session)
 
     renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
 
     #point match collections
     lowres_pm_collection = "%s_Lowres_3D"%renderProject.name
@@ -26,10 +25,12 @@ def run(p, sessionFolder):
     #get numsections
     f = open(numsections_file)
     numSections = int(f.readline())
-    print (numSections)
+    print ("Number of sections to create pointmatches for: " + str(numSections))
 
-    # docker commands
-    #Extract point matches
+    jsondir  = os.path.join(projectRoot, p.dataOutputFolder, "tilepairfiles")
+    jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
+
+    #SIFT Point Match Client
     cmd = "docker exec " + p.rpaContainer
     cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
     cmd = cmd + " --conf spark.default.parallelism=4750"
@@ -40,9 +41,9 @@ def run(p, sessionFolder):
     cmd = cmd + " --name PointMatchFull"
     cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.0.1-SNAPSHOT-standalone.jar"
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
-    cmd = cmd + " --collection M33_lowres_round1"
-    cmd = cmd + " --owner ATExplorer"
-    cmd = cmd + " --pairJson /mnt/data/M33/processed/tilepairfiles1/tilepairs-10-0-23-nostitch-EDIT.json"
+    cmd = cmd + " --collection %s_lowres_round"             %(renderProjectName)
+    cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
+    cmd = cmd + " --pairJson %s"                            %(u.toDockerMountedPath(jsonfile, p.prefixPath))
     cmd = cmd + " --renderWithFilter true"
     cmd = cmd + " --maxFeatureCacheGb 40"
     cmd = cmd + " --matchModelType RIGID"

@@ -11,7 +11,7 @@ def run(p, sessionFolder):
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
-    stitching_dir    = os.path.join("%s"%projectroot, "processed", "stitching")
+    stitching_dir    = os.path.join(projectroot, p.dataOutputFolder, "stitching")
 
     #Make sure output folder exist
     if os.path.isdir(stitching_dir) == False:
