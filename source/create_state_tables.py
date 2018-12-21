@@ -8,13 +8,12 @@ def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-
     for sectnum in range(p.firstSection, p.lastSection + 1):
         print("Processing section: " + str(sectnum))
 
         #State table file
-        statetablefile = projectroot + os.path.join("scripts", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
-
+        statetablefile = p.getStateTableFileName(ribbon, session, sectnum)
+        print("Creating statetable file: " + statetablefile)
 
         if os.path.exists(statetablefile):
            print("The statetable: " + statetablefile + " already exists. Continuing..")
@@ -28,7 +27,7 @@ def run(p, sessionFolder):
             cmd = cmd + " --section %d"%(sectnum)
             cmd = cmd + " --oneribbononly True"
 
-		    #Run =============
+		    #Run ====================
             print ("Running: " + cmd)
 
             proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

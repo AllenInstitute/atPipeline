@@ -21,7 +21,7 @@ def run(p, sessionFolder):
     roughalignedStack = "RA_Session%d"%(session)
 
     renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+    renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
 
 	#point match collections
     lowresPmCollection = "%s_Lowres_3D"%renderProject.name

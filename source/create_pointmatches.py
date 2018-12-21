@@ -6,7 +6,6 @@ import timeit
 
 
 def run(p, sessionFolder):
-
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
@@ -19,7 +18,7 @@ def run(p, sessionFolder):
     lowres_stack = "LR_DRP_STI_Session%d"%(session)
 
     renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+    renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
 
     #point match collections
     lowres_pm_collection = "%s_Lowres_3D"%renderProject.name
@@ -41,7 +40,6 @@ def run(p, sessionFolder):
     cmd = cmd + " --name PointMatchFull"
     cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.0.1-SNAPSHOT-standalone.jar"
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
-    #cmd = cmd + " --baseDataUrl http://ibs-forrestc-ux1:8988/render-ws/v1"
     cmd = cmd + " --collection M33_lowres_round1"
     cmd = cmd + " --owner ATExplorer"
     cmd = cmd + " --pairJson /mnt/data/M33/processed/tilepairfiles1/tilepairs-10-0-23-nostitch-EDIT.json"

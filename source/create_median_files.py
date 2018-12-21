@@ -12,7 +12,7 @@ def run(p, sessionFolder):
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
-    median_dir       = os.path.join("%s"%projectroot, "processed", "medians")
+    median_dir       = os.path.join("%s"%projectroot, p.dataOutputFolder, "medians")
     median_json       = os.path.join(median_dir, "median_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
 
     #Make sure output folder exist
@@ -24,7 +24,7 @@ def run(p, sessionFolder):
     median_stack     = "MED_Session%d"%(session)
 
     renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
 
     with open(u.median_template) as json_data:
          med = json.load(json_data)

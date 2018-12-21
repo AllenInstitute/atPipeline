@@ -12,7 +12,7 @@ def run(p, sessionFolder):
     lowres_stack = "LR_DRP_STI_Session%d"%(session)
 
     renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+    renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
 
 
     JSONDIR = "%s/processed/tilepairfiles1"%(projectRoot)
