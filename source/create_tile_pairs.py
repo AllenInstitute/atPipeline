@@ -58,5 +58,6 @@ if __name__ == "__main__":
 
     for sessionFolder in p.sessionFolders:
         run(p, sessionFolder)
+
     timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
     print("Elapsed time: " + timeDuration + " minutes")

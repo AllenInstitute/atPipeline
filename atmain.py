@@ -40,8 +40,13 @@ if __name__ == '__main__':
 
         #Create lowres stacks
         if p.createLowResStacks == True:
-           print("Create Lowres Stacks for Session: "+ sessionFolder)
+           print("Create Lowres Stacks for Session: " + sessionFolder)
            create_lowres_stacks.run(p, sessionFolder)
+
+        #Create TilePairs
+        if p.createTilePairs == True:
+           print("Create TilePairs for Session:" + sessionFolder)
+           create_tile_pairs.run(p, sessionFolder)
 
         #Create PointMatches
         if p.createPointMatches == True:
