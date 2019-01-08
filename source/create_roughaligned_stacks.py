@@ -28,6 +28,7 @@ def run(p, sessionFolder):
     with open(u.alignment_template) as json_data:
        ra = json.load(json_data)
 
+    #Create folder if not exists
     u.saveroughalignjson(ra, ra_json, "w10dtmj03eg6z.corp.alleninstitute.org" , 80, renderProject.owner, renderProject.name, lowresStack, lowresPmCollection, roughalignedStack, p.clientScripts, p.logLevel, p.firstSection, p.lastSection)
 
     #Run docker command
