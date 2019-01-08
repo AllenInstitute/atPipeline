@@ -19,8 +19,8 @@
    "log_level": "ERROR",
    "freeze_first_tile": false,
    "poly_factors": null,
-   "default_lambda": 1000,
-   "translation_factor": 1000
+   "default_lambda": 10000,
+   "translation_factor": 0.00001
  },
 
  "hdf5_options": {
@@ -31,7 +31,7 @@
 
  "matrix_assembly": {
    "cross_pt_weight": 0.5,
-   "depth": 3,
+   "depth": 10,
    "npts_max": 100,
    "log_level": "ERROR",
    "inverse_dz": true,
