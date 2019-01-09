@@ -53,5 +53,11 @@ if __name__ == '__main__':
            print("Create Pointmatches: "+ sessionFolder)
            create_pointmatches.run(p, sessionFolder)
 
+        #Rough Align
+        if p.createRoughAlignedStacks == True:
+           print("Create Rough Aligned Stacks: "+ sessionFolder)
+           create_rough_aligned_stacks.run(p, sessionFolder)
+
+
     timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
     print("Elapsed time: " + timeDuration + " minutes")
