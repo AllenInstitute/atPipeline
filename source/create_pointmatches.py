@@ -39,7 +39,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --executor-cores 44"
     cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
     cmd = cmd + " --name PointMatchFull"
-    cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.0.1-SNAPSHOT-standalone.jar"
+    cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.0.2-SNAPSHOT-standalone.jar"
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
     cmd = cmd + " --collection %s_lowres_round"             %(renderProjectName)
     cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
@@ -47,11 +47,16 @@ def run(p, sessionFolder):
     cmd = cmd + " --renderWithFilter true"
     cmd = cmd + " --maxFeatureCacheGb 40"
     cmd = cmd + " --matchModelType RIGID"
-    cmd = cmd + " --matchMinNumInliers 8"
-    cmd = cmd + " --SIFTmaxScale 1.0"
-    cmd = cmd + " --SIFTminScale 0.8"
-    cmd = cmd + " --SIFTsteps 7"
+    cmd = cmd + " --matchMinNumInliers 15"
+    cmd = cmd + " --matchMaxEpsilon 15.0"
+    #cmd = cmd + " --matchMaxTrust 1.0"
+
+    cmd = cmd + " --SIFTmaxScale 0.85"
+    cmd = cmd + " --SIFTminScale 0.7"
+    cmd = cmd + " --SIFTsteps 2"
     cmd = cmd + " --renderScale 1.0"
+    cmd = cmd + " --matchRod 0.5"
+    cmd = cmd + " --matchFilter CONSENSUS_SETS"
 
     #Run =============
     print ("Running: " + cmd)

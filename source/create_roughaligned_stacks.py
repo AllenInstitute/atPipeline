@@ -3,7 +3,6 @@ import subprocess
 import posixpath
 import atutils as u
 import timeit
-from shutil import copyfile
 import json
 
 def run(p, sessionFolder):
@@ -24,25 +23,25 @@ def run(p, sessionFolder):
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
 
 	#point match collections
-    lowresPmCollection = "%s_Lowres_3D"%renderProject.name
+    lowresPmCollection = "%s_lowres_round"%renderProject.name
 
     with open(u.alignment_template) as json_data:
-         ra = json.load(json_data)
+       ra = json.load(json_data)
 
-    u.saveroughalignjson(ra, ra_json, renderProject.host, renderProject.port, renderProject.owner, renderProject.name, lowresStack, lowresPmCollection, roughalignedStack, p.clientScripts, p.logLevel, p.nFirst, p.nLast)
+    #Create folder if not exists
+    u.saveroughalignjson(ra, ra_json, "w10dtmj03eg6z.corp.alleninstitute.org" , 80, renderProject.owner, renderProject.name, lowresStack, lowresPmCollection, roughalignedStack, p.clientScripts, p.logLevel, p.firstSection, p.lastSection)
 
     #Run docker command
-    cmd = "docker exec " + p.rpaContainer
-    cmd = cmd + " --input_json %s"%ra_json
-    cmd = cmd + " --output_json %s"%out_json
+    cmd = "docker exec " + "rpa-master"
+    cmd = cmd + " python -m rendermodules.solver.solve"
+    cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(ra_json, p.prefixPath))
+    cmd = cmd + " --output_json %s"%(u.toDockerMountedPath(out_json, p.prefixPath))
 
     #Run =============
     print ("Running: " + cmd)
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in proc.stdout.readlines():
         print (line)
-
-
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()

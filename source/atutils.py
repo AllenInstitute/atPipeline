@@ -7,23 +7,20 @@ import configparser
 import ast
 
 #Some hardcoded paths..
-templates_folder_mac = "/Users/synbio/ATExplorer/ThirdParty/atPipeline/templates"
-templates_folder_win = "c:\\pDisk\\ATExplorer\\ThirdParty\\atPipeline\\templates"
-templates_folder_linux = "/nas/atDeploy/ThirdParty/atPipeline/templates"
 dockerMountName = "/mnt"
 
 if platform.system() == "Windows":
-   templates_folder = templates_folder_win
+   templates_folder = "c:\\pDisk\\ATExplorer\\ThirdParty\\atPipeline\\templates"
 elif platform.system() == "Linux":
-   templates_folder = templates_folder_linux
+   templates_folder = "/nas/atDeploy/ThirdParty/atPipeline/templates"
 else:
-   templates_folder = templates_folder_mac
+   templates_folder = "/Users/synbio/ATExplorer/ThirdParty/atPipeline/templates"
 
-median_template    = os.path.join(templates_folder, "median.json")
-stitching_template = os.path.join(templates_folder, "stitching.json")
-flatfield_template = os.path.join(templates_folder, "flatfield.json")
+median_template        = os.path.join(templates_folder, "median.json")
+stitching_template     = os.path.join(templates_folder, "stitching.json")
+flatfield_template     = os.path.join(templates_folder, "flatfield.json")
 deconvolution_template = os.path.join(templates_folder, "deconvolution.json")
-alignment_template = os.path.join(templates_folder, "roughalign.json")
+alignment_template     = os.path.join(templates_folder, "roughalign.json")
 
 def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")
@@ -32,21 +29,20 @@ class ATDataIni:
       def __init__(self, iniFile):
           config = configparser.ConfigParser()
           config.read(iniFile)
-          general        = config['GENERAL']
-          deconv         = config['DECONV']
-          align          = config['ALIGN']
-		  tp_client      = config['TILE_PAIR_CLIENT']
-		  
-          self.ch405 = config['DECONV_405']
-          self.ch488 = config['DECONV_488']
-          self.ch594 = config['DECONV_594']
-          self.ch647 = config['DECONV_647']
+          general                               = config['GENERAL']
+          deconv                                = config['DECONV']
+          align                                 = config['ALIGN']
+          tp_client                             = config['TILE_PAIR_CLIENT']
+
+          self.ch405                            = config['DECONV_405']
+          self.ch488                            = config['DECONV_488']
+          self.ch594                            = config['DECONV_594']
+          self.ch647                            = config['DECONV_647']
           self.renderProjectOwner = general['RENDER_PROJECT_OWNER']
 
           #What data to process??
-          self.prefixPath      = general['PREFIX_PATH']
-          self.dataRootFolder  = general['DATA_ROOT_FOLDER']
-          self.dataRootFolder  = os.path.join(self.prefixPath, self.dataRootFolder)
+          self.prefixPath                       = general['PREFIX_PATH']
+          self.dataRootFolder                   = os.path.join(self.prefixPath, general['DATA_FOLDER'])
           self.dataOutputFolder                 = os.path.join(general['PROCESSED_DATA_FOLDER'])
 
           #Process parameters
@@ -70,6 +66,7 @@ class ATDataIni:
           self.createStitchedSections           = toBool(general['CREATE_STITCHED_SECTIONS'])
           self.dropStitchingMistakes            = toBool(general['DROP_STITCHING_MISTAKES'])
           self.createLowResStacks               = toBool(general['CREATE_LOWRES_STACKS'])
+          self.createTilePairs                  = toBool(general['CREATE_TILE_PAIRS'])
           self.createPointMatches               = toBool(general['CREATE_POINT_MATCHES'])
 
           #Tilepair client
@@ -77,6 +74,7 @@ class ATDataIni:
           self.excludeSameSectionNeighbors      = toBool(tp_client['EXCLUDE_SAME_SECTION_NEIGHBOR'])
           self.zNeighborDistance                = int(tp_client['Z_NEIGHBOR_DISTANCE'])
           self.xyNeighborFactor                 = float(tp_client['XY_NEIGHBOR_FACTOR'])
+
           #Deconvolution parameters
           self.channels                         = ast.literal_eval(deconv['CHANNELS'])
           self.bgrdSize                         = ast.literal_eval(deconv['BGRD_SIZE'])
@@ -84,18 +82,18 @@ class ATDataIni:
           self.numIter                          = int(deconv['NUM_ITER'])
 
           #Alignment parameters
-          self.poolSize           = int(align['POOL_SIZE'])
-          self.edgeThreshold      = int(align['EDGE_THRESHOLD'])
-          self.scale              = float(align['SCALE'])
-          self.distance           = int(align['DISTANCE'])
-          self.siftMin            = float(align['SIFTMIN'])
-          self.siftMax            = float(align['SIFTMAX'])
-          self.siftSteps          = int(align['SIFTSTEPS'])
-          self.renderScale        = float(align['RENDERSCALE'])
-
+          self.poolSize                         = int(align['POOL_SIZE'])
+          self.edgeThreshold                    = int(align['EDGE_THRESHOLD'])
+          self.scale                            = float(align['SCALE'])
+          self.distance                         = int(align['DISTANCE'])
+          self.siftMin                          = float(align['SIFTMIN'])
+          self.siftMax                          = float(align['SIFTMAX'])
+          self.siftSteps                        = int(align['SIFTSTEPS'])
+          self.renderScale                      = float(align['RENDERSCALE'])
 
           for session in self.sessions:
               self.sessionFolders.append(os.path.join(self.dataRootFolder, "raw", "data", self.ribbons[0], session))
+
       def getStateTableFileName(self, ribbon, session, sectnum):
           return os.path.join(self.dataRootFolder, self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
 
@@ -145,7 +143,7 @@ def savemedianjson(template, outFile, render_host, owner, project, acq_stack, me
     template['render']['host']    = render_host
     template['render']['owner']   = owner
     template['render']['project'] = project
-    template['input_stack']    = acq_stack
+    template['input_stack']       = acq_stack
     template['output_stack']      = median_stack
     template['minZ']              = minz
     template['maxZ']              = maxz
@@ -166,17 +164,17 @@ def saveflatfieldjson(template, outFile, render_host, owner, project, acq_stack,
     dump_json(template, outFile)
 
 def savedeconvjson(template,outFile,owner, project, flatfield_stack,deconv_stack,deconv_dir,sectnum,psf_file, num_iter,bgrd_size,scale_factor,close_stack):
-    template['render']['owner'] = owner
+    template['render']['owner']   = owner
     template['render']['project'] = project
-    template['input_stack'] = flatfield_stack
-    template['output_stack'] = deconv_stack
-    template['psf_file'] = psf_file
-    template['num_iter']=num_iter
-    template['bgrd_size'] = bgrd_size
-    template['z_index'] = sectnum
-    template['output_directory'] = deconv_dir
-    template['scale_factor'] = scale_factor
-    template['close_stack'] = close_stack
+    template['input_stack']       = flatfield_stack
+    template['output_stack']      = deconv_stack
+    template['psf_file']          = psf_file
+    template['num_iter']          = num_iter
+    template['bgrd_size']         = bgrd_size
+    template['z_index']           = sectnum
+    template['output_directory']  = deconv_dir
+    template['scale_factor']      = scale_factor
+    template['close_stack']       = close_stack
     dump_json(template, outFile)
 
 def savestitchingjson(template, outfile, owner, project, flatfield_stack, stitched_stack, sectnum, render_host):
@@ -188,90 +186,90 @@ def savestitchingjson(template, outfile, owner, project, flatfield_stack, stitch
     template['baseDataUrl']            = "http://%s/render-ws/v1"%(render_host)
     dump_json(template, outfile)
 
-def saveroughalignjson(template, outFile, renderHost, port, owner, project, lowresStack, lowresPmCollection, roughalignedStack, clientScripts, logLevel, nFirst, nLast):    
-    template['regularization']['log_level'] = logLevel
-    template['regularization']['freeze_first_tile'] = False
-    template['regularization']['poly_factors'] = null
-    template['regularization']['default_lambda'] = 1000
-    template['regularization']['translation_factor'] = 1000
-    
-    template['matrix_assembly']['cross_pt_weight'] = 0.5
-    template['matrix_assembly']['depth'] = 3
-    template['matrix_assembly']['npts_max'] = 100
-    template['matrix_assembly']['log_level'] = logLevel
-    template['matrix_assembly']['inverse_dz'] = True
-    template['matrix_assembly']['choose_random'] = False
-    template['matrix_assembly']['npts_min'] = 5
-    template['matrix_assembly']['montage_pt_weight'] = 1.0
-    
-    template['output_stack']['client_scripts'] = clientScripts
-    template['output_stack']['mongo_port'] = 0
-    template['output_stack']['owner'] = owner
-    template['output_stack']['log_level'] = logLevel
-    template['output_stack']['project'] = project
-    template['output_stack']['mongo_host'] = ""
-    template['output_stack']['mongo_authenticationDatabase'] = ""
-    template['output_stack']['use_rest'] = False
-    template['output_stack']['name'] = roughalignedStack
-    template['output_stack']['port'] = port
-    template['output_stack']['mongo_password'] = ""
-    template['output_stack']['host'] = renderHost
-    template['output_stack']['mongo_username'] = ""
-    template['output_stack']['db_interface'] = "render"
+def saveroughalignjson(template, outFile, renderHost, port, owner, project, lowresStack, lowresPmCollection, roughalignedStack, clientScripts, logLevel, nFirst, nLast):
+    template['regularization']['log_level']                  = logLevel
+    #template['regularization']['freeze_first_tile']          = False
+    #template['regularization']['poly_factors']               = 0
+    #template['regularization']['default_lambda']             = 1000
+    #template['regularization']['translation_factor']         = 1000
 
-    template['input_stack']['client_scripts'] = clientScripts
-    template['input_stack']['mongo_port'] = 0
-    template['input_stack']['owner'] = owner
-    template['input_stack']['collection_type'] = "stack"
-    template['input_stack']['log_level'] = logLevel
-    template['input_stack']['project'] = project
-    template['input_stack']['mongo_host'] = ""
-    template['input_stack']['mongo_authenticationDatabase'] = ""
-    template['input_stack']['use_rest'] = False
-    template['input_stack']['name'] = lowresStack
-    template['input_stack']['port'] = port
-    template['input_stack']['mongo_password'] = ""
-    template['input_stack']['host'] = renderHost
-    template['input_stack']['mongo_username'] = ""
-    template['input_stack']['db_interface'] = "render"
+    #template['matrix_assembly']['cross_pt_weight']           = 0.5
+    #template['matrix_assembly']['depth']                     = 3
+    #template['matrix_assembly']['npts_max']                  = 100
+    template['matrix_assembly']['log_level']                 = logLevel
+    #template['matrix_assembly']['inverse_dz']                = True
+    #template['matrix_assembly']['choose_random']             = False
+    #template['matrix_assembly']['npts_min']                  = 5
+    #template['matrix_assembly']['montage_pt_weight']         = 1.0
 
-    template['pointmatch']['client_scripts'] = clientScripts
-    template['pointmatch']['mongo_port'] = 0
-    template['pointmatch']['owner'] = owner
-    template['pointmatch']['collection_type'] = "pointmatch"
-    template['pointmatch']['log_level'] = logLevel
-    template['pointmatch']['project'] = project
-    template['pointmatch']['mongo_host'] = ""
-    template['pointmatch']['mongo_authenticationDatabase'] = ""
-    template['pointmatch']['name'] = lowresPmCollection
-    template['pointmatch']['port'] = port
-    template['pointmatch']['mongo_password'] = ""
-    template['pointmatch']['host'] = renderHost
-    template['pointmatch']['mongo_username'] = ""
-    template['pointmatch']['db_interface'] = "render"
+    template['output_stack']['client_scripts']               = clientScripts
+    #template['output_stack']['mongo_port']                   = 0
+    template['output_stack']['owner']                        = owner
+    template['output_stack']['log_level']                    = logLevel
+    template['output_stack']['project']                      = project
+    #template['output_stack']['mongo_host']                   = ""
+    #template['output_stack']['mongo_authenticationDatabase'] = ""
+    #template['output_stack']['use_rest']                     = False
+    template['output_stack']['name']                         = roughalignedStack
+    template['output_stack']['port']                         = port
+    #template['output_stack']['mongo_password']               = ""
+    template['output_stack']['host']                         = renderHost
+    #template['output_stack']['mongo_userName']               = ""
+    #template['output_stack']['db_interface']                 = "render"
 
-    template['hdf5_options']['log_level'] = logLevel
-    template['hdf5_options']['output_dir'] = ""
-    template['hdf5_options']['chunks_per_file'] = -1
-    
-    template['assemble_from_file']           = ""
-    template['showtiming']           = 1
-    template['solve_type']           = "3D"
-    template['render_output']  = "null"
-    template['last_section']       = nLast
-    template['first_section']      = nFirst
-    template['log_level']          = "INFO"
-    template['profile_data_load']       = False
-    template['ingest_from_file']       = ""
-    template['fullsize_transform']       = ""
-    template['output_mode']       = "stack"
-    template['close_stack']       = True
-    template['overwrite_zlayer']       = True
-    template['n_parallel_jobs']       = 32
-    template['poly_order']       = 1
-    template['transformation']       = "rigid"
+    template['input_stack']['client_scripts']                = clientScripts
+    #template['input_stack']['mongo_port']                    = 0
+    template['input_stack']['owner']                         = owner
+    #template['input_stack']['collection_type']               = "stack"
+    template['input_stack']['log_level']                     = logLevel
+    template['input_stack']['project']                       = project
+    #template['input_stack']['mongo_host']                    = ""
+    #template['input_stack']['mongo_authenticationDatabase']  = ""
+    #template['input_stack']['use_rest']                      = False
+    #template['input_stack']['name']                          = lowresStack
+    template['input_stack']['port']                          = port
+    #template['input_stack']['mongo_password']                = ""
+    template['input_stack']['host']                          = renderHost
+    #template['input_stack']['mongo_userName']                = ""
+    #template['input_stack']['db_interface']                  = "render"
 
+    template['pointmatch']['client_scripts']                 = clientScripts
+    #template['pointmatch']['mongo_port']                     = 0
+    template['pointmatch']['owner']                          = owner
+    #template['pointmatch']['collection_type']                = "pointmatch"
+    template['pointmatch']['log_level']                      = logLevel
+    template['pointmatch']['project']                        = project
+    #template['pointmatch']['mongo_host']                     = ""
+    #template['pointmatch']['mongo_authenticationDatabase']   = ""
+    template['pointmatch']['name']                           = lowresPmCollection
+    template['pointmatch']['port']                           = port
+    #template['pointmatch']['mongo_password']                 = ""
+    template['pointmatch']['host']                           = renderHost
+    #template['pointmatch']['mongo_userName']                 = ""
+    #template['pointmatch']['db_interface']                   = "render"
+
+    template['hdf5_options']['log_level']                    = logLevel
+    #template['hdf5_options']['output_dir']                   = ""
+    #template['hdf5_options']['chunks_per_file']              = -1
+
+    #template['assemble_from_file']                           = ""
+    #template['showtiming']                                   = 1
+    #template['solve_type']                                   = "3D"
+    #template['render_output']                                = "null"
+    template['last_section']                                 = nLast
+    template['first_section']                                = nFirst
+    template['log_level']                                    = "INFO"
+    #template['profile_data_load']                            = False
+    #template['ingest_from_file']                             = ""
+    #template['fullsize_transform']                           = False
+    #template['output_mode']                                  = "stack"
+    #template['close_stack']                                  = True
+    #template['overwrite_zlayer']                             = True
+    #template['n_parallel_jobs']                              = 32
+    #template['poly_order']                                   = 1
+    #template['transformation']                               = "rigid"
     dump_json(template, outFile)
+
 def main():
     pass
 
