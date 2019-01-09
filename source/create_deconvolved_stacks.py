@@ -6,12 +6,27 @@ import posixpath
 import atutils as u
 import timeit
 import time
+import csv
+
+def set_channel_dict(file_dir, channel):
+    
+    with open(file_dir) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+
+    channel_dir = {
+            'chNum' =
+            'chName'= 
+            'bgScale' =
+            'scaleFactor' =  
+            }
+
 def run(p, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    #Output directories
+    #Directories
+    deconv_params_dir = os.path.join(projectroot,'processed','deconv_scale_factors')
     deconv_dir    = os.path.join("%s"%projectroot, "processed", "deconvolved")
 
     #Make sure output folder exists
