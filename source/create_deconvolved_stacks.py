@@ -37,8 +37,7 @@ def run(p, sessionFolder):
     ffStack   = "FF_Session%d"%(session)
     dcvStack      = "DCV_Session%d"%(session)
 
-    renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
 	
     channels = [p.ch405,p.ch488,p.ch594,p.ch647]
     #Create json files and apply median.

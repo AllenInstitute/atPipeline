@@ -11,8 +11,7 @@ def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
 
     for sectnum in range(p.firstSection, p.lastSection + 1):
         print("Processing section: " + str(sectnum))

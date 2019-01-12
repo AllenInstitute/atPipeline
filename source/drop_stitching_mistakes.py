@@ -22,8 +22,7 @@ def run(p, sessionFolder):
     stitched_dapi_Stack     = "STI_Session%d"     %(session)
     dropped_dapi_Stack      = "DRP_STI_Session%d" %(session)
 
-    renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
 
     # command string
     cmd = "docker exec " + p.rpaContainer

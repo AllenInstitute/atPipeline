@@ -50,6 +50,7 @@ class ATDataIni:
           self.atmContainer                     = general['AT_MODULES_CONTAINER']
           self.renderHost                       = general['RENDER_HOST']
           self.renderProjectOwner               = general['RENDER_PROJECT_OWNER']
+          self.renderProjectName                = general['RENDER_PROJECT_NAME']
           self.clientScripts                    = general['CLIENT_SCRIPTS']
           self.port                             = int(general['PORT'])
           self.memGB                            = general['MEM_GB']
@@ -59,6 +60,8 @@ class ATDataIni:
           self.sessionFolders                   = []
           self.firstSection                     = int(general['START_SECTION'])
           self.lastSection                      = int(general['END_SECTION'])
+          self.firstRibbon                      = int(general['FIRST_RIBBON'])
+          self.lastRibbon                       = int(general['LAST_RIBBON'])
           self.createStateTables                = toBool(general['CREATE_STATE_TABLES'])
           self.createRawDataRenderMultiStacks   = toBool(general['CREATE_RAWDATA_RENDER_MULTI_STACKS'])
           self.createMedianFiles                = toBool(general['CREATE_MEDIAN_FILES'])

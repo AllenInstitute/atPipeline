@@ -25,8 +25,7 @@ def run(p, sessionFolder):
     dropped_dapi_Stack = "DRP_STI_Session%d"   %(session)
     lowres_stack       = "LR_DRP_STI_Session%d"%(session)
 
-    renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
+    renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
 
     # docker commands
     cmd = "docker exec " + p.rpaContainer

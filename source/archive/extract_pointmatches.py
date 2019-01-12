@@ -20,8 +20,7 @@ def run(p, sessionFolder):
 	# stacks
 	lowres_stack = "LR_DRP_STI_Session%d"%(session)
 
-	renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-	renderProject = u.RenderProject("ATExplorer", p.renderHost, renderProjectName)
+	renderProject = u.RenderProject("ATExplorer", p.renderHost, p.renderProjectName)
 
 	#point match collections
 	lowres_pm_collection = "%s_Lowres_3D"%renderProject.name

@@ -16,8 +16,7 @@ def run(p, sessionFolder):
     # stacks
     lowres_stack = "LR_DRP_STI_Session%d"%(session)
 
-    renderProjectName = u.getProjectNameFromSessionFolder(sessionFolder)
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
 
     #point match collections
     lowres_pm_collection = "%s_Lowres_3D"%renderProject.name
@@ -31,7 +30,7 @@ def run(p, sessionFolder):
     jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
 
     #SIFT Point Match Client
-    cmd = "docker exec " + p.rpaContainer
+    cmd = "docker exec " + "rpa-master"
     cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
     cmd = cmd + " --conf spark.default.parallelism=4750"
     cmd = cmd + " --driver-memory 19g"
@@ -41,7 +40,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --name PointMatchFull"
     cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.0.2-SNAPSHOT-standalone.jar"
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
-    cmd = cmd + " --collection %s_lowres_round"             %(renderProjectName)
+    cmd = cmd + " --collection %s_lowres_round"             %(p.renderProjectName)
     cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
     cmd = cmd + " --pairJson %s"                            %(u.toDockerMountedPath(jsonfile, p.prefixPath))
     cmd = cmd + " --renderWithFilter true"
