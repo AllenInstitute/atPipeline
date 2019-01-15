@@ -38,7 +38,6 @@ class ATDataIni:
           self.ch488                            = config['DECONV_488']
           self.ch594                            = config['DECONV_594']
           self.ch647                            = config['DECONV_647']
-          self.renderProjectOwner = general['RENDER_PROJECT_OWNER']
 
           #What data to process??
           self.prefixPath                       = general['PREFIX_PATH']
