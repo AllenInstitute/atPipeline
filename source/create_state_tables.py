@@ -34,7 +34,6 @@ def run(p, sessionFolder):
             for line in proc.stdout.readlines():
                 print (line)
 
-
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
     f = os.path.join('..', 'ATData.ini')

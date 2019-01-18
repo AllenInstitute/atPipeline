@@ -13,7 +13,6 @@ def run(p, sessionFolder):
     lowres_stack = "LR_DRP_STI_Session%d"%(session)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
-
     jsondir           = os.path.join(projectRoot, p.dataOutputFolder, "tilepairfiles")
 
     # Make sure output folder exist
