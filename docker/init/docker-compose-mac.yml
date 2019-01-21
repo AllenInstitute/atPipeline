@@ -31,7 +31,7 @@ services:
        ports:
            - 5000:5000
        volumes:
-           - ./../Render-Deploy/vizrelay_config.json:/app/config.json
+           - ./../render-deploy/vizrelay_config.json:/app/config.json
     ndviz:
       image: neurodata/ndviz:beta
       ports:

@@ -31,7 +31,7 @@ services:
        ports:
            - 5000:5000
        volumes:
-           - C:\\pDisk\atPipeline\\render\\init\\vizrelay_config.json:/app/config.json
+           - C:\\pDisk\atPipeline\\docker\\init\\vizrelay_config.json:/app/config.json
     ndviz:
       image: neurodata/ndviz:beta
       ports:

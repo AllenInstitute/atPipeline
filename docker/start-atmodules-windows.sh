@@ -20,9 +20,8 @@ docker rm $container_name
 echo "Starting container with name: $container_name"
 docker run -d --name $container_name \
 -v e:/Documents/data:/mnt/  \
--v e:/Documents/data:/mnt/data/  \
--v c:/pDisk/atExplorer/ThirdParty/atPipeline/pipeline:/pipeline  \
--v c:/pDisk/atExplorer/ThirdParty/at_modules/src:/usr/local/at_modules/src  \
+-v c:/pDisk/atPipeline/pipeline:/pipeline  \
+-v c:/pDisk/atPipeline/docker/at_modules/src:/usr/local/at_modules/src  \
 -i -t $image_tag /bin/bash
 
 echo "Done.."
