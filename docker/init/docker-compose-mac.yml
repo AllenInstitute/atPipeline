@@ -1,0 +1,48 @@
+version: "2.0"
+services:
+    render:
+       image: fcollman/render-ws
+       links:
+           - mongo
+       ports:
+           - 8080:8080
+           - 80:8080
+       environment:
+           - MONGO_HOST=mongo
+           - MONGO_PORT=27017
+           - NDVIZ_URL=127.0.0.1:5000
+           - JAVA_OPTIONS=-Xms10g -Xmx10g -server -Djava.awt.headless=true
+       volumes:
+           - /Users/synbio/Documents:/mnt
+       logging:
+           options:
+               max-size: "5g"
+    mongo:
+       image: mongo:3.4.2
+       ports:
+           - "27017"
+       volumes:
+           - mongodata:/data/db
+       restart: always
+       security_opt:
+         - seccomp:unconfined
+    vizrelay:
+       image: fcollman/vizrelay
+       ports:
+           - 5000:5000
+       volumes:
+           - ./../Render-Deploy/vizrelay_config.json:/app/config.json
+    ndviz:
+      image: neurodata/ndviz:beta
+      ports:
+          - "8001:8080"
+# render-python:
+#   image: fcollman/render-python-apps 
+#   volumes:
+#       - e:/data:/mnt/data/  
+#       - c:/pDisk/atExplorer/ThirdParty/atPipeline:/pipeline  
+#       - c:/pDisk/atExplorer/ThirdParty/Render-Python-Apps:/usr/local/render-python-apps  
+
+volumes:
+    mongodata:
+ 
