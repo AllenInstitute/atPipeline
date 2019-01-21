@@ -1,0 +1,12 @@
+[submodule "docker/at_modules"]
+	path = docker/at_modules
+	url = https://github.com/AllenInstitute/at_modules
+[submodule "docker/render-deploy"]
+	path = docker/render-deploy
+	url = https://github.com/fcollman/render-deploy.git
+[submodule "docker/render-modules"]
+	path = docker/render-modules
+	url = https://github.com/AllenInstitute/render-modules.git
+[submodule "docker/render-python-apps"]
+	path = docker/render-python-apps
+	url = https://github.com/AllenInstitute/render-python-apps.git
