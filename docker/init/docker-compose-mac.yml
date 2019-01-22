@@ -11,9 +11,9 @@ services:
            - MONGO_HOST=mongo
            - MONGO_PORT=27017
            - NDVIZ_URL=127.0.0.1:5000
-           - JAVA_OPTIONS=-Xms10g -Xmx10g -server -Djava.awt.headless=true
+           - JAVA_OPTIONS=-Xms6g -Xmx6g -server -Djava.awt.headless=true
        volumes:
-           - /Users/synbio/Documents:/mnt
+           - /Users/eric/nobackup/M33:/mnt
        logging:
            options:
                max-size: "5g"
@@ -31,7 +31,7 @@ services:
        ports:
            - 5000:5000
        volumes:
-           - ./../render-deploy/vizrelay_config.json:/app/config.json
+           - ./vizrelay_config.json:/app/config.json
     ndviz:
       image: neurodata/ndviz:beta
       ports:
