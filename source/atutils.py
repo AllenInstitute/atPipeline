@@ -12,9 +12,9 @@ dockerMountName = "/mnt"
 if platform.system() == "Windows":
    templates_folder = "c:\\pDisk\\ATExplorer\\ThirdParty\\atPipeline\\templates"
 elif platform.system() == "Linux":
-   templates_folder = "/nas/atDeploy/ThirdParty/atPipeline/templates"
+   templates_folder = "../templates"
 else:
-   templates_folder = "/Users/synbio/ATExplorer/ThirdParty/atPipeline/templates"
+   templates_folder = "../templates"
 
 median_template        = os.path.join(templates_folder, "median.json")
 stitching_template     = os.path.join(templates_folder, "stitching.json")
