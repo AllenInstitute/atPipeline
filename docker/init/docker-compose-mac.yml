@@ -13,7 +13,7 @@ services:
            - NDVIZ_URL=127.0.0.1:5000
            - JAVA_OPTIONS=-Xms6g -Xmx6g -server -Djava.awt.headless=true
        volumes:
-           - /Users/eric/nobackup/M33:/mnt
+           - /Users/eric/nobackup:/mnt
        logging:
            options:
                max-size: "5g"

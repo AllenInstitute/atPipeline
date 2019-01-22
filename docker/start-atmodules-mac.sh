@@ -19,7 +19,7 @@ docker rm $container_name
 
 echo "Starting container with name: $container_name"
 docker run -d --name $container_name \
--v /Users/eric/nobackup/M33:/mnt \
+-v /Users/eric/nobackup:/mnt \
 -v /Users/eric/tra/atPipeline/pipeline:/pipeline \
 -v /Users/eric/tra/atPipeline/docker/at_modules/src:/usr/local/at_modules/src  \
 -i -t $image_tag /bin/bash
