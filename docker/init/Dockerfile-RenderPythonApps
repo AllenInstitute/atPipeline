@@ -4,7 +4,7 @@ MAINTAINER Forrest Collman (forrest.collman@gmail.com)
 RUN mkdir -p /usr/local/render-python-apps
 WORKDIR /usr/local/render-python-apps
 COPY requirements.txt /usr/local/render-python-apps
-RUN pip install -r requirements.txt
+
 RUN pip install setuptools --upgrade --disable-pip-version-check
 RUN pip install argschema --upgrade --disable-pip-version-check
 RUN pip install jupyter
@@ -31,7 +31,7 @@ RUN pip install .
 WORKDIR /usr/local/render-python-apps
 
 
-#RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt
 RUN python setup.py install
 
 
