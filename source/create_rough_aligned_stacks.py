@@ -31,7 +31,7 @@ def run(p, sessionFolder):
     if os.path.isdir(dataOutputFolder) == False:
         os.mkdir(dataOutputFolder)
 
-    u.saveroughalignjson(ra, input_json, "w10dtmj03eg6z.corp.alleninstitute.org" , 80, renderProject.owner, renderProject.name, lowresStack, lowresPmCollection, roughalignedStack, p.clientScripts, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
+    u.saveroughalignjson(ra, input_json, p.renderHost, 80, renderProject.owner, renderProject.name, lowresStack, lowresPmCollection, roughalignedStack, p.clientScripts, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
 
     #Run docker command
     cmd = "docker exec " + "rpa-master"
