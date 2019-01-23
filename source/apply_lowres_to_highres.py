@@ -52,8 +52,8 @@ def run(p, sessionFolder):
     cmd = cmd + " --prealigned_stack %s"      %lowresRoughAlignedStack
     cmd = cmd + " --output_stack %s"          %("RoughAligned")
 
-    cmd = cmd + " --minZ %d"                  %(p.firstSection*100)
-    cmd = cmd + " --maxZ %d"                  %(p.lastSection*100)
+    cmd = cmd + " --minZ 0"#%d"                  %(p.firstSection*100)
+    cmd = cmd + " --maxZ 500"#%d"                  %(p.lastSection*100)
     #cmd = cmd + " --minZ %d --maxZ %d "       %(firstribbon*100, (lastribbon+1) * 100)
 
     #Run =============
