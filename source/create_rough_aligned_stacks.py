@@ -17,7 +17,8 @@ def run(p, sessionFolder):
 
     #stacks
     lowresStack       = "LR_DRP_STI_Session%d"%(session)
-    roughalignedStack = "RA_Session%d"%(session)
+	
+    roughalignedStack = "RA_LR_Session%d"%(session)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
 
