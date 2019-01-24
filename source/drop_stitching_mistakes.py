@@ -43,7 +43,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --distance_threshold %d"                  %(p.distance)
 
     # Run =============
-    print ("Running: " + cmd)
+    print ("Running: " + cmd.replace('--', '\n--'))
 
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in proc.stdout.readlines():
