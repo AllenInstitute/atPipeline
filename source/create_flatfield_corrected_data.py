@@ -42,7 +42,7 @@ def run(p, sessionFolder):
         cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(flatfield_json, p.prefixPath))
 
         #Run =============
-        print ("Running: " + cmd)
+        print ("Running: " + cmd.replace('--', '\n--'))
         proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         for line in proc.stdout.readlines():
             print (line)

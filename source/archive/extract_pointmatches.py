@@ -54,7 +54,7 @@ def run(p, sessionFolder):
 
 
 	# Run =============
-	print ("Running: " + cmd)
+	print ("Running: " + cmd.replace('--', '\n--'))
 
 	proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 	for i in range(0,2):	

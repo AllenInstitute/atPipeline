@@ -22,7 +22,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --section %s"%p.firstSection
 
     #Run =============
-    print ("Running: " + cmd)
+    print ("Running: " + cmd.replace('--', '\n--'))
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in proc.stdout.readlines():
         print (line)

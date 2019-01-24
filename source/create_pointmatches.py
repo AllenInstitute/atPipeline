@@ -58,7 +58,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --matchFilter CONSENSUS_SETS"
 
     #Run =============
-    print ("Running: " + cmd)
+    print ("Running: " + cmd.replace('--', '\n--'))
 
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in proc.stdout.readlines():
