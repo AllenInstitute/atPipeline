@@ -10,24 +10,32 @@ import timeit
 ##Create a new stack with "consolidated" transforms
 def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
-    [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
+    [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    d_str = "docker exec renderapps_develop "
-    render_str = "--render.host %s --render.client_scripts %s --render.port %d --render.memGB %s --log_level %s "%(host,client_scripts,port,memGB,loglevel)
-    project_str = "--render.project %s --render.owner %s" %(project, owner)
+    renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
+    outputFolder  = os.path.join(projectRoot, p.dataOutputFolder, "json_tilespecs_consolidation_master")
 
-    cmd_cons = "docker exec "
-    cmd_cons = "%s python -m renderapps.stack.consolidate_render_transforms %s %s "%(d_str,render_str,project_str)
-    cmd_cons = cmd_cons + "--stack Rough_Aligned_1_DAPI_1 --output_stack Rough_Aligned_1_DAPI_1_CONS --postfix CONS  "
-    cmd_cons = cmd_cons + "--output_directory %s/processed/json_tilespecs_consolidation_master --pool_size 20"%project_root_dir
+    cmd = "docker exec rpa-master" #+ p.rpaContainer
+    cmd = cmd + " python -m rendermodules.stack.consolidate_transforms"
+    cmd = cmd + " --render.host %s"                           %(renderProject.host)
+    cmd = cmd + " --render.project %s"                        %(renderProject.name)
+    cmd = cmd + " --render.owner %s"                          %(renderProject.owner)
+    cmd = cmd + " --render.client_scripts %s"                 %(p.clientScripts)
+    cmd = cmd + " --render.memGB %s"                          %(p.memGB)
+    cmd = cmd + " --render.port %s"                           %(p.port)
+    cmd = cmd + " --pool_size %s"                             %(p.poolSize)
+    cmd = cmd + " --stack RA_Session%d"                    %(session)
+    #cmd = cmd + " --stack STI_Session1"
+
+    cmd = cmd + " --output_stack RA_CONS_Session%d"    %(session)
+    cmd = cmd + " --output_json Test"
 
     # Run =============
-    print ("Running: " + cmd)
+    print ("Running: " + cmd.replace('--', '\n--'))
 
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in proc.stdout.readlines():
     	print (line)
-
 
 if __name__ == "__main__":
     timeStart = timeit.default_timer()
