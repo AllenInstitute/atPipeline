@@ -9,18 +9,12 @@ import ast
 #Some hardcoded paths..
 dockerMountName = "/mnt"
 
-if platform.system() == "Windows":
-   templates_folder = "c:\\pDisk\\ATExplorer\\ThirdParty\\atPipeline\\templates"
-elif platform.system() == "Linux":
-   templates_folder = "../templates"
-else:
-   templates_folder = "../templates"
-
-median_template        = os.path.join(templates_folder, "median.json")
-stitching_template     = os.path.join(templates_folder, "stitching.json")
-flatfield_template     = os.path.join(templates_folder, "flatfield.json")
-deconvolution_template = os.path.join(templates_folder, "deconvolution.json")
-alignment_template     = os.path.join(templates_folder, "roughalign.json")
+templates_folder = "templates"
+median_template        = os.path.join("..", templates_folder, "median.json")
+stitching_template     = os.path.join("..", templates_folder, "stitching.json")
+flatfield_template     = os.path.join("..", templates_folder, "flatfield.json")
+deconvolution_template = os.path.join("..", templates_folder, "deconvolution.json")
+alignment_template     = os.path.join("..", templates_folder, "roughalign.json")
 
 def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")
