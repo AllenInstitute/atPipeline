@@ -47,15 +47,15 @@ def run(p, sessionFolder):
     cmd = cmd + " --maxFeatureCacheGb 40"
     cmd = cmd + " --matchModelType RIGID"
     cmd = cmd + " --matchMinNumInliers 15"
-    cmd = cmd + " --matchMaxEpsilon 15.0"
+    #cmd = cmd + " --matchMaxEpsilon 15.0"
     #cmd = cmd + " --matchMaxTrust 1.0"
 
     cmd = cmd + " --SIFTmaxScale 0.85"
     cmd = cmd + " --SIFTminScale 0.7"
-    cmd = cmd + " --SIFTsteps 2"
+    cmd = cmd + " --SIFTsteps 5"
     cmd = cmd + " --renderScale 1.0"
     cmd = cmd + " --matchRod 0.5"
-    cmd = cmd + " --matchFilter CONSENSUS_SETS"
+    #cmd = cmd + " --matchFilter CONSENSUS_SETS"
 
     #Run =============
     print ("Running: " + cmd.replace('--', '\n--'))
