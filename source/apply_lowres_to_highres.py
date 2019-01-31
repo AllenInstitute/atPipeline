@@ -41,7 +41,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --scale %s"                      %scale
     cmd = cmd + " --input_stack %s"                %inputStack
     cmd = cmd + " --lowres_stack %s"               %lowresStack
-    cmd = cmd + " --prealigned_stack %s"           %lowresRoughAlignedStack
+    cmd = cmd + " --prealigned_stack %s"           %inputStack
     cmd = cmd + " --output_stack RA_Session%d"     %(session)
 
     #TODO: get the Z's right..
