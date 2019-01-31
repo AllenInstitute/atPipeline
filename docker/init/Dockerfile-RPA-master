@@ -12,7 +12,7 @@ RUN conda install nomkl
 COPY . /usr/local/render-python-apps
 
 WORKDIR /shared/render-modules
-RUN pip install .
+RUN pip install -e .
 WORKDIR /usr/local/render-python-apps
 
 
