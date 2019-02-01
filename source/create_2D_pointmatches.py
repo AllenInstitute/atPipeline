@@ -17,7 +17,7 @@ def run(p, sessionFolder):
 
     pm2DStack = "RA_Session1"
     outputStack = "%s_HR_2D"%(renderProject.name)
-    delta = 150
+    delta = 250
 
     cmd = "docker exec rpa-master"
     cmd = cmd + " python -m renderapps.stitching.create_montage_pointmatches_in_place"
