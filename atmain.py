@@ -58,6 +58,21 @@ if __name__ == '__main__':
            print("Create Rough Aligned Stacks: "+ sessionFolder)
            create_rough_aligned_stacks.run(p, sessionFolder)
 
+        #Consolidate transforms
+        if p.applyLowResToHighRes == True:
+           print("Applying low resolution alignment transforms to high resoloution stack: "+ sessionFolder)
+           apply_lowres_to_highres.run(p, sessionFolder)
+
+        #Consolidate transforms
+        if p.consolidateRoughAlignedRenderTransforms == True:
+           print("Consolidating Rough Aligned RenderTransforms: "+ sessionFolder)
+           consolidate_render_transforms.run(p, sessionFolder)
+
+        #Create 2D point matches
+        if p.create2DPointMatches == True:
+           print("Create 2D pointmatches (tile on tile) for session: "+ sessionFolder)
+           create_2D_pointmatches.run(p, sessionFolder)
+
 
     timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
     print("Elapsed time: " + timeDuration + " minutes")
