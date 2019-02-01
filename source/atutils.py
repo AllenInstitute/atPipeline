@@ -101,7 +101,7 @@ class ATDataIni:
         for session in self.sessions:
           self.sessionFolders.append(os.path.join(self.dataRootFolder, "raw", "data", self.ribbons[0], session))
 
-      def getStateTableFileName(self, ribbon, session, sectnum):
+        def getStateTableFileName(self, ribbon, session, sectnum):
           return os.path.join(self.dataRootFolder, self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
 
 
