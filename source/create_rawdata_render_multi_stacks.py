@@ -33,6 +33,7 @@ def run(p, sessionFolder):
         cmd = cmd + " --projectDirectory %s"      %(u.toDockerMountedPath(projectroot,   p.prefixPath))
         cmd = cmd + " --dataOutputFolder %s"      %(p.dataOutputFolder.replace('\\', '/'))
         cmd = cmd + " --outputStackPrefix ACQ_"
+        cmd = cmd + " --reference_channel %s"      %(p.referenceChannel)
 
 		#Run =============
         print ("Running: " + cmd.replace('--', '\n--'))

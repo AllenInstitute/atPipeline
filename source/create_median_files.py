@@ -30,7 +30,7 @@ def run(p, sessionFolder):
 
     u.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, u.toDockerMountedPath(median_dir, p.prefixPath), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
 
-    cmd = "docker exec " + p.rpaContainer
+    cmd = "docker exec rpa-master"
     cmd = cmd + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
     cmd = cmd + " --render.port 80"
     cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(median_json,  p.prefixPath))

@@ -54,6 +54,7 @@ class ATDataIni:
           self.port                             = int(general['PORT'])
           self.memGB                            = general['MEM_GB']
           self.logLevel                         = general['LOG_LEVEL']
+          self.referenceChannel                 = general['REFERENCE_CHANNEL']
           self.ribbons                          = ast.literal_eval(general['RIBBONS'])
           self.sessions                         = ast.literal_eval(general['SESSIONS'])
           self.sessionFolders                   = []
