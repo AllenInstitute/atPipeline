@@ -69,10 +69,16 @@ mkdir -p $JSONDIR
 java -cp /pipeline/forrestrender/render-ws-java-client/target/render-ws-java-client-2.0.1-SNAPSHOT-standalone.jar \
 org.janelia.render.client.TilePairClient \
 --baseDataUrl http://ibs-forrestc-ux1:80/render-ws/v1 \
---owner $OWNER --project $PROJECT --stack $STACK \
---minZ $MINZ --maxZ $MAXZ --toJson $JSONFILE \
---excludeCornerNeighbors true --zNeighborDistance $DELTAZ \
---excludeSameSectionNeighbors true --xyNeighborFactor 0.01
+--owner $OWNER \
+--project $PROJECT \
+--stack $STACK \
+--minZ $MINZ \
+--maxZ $MAXZ \
+--toJson $JSONFILE \
+--excludeCornerNeighbors true \
+--zNeighborDistance $DELTAZ \
+--excludeSameSectionNeighbors true \
+--xyNeighborFactor 0.01
 echo $JSONFILEEDIT
 rm -f $JSONFILEEDIT
 cp $JSONFILE $JSONFILEEDIT
