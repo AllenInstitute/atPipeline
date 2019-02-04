@@ -15,8 +15,7 @@ def run(p, sessionFolder):
     renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
     outputFolder  = os.path.join(projectRoot, p.dataOutputFolder, "json_tilespecs_consolidation_master")
 
-    pm2DStack = "RA_Session1"
-    outputStack = "%s_HR_2D"%(renderProject.name)
+    match_collection_name = "%s_HR_2D"%(renderProject.name)
     delta = 250
 
     cmd = "docker exec rpa-master"
@@ -32,7 +31,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --minZ %d"                                  %(p.firstSection)
     cmd = cmd + " --maxZ %d"                                  %(p.lastSection)
     cmd = cmd + " --dataRoot %s"                              %(u.toDockerMountedPath(p.dataRootFolder, p.prefixPath))
-    cmd = cmd + " --matchCollection %s"                       %(outputStack)
+    cmd = cmd + " --matchCollection %s"                       %(match_collection_name)
     cmd = cmd + " --delta %d"                                 %(delta)
     cmd = cmd + " --output_json Test"
 
