@@ -11,7 +11,7 @@ def run(p, sessionFolder):
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
     # stacks
-    input_stack = "RA_CONS_Session%d"%(session)
+    input_stack = "S%d_RoughAligned_Consolidated"%(session)
 
     #point match collection
     match_collection_name = "%s_HR_3D"%(renderProject.name)

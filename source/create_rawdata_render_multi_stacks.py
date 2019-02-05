@@ -32,7 +32,7 @@ def run(p, sessionFolder):
         cmd = cmd + " --statetableFile %s"        %(u.toDockerMountedPath(statetablefile,  p.prefixPath))
         cmd = cmd + " --projectDirectory %s"      %(u.toDockerMountedPath(projectroot,   p.prefixPath))
         cmd = cmd + " --dataOutputFolder %s"      %(p.dataOutputFolder.replace('\\', '/'))
-        cmd = cmd + " --outputStackPrefix ACQ_"
+        cmd = cmd + " --outputStackPrefix S%d_"   %(session)
         cmd = cmd + " --reference_channel %s"      %(p.referenceChannel)
 
 		#Run =============

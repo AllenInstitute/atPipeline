@@ -10,8 +10,8 @@ drop_stitching_mistakes
 create_rawdata_render_multi_stacks
 create_median_files
 create_lowres_stacks
-create_tile_pairs
-create_pointmatches
+create_LR_tilepairs
+create_LR_pointmatches
 create_rough_aligned_stacks
 apply_lowres_to_highres
 consolidate_stack_transforms

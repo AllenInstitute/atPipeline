@@ -27,7 +27,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --render.memGB %s"                          %(p.memGB)
     cmd = cmd + " --render.port %s"                           %(p.port)
     cmd = cmd + " --pool_size %s"                             %(p.poolSize)
-    cmd = cmd + " --stack RA_Session%d"                       %(session)
+    cmd = cmd + " --stack S%d_RoughAligned"             %(session)
     cmd = cmd + " --minZ %d"                                  %(p.firstSection)
     cmd = cmd + " --maxZ %d"                                  %(p.lastSection)
     cmd = cmd + " --dataRoot %s"                              %(u.toDockerMountedPath(p.dataRootFolder, p.prefixPath))

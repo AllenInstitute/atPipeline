@@ -22,8 +22,8 @@ def run(p, sessionFolder):
         os.mkdir(downsample_dir)
 
     # stacks
-    input_stack  = "DRP_STI_Session%d"   %(session)
-    output_stack = "LR_DRP_STI_Session%d"%(session)
+    input_stack  = "S%d_Stitched_Dropped"   %(session)
+    output_stack = "S%d_Stitched_Dropped_LowRes"%(session)
 
     renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 

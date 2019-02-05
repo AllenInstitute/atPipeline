@@ -19,9 +19,9 @@ def run(p, sessionFolder):
        os.mkdir(flatfield_dir)
 
     #stacks
-    acq_stack        = "ACQ_Session%d"%(session)
-    median_stack     = "MED_Session%d"%(session)
-    flatfield_stack  = "FF_Session%d"%(session)
+    acq_stack        = "S%d_Session%d"%(session,session)
+    median_stack     = "S%d_Medians"%(session)
+    flatfield_stack  = "S%d_FlatFielded"%(session)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 

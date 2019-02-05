@@ -10,10 +10,10 @@ def run(p, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
-    lowres_stack = "LR_DRP_STI_Session%d"%(session)
+    inputStack = "S%d_Stitched_Dropped_LowRes"%(session)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
-    jsondir           = os.path.join(projectRoot, p.dataOutputFolder, "tilepairfiles")
+    jsondir           = os.path.join(projectRoot, p.dataOutputFolder, "lowres_tilepairfiles")
 
     # Make sure output folder exist
     if os.path.isdir(jsondir) == False:
@@ -28,7 +28,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
     cmd = cmd + " --owner %s"							    %(renderProject.owner)
     cmd = cmd + " --project %s"                             %(renderProject.name)
-    cmd = cmd + " --stack %s"                               %(lowres_stack)
+    cmd = cmd + " --stack %s"                               %(inputStack)
     cmd = cmd + " --minZ %d"                                %(p.firstSection)
     cmd = cmd + " --maxZ %d"                                %(p.lastSection)
     cmd = cmd + " --toJson %s"                              %(u.toDockerMountedPath(jsonfile, p.prefixPath))
@@ -46,6 +46,7 @@ def run(p, sessionFolder):
     #Prepare json file for the SIFTPointMatch Client
     jsonfileedit      = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"%(p.zNeighborDistance, p.firstSection, p.lastSection))
     copyfile(jsonfile, jsonfileedit)
+
     for line in fileinput.input(jsonfileedit, inplace=True):
       print (line.replace("render-parameters", "render-parameters?removeAllOption=true"), end="")
 

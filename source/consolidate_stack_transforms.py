@@ -24,8 +24,8 @@ def run(p, sessionFolder):
     cmd = cmd + " --render.memGB %s"                          %(p.memGB)
     cmd = cmd + " --render.port %s"                           %(p.port)
     cmd = cmd + " --pool_size %s"                             %(p.poolSize)
-    cmd = cmd + " --stack RA_Session%d"                    %(session)
-    cmd = cmd + " --output_stack RA_CONS_Session%d"    %(session)
+    cmd = cmd + " --stack S%d_RoughAligned"                        %(session)
+    cmd = cmd + " --output_stack S%d_RoughAligned_Consolidated"    %(session)
     cmd = cmd + " --close_stack %d"%(True)
     cmd = cmd + " --output_json Test"
 

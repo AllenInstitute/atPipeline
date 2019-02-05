@@ -18,9 +18,9 @@ def run(p, sessionFolder):
        os.mkdir(dropped_dir)
 
 	# stacks
-    acquisition_Stack       = "ACQ_Session%d"     %(session)
-    stitched_dapi_Stack     = "STI_Session%d"     %(session)
-    dropped_dapi_Stack      = "DRP_STI_Session%d" %(session)
+    acquisition_Stack       = "S%d_Session%d"    %(session, session)
+    stitched_dapi_Stack     = "S%d_Stitched"     %(session)
+    dropped_dapi_Stack      = "S%d_Stitched_Dropped" %(session)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 

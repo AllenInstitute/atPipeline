@@ -16,8 +16,8 @@ def run(p, sessionFolder):
     output_json    = os.path.join(dataOutputFolder, "output_fine_alignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
 
     #stacks
-    input_stack       = "RA_CONS_Session%d"%(session)
-    output_stack      = "FineAligned_HR_Session%d"%(session)
+    input_stack       = "S%d_RoughAligned_Consolidated"%(session)
+    output_stack      = "S%d_FineAligned"%(session)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 

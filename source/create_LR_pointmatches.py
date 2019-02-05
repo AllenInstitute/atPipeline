@@ -8,24 +8,15 @@ def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    # output directories
-    downsample_dir   = os.path.join(projectRoot, p.dataOutputFolder, "low_res")
-    numsections_file = os.path.join(downsample_dir, "numsections")
-
-    # stacks
-    lowres_stack = "LR_DRP_STI_Session%d"%(session)
-
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
+    #output directories
+    downsample_dir   = os.path.join(projectRoot, p.dataOutputFolder, "low_res")
+
     #point match collections
-    lowres_pm_collection = "%s_Lowres_3D"%renderProject.name
+    lowres_pm_collection = "%s_LowRes_3D"%renderProject.name
 
-    #get numsections
-    f = open(numsections_file)
-    numSections = int(f.readline())
-    print ("Number of sections to create pointmatches for: " + str(numSections))
-
-    jsondir  = os.path.join(projectRoot, p.dataOutputFolder, "tilepairfiles")
+    jsondir  = os.path.join(projectRoot, p.dataOutputFolder, "lowres_tilepairfiles")
     jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
 
     #SIFT Point Match Client

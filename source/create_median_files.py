@@ -13,15 +13,15 @@ def run(p, sessionFolder):
 
     #Output directories
     median_dir       = os.path.join("%s"%projectroot, p.dataOutputFolder, "medians")
-    median_json       = os.path.join(median_dir, "median_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
+    median_json      = os.path.join(median_dir, "median_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
 
     #Make sure output folder exist
     if os.path.isdir(median_dir) == False:
        os.mkdir(median_dir)
 
     #stacks
-    acq_stack        = "ACQ_Session%d"%(session)
-    median_stack     = "MED_Session%d"%(session)
+    acq_stack        = "S%d_Session%d"%(session, session)
+    median_stack     = "S%d_Medians"%(session)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 

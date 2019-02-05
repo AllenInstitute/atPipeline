@@ -10,10 +10,11 @@ def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    lowresStack             = "LR_DRP_STI_Session%d"%(session)
-    lowresRoughAlignedStack = "RA_Session%d"%(session)
-    inputStack              = "DRP_STI_Session%d"%(session)
-    outputStack             = "RAM_Session%d"%(session)
+    lowresStack             = "S%d_Stitched_Dropped_LowRes"%(session)
+
+    inputStack              = "S%d_Stitched_Dropped"%(session)
+    outputStack             = "S%d_RoughAligned"%(session)
+
     renderProject           = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
     firstribbon             = p.firstRibbon
     lastribbon              = p.lastRibbon
@@ -28,7 +29,7 @@ def run(p, sessionFolder):
     scale = 0.05
 
     #Run docker command
-    cmd = "docker exec " + "rpa"
+    cmd = "docker exec " + p.rpaContainer
     cmd = cmd + " python -m renderapps.rough_align.ApplyLowRes2HighRes"
     cmd = cmd + " --render.host %s"                %renderProject.host
     cmd = cmd + " --render.owner %s "              %renderProject.owner
@@ -42,7 +43,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --input_stack %s"                %inputStack
     cmd = cmd + " --lowres_stack %s"               %lowresStack
     cmd = cmd + " --prealigned_stack %s"           %inputStack
-    cmd = cmd + " --output_stack RA_Session%d"     %(session)
+    cmd = cmd + " --output_stack %s"     		   %(outputStack)
 
     #TODO: get the Z's right..
     cmd = cmd + " --minZ 0"#%d"                  %(p.firstSection*100)

@@ -16,8 +16,8 @@ def run(p, sessionFolder):
     output_json    = os.path.join(dataOutputFolder, "output_roughalignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
 
     #stacks
-    inputStack     = "LR_DRP_STI_Session%d"%(session)
-    outputStack    = "RA_LR_Session%d"%(session)
+    inputStack     = "S%d_Stitched_Dropped_LowRes"%(session)
+    outputStack    = "S%d_RoughAligned_LowRes"%(session)
 
     renderProject  = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
