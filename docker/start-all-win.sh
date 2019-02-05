@@ -12,6 +12,6 @@ sh ./start-atmodules-windows.sh $BUILD
 sh ./start-rpa-windows.sh $BUILD
 
 #RENDER PYTHON APPS MASTER BRANCH
-sh ./start-rpa-master-windows.sh $BUILD
+#sh ./start-rpa-master-windows.sh $BUILD
 
 echo "Done.."

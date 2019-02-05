@@ -12,7 +12,7 @@ def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
+    renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
     outputFolder  = os.path.join(projectRoot, p.dataOutputFolder, "json_tilespecs_consolidation_master")
 
     match_collection_name = "%s_HR_2D"%(renderProject.name)

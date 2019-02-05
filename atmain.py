@@ -64,14 +64,29 @@ if __name__ == '__main__':
            apply_lowres_to_highres.run(p, sessionFolder)
 
         #Consolidate transforms
-        if p.consolidateRoughAlignedRenderTransforms == True:
+        if p.consolidateRoughAlignedStackTransforms == True:
            print("Consolidating Rough Aligned RenderTransforms: "+ sessionFolder)
-           consolidate_render_transforms.run(p, sessionFolder)
+           consolidate_stack_transforms.run(p, sessionFolder)
 
         #Create 2D point matches
         if p.create2DPointMatches == True:
            print("Create 2D pointmatches (tile on tile) for session: "+ sessionFolder)
            create_2D_pointmatches.run(p, sessionFolder)
+
+       #Create HR tile pairs
+        if p.createHRTilePairs == True:
+           print("Create HighResolution tile pairs.")
+           create_HR_tilepairs.run(p, sessionFolder)
+
+        #Create HR pointmatches
+        if p.createHRPointMatches == True:
+           print("Create HighResolution point matches.")
+           create_HR_pointmatches.run(p, sessionFolder)
+
+        #Create FineAligned stack
+        if p.createFineAlignedStacks == True:
+           print("Create FineAligned Stacks.")
+           create_fine_aligned_stacks.run(p, sessionFolder)
 
 
     timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)

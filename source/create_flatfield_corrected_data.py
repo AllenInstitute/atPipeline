@@ -23,7 +23,7 @@ def run(p, sessionFolder):
     median_stack     = "MED_Session%d"%(session)
     flatfield_stack  = "FF_Session%d"%(session)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
     #Create json files and apply median.
     for sectnum in range(p.firstSection, p.lastSection + 1):

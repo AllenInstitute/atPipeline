@@ -8,7 +8,7 @@ def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
     # stacks
     input_stack = "RA_CONS_Session%d"%(session)

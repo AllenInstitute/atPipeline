@@ -15,7 +15,7 @@ def run(p, sessionFolder):
     # stacks
     lowres_stack = "LR_DRP_STI_Session%d"%(session)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
     #point match collections
     lowres_pm_collection = "%s_Lowres_3D"%renderProject.name
@@ -39,7 +39,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --name PointMatchFull"
     cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.0.2-SNAPSHOT-standalone.jar"
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
-    cmd = cmd + " --collection %s_lowres_round"             %(p.renderProjectName)
+    cmd = cmd + " --collection %s_lowres_round"             %(p.projectName)
     cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
     cmd = cmd + " --pairJson %s"                            %(u.toDockerMountedPath(jsonfile, p.prefixPath))
     cmd = cmd + " --renderWithFilter true"

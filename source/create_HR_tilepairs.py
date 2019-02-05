@@ -12,7 +12,7 @@ def run(p, sessionFolder):
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
     input_stack = "RA_CONS_Session%d"%(session)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
     jsonOutputFolder  = os.path.join(projectRoot, p.dataOutputFolder, "high_res_tilepairfiles")
 
     # Make sure that the output folder exist

@@ -19,7 +19,7 @@ def run(p, sessionFolder):
     inputStack     = "LR_DRP_STI_Session%d"%(session)
     outputStack    = "RA_LR_Session%d"%(session)
 
-    renderProject  = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
+    renderProject  = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
 	#point match collections
     lowresPmCollection = "%s_lowres_round"%renderProject.name

@@ -50,7 +50,8 @@ class ATDataIni:
         self.atmContainer                             = general['AT_MODULES_CONTAINER']
         self.renderHost                               = general['RENDER_HOST']
         self.renderProjectOwner                       = general['RENDER_PROJECT_OWNER']
-        self.renderProjectName                        = general['RENDER_PROJECT_NAME']
+        self.projectName                              = general['PROJECT_NAME']
+        self.dataOutputFolder                         = os.path.join(  self.dataOutputFolder, self.projectName)
         self.clientScripts                            = general['CLIENT_SCRIPTS']
         self.port                                     = int(general['PORT'])
         self.memGB                                    = general['MEM_GB']

@@ -23,7 +23,7 @@ def run(p, sessionFolder):
     acq_stack        = "ACQ_Session%d"%(session)
     median_stack     = "MED_Session%d"%(session)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
     with open(u.median_template) as json_data:
          med = json.load(json_data)

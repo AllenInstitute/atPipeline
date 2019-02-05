@@ -14,7 +14,7 @@ def run(p, sessionFolder):
     lowresRoughAlignedStack = "RA_Session%d"%(session)
     inputStack              = "DRP_STI_Session%d"%(session)
     outputStack             = "RAM_Session%d"%(session)
-    renderProject           = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
+    renderProject           = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
     firstribbon             = p.firstRibbon
     lastribbon              = p.lastRibbon
 
