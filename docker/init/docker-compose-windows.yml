@@ -36,12 +36,6 @@ services:
       image: neurodata/ndviz:beta
       ports:
           - "8001:8080"
-# render-python:
-#   image: fcollman/render-python-apps 
-#   volumes:
-#       - e:/data:/mnt/data/  
-#       - c:/pDisk/atExplorer/ThirdParty/atPipeline:/pipeline  
-#       - c:/pDisk/atExplorer/ThirdParty/Render-Python-Apps:/usr/local/render-python-apps  
 
 volumes:
     mongodata:

@@ -9,9 +9,7 @@ sh ./start-render-services.sh $BUILD
 sh ./start-atmodules-windows.sh $BUILD
 
 #RENDER PYTHON APPS (MULTCHAN branch) 
-sh ./start-rpa-windows.sh $BUILD
+sh ./start-atcore-windows.sh $BUILD
 
-#RENDER PYTHON APPS MASTER BRANCH
-#sh ./start-rpa-master-windows.sh $BUILD
 
 echo "Done.."

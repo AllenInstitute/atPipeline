@@ -1,6 +1,5 @@
-FROM docker.aibs-artifactory.corp.alleninstitute.org/fcollman/render-modules-candidate:multi-channel-correction
+FROM docker.aibs-artifactory.corp.alleninstitute.org/fcollman/render-modules:master
 MAINTAINER Forrest Collman (forrest.collman@gmail.com)
-
 RUN mkdir -p /usr/local/render-python-apps
 WORKDIR /usr/local/render-python-apps
 COPY requirements.txt /usr/local/render-python-apps
@@ -9,8 +8,17 @@ RUN pip install setuptools --upgrade --disable-pip-version-check
 RUN pip install argschema --upgrade --disable-pip-version-check
 RUN pip install jupyter
 RUN apt-get update && apt-get install libspatialindex-dev -y
+RUN conda install nomkl
+COPY . /usr/local/render-python-apps
 
-## SPARK
+WORKDIR /shared/render-modules
+RUN pip install -e .
+WORKDIR /usr/local/render-python-apps
+
+RUN pip install -r requirements.txt
+RUN python setup.py install
+
+#=====================  SPARK  ===============
 ENV SPARK_VERSION 2.0.2
 ENV SPARK_PACKAGE spark-${SPARK_VERSION}-bin-hadoop2.7
 ENV SPARK_HOME /usr/spark-${SPARK_VERSION}
@@ -22,16 +30,3 @@ RUN curl -sL --retry 3 \
  | tar x -C /usr/ \
 && mv /usr/$SPARK_PACKAGE $SPARK_HOME \
 && chown -R root:root $SPARK_HOME
-
-RUN conda install nomkl
-COPY . /usr/local/render-python-apps
-
-WORKDIR /shared/render-modules
-RUN pip install .
-WORKDIR /usr/local/render-python-apps
-
-
-RUN pip install -r requirements.txt
-RUN python setup.py install
-
-
