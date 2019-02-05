@@ -15,7 +15,7 @@ def run(p, sessionFolder):
     renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
     outputFolder  = os.path.join(projectRoot, p.dataOutputFolder, "json_tilespecs_consolidation_master")
 
-    cmd = "docker exec rpa-master" #+ p.rpaContainer
+    cmd = "docker exec "+ p.rpaContainer
     cmd = cmd + " python -m rendermodules.stack.consolidate_transforms"
     cmd = cmd + " --render.host %s"                           %(renderProject.host)
     cmd = cmd + " --render.project %s"                        %(renderProject.name)

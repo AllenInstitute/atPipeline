@@ -16,10 +16,10 @@ def run(p, sessionFolder):
     output_json    = os.path.join(dataOutputFolder, "output_roughalignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
 
     #stacks
-    lowresStack       = "LR_DRP_STI_Session%d"%(session)
-    roughalignedStack = "RA_LR_Session%d"%(session)
+    inputStack     = "LR_DRP_STI_Session%d"%(session)
+    outputStack    = "RA_LR_Session%d"%(session)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
+    renderProject  = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
 
 	#point match collections
     lowresPmCollection = "%s_lowres_round"%renderProject.name
@@ -31,10 +31,10 @@ def run(p, sessionFolder):
     if os.path.isdir(dataOutputFolder) == False:
         os.mkdir(dataOutputFolder)
 
-    u.saveroughalignjson(ra, input_json, p.renderHost, 80, renderProject.owner, renderProject.name, lowresStack, lowresPmCollection, roughalignedStack, p.clientScripts, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
+    u.saveRoughAlignJSON(ra, input_json, p.renderHost, 80, renderProject.owner, renderProject.name, inputStack, outputStack, lowresPmCollection, p.clientScripts, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
 
     #Run docker command
-    cmd = "docker exec " + "rpa-master"
+    cmd = "docker exec " + p.rpaContainer
     cmd = cmd + " python -m rendermodules.solver.solve"
     cmd = cmd + " --input_json %s" %(u.toDockerMountedPath(input_json, p.prefixPath))
     cmd = cmd + " --output_json %s"%(u.toDockerMountedPath(output_json, p.prefixPath))

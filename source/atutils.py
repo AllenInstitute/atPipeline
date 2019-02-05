@@ -21,6 +21,7 @@ stitching_template     = os.path.join(templates_folder, "stitching.json")
 flatfield_template     = os.path.join(templates_folder, "flatfield.json")
 deconvolution_template = os.path.join(templates_folder, "deconvolution.json")
 alignment_template     = os.path.join(templates_folder, "roughalign.json")
+fine_alignment_template= os.path.join(templates_folder, "fine_align.json")
 
 def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")
@@ -75,6 +76,9 @@ class ATDataIni:
         self.applyLowResToHighRes                     = toBool(general['APPLY_LOWRES_TO_HIGH_RES'])
         self.consolidateRoughAlignedStackTransforms   = toBool(general['CONSOLIDATE_ROUGH_ALIGNED_STACK_TRANSFORMS'])
         self.create2DPointMatches                     = toBool(general['CREATE_2D_POINTMATCHES'])
+        self.createHRTilePairs                        = toBool(general['CREATE_HR_TILEPAIRS'])
+        self.createHRPointMatches                     = toBool(general['CREATE_HR_POINTMATCHES'])
+        self.createFineAlignedStacks                  = toBool(general['CREATE_FINE_ALIGNED_STACKS'])
 
         #Tilepair client
         self.excludeCornerNeighbors           = toBool(tp_client['EXCLUDE_CORNER_NEIGHBOURS'])
@@ -101,8 +105,8 @@ class ATDataIni:
         for session in self.sessions:
           self.sessionFolders.append(os.path.join(self.dataRootFolder, "raw", "data", self.ribbons[0], session))
 
-        def getStateTableFileName(self, ribbon, session, sectnum):
-          return os.path.join(self.dataRootFolder, self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
+    def getStateTableFileName(self, ribbon, session, sectnum):
+        return os.path.join(self.dataRootFolder, self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
 
 
 class RenderProject:
@@ -193,7 +197,7 @@ def savestitchingjson(template, outfile, owner, project, flatfield_stack, stitch
     template['baseDataUrl']            = "http://%s/render-ws/v1"%(render_host)
     dump_json(template, outfile)
 
-def saveroughalignjson(template, outFile, renderHost, port, owner, project, lowresStack, lowresPmCollection, roughalignedStack, clientScripts, logLevel, nFirst, nLast, dataOutputFolder):
+def saveRoughAlignJSON(template, outFile, renderHost, port, owner, project, input_stack, output_stack, lowresPmCollection, clientScripts, logLevel, nFirst, nLast, dataOutputFolder):
     template['regularization']['log_level']                  = logLevel
     template['matrix_assembly']['log_level']                 = logLevel
 
@@ -201,7 +205,42 @@ def saveroughalignjson(template, outFile, renderHost, port, owner, project, lowr
     template['output_stack']['owner']                        = owner
     template['output_stack']['log_level']                    = logLevel
     template['output_stack']['project']                      = project
-    template['output_stack']['name']                         = roughalignedStack
+    template['output_stack']['port']                         = port
+    template['output_stack']['host']                         = renderHost
+    template['output_stack']['name']                         = output_stack
+    template['input_stack']['client_scripts']                = clientScripts
+    template['input_stack']['owner']                         = owner
+    template['input_stack']['log_level']                     = logLevel
+    template['input_stack']['project']                       = project
+    template['input_stack']['port']                          = port
+    template['input_stack']['host']                          = renderHost
+    template['input_stack']['name']                          = input_stack
+
+    template['pointmatch']['client_scripts']                 = clientScripts
+    template['pointmatch']['owner']                          = owner
+    template['pointmatch']['log_level']                      = logLevel
+    template['pointmatch']['project']                        = project
+    template['pointmatch']['name']                           = lowresPmCollection
+    template['pointmatch']['port']                           = port
+    template['pointmatch']['host']                           = renderHost
+
+    template['hdf5_options']['log_level']                    = logLevel
+    template['hdf5_options']['output_dir']                   = dataOutputFolder
+
+    template['last_section']                                 = nLast
+    template['first_section']                                = nFirst
+    template['log_level']                                    = "INFO"
+    dump_json(template, outFile)
+
+def saveFineAlignJSON(template, outFile, renderHost, port, owner, project, input_stack, output_stack, lowresPmCollection, roughalignedStack, clientScripts, logLevel, nFirst, nLast, dataOutputFolder):
+    template['regularization']['log_level']                  = logLevel
+    template['matrix_assembly']['log_level']                 = logLevel
+
+    template['output_stack']['client_scripts']               = clientScripts
+    template['output_stack']['owner']                        = owner
+    template['output_stack']['log_level']                    = logLevel
+    template['output_stack']['project']                      = project
+    template['output_stack']['name']                         = output_stack
     template['output_stack']['port']                         = port
     template['output_stack']['host']                         = renderHost
 
@@ -211,6 +250,7 @@ def saveroughalignjson(template, outFile, renderHost, port, owner, project, lowr
     template['input_stack']['project']                       = project
     template['input_stack']['port']                          = port
     template['input_stack']['host']                          = renderHost
+    template['input_stack']['name']                          = input_stack
 
     template['pointmatch']['client_scripts']                 = clientScripts
     template['pointmatch']['owner']                          = owner

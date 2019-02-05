@@ -12,7 +12,7 @@ def run(p, sessionFolder):
 
     #Output directories
     dataOutputFolder       = os.path.join(projectRoot, p.dataOutputFolder, "fine_aligned")
-    input_json     = os.path.join(dataOutputFolder, "fine_alignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
+    input_json     = os.path.join(dataOutputFolder, "input_fine_alignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
     output_json    = os.path.join(dataOutputFolder, "output_fine_alignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
 
     #stacks
@@ -24,17 +24,17 @@ def run(p, sessionFolder):
 	#point match collections
     match_collection_name = "%s_HR_3D"%(renderProject.name)
 
-    with open(u.alignment_template) as json_data:
+    with open(u.fine_alignment_template) as json_data:
        ra = json.load(json_data)
 
     #Create folder if not exists
     if os.path.isdir(dataOutputFolder) == False:
         os.mkdir(dataOutputFolder)
 
-    u.saveroughalignjson(ra, input_json, p.renderHost, 80, renderProject.owner, renderProject.name, output_stack, match_collection_name, output_stack, p.clientScripts, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
+    u.saveFineAlignJSON(ra, input_json, p.renderHost, 80, renderProject.owner, renderProject.name, input_stack, output_stack, match_collection_name, output_stack, p.clientScripts, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
 
     #Run docker command
-    cmd = "docker exec " + "rpa-master"
+    cmd = "docker exec " + p.rpaContainer
     cmd = cmd + " python -m rendermodules.solver.solve"
     cmd = cmd + " --input_json %s" %(u.toDockerMountedPath(input_json, p.prefixPath))
     cmd = cmd + " --output_json %s"%(u.toDockerMountedPath(output_json, p.prefixPath))

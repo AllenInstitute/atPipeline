@@ -18,7 +18,7 @@ def run(p, sessionFolder):
     match_collection_name = "%s_HR_2D"%(renderProject.name)
     delta = 250
 
-    cmd = "docker exec rpa-master"
+    cmd = "docker exec " + p.rpaContainer
     cmd = cmd + " python -m renderapps.stitching.create_montage_pointmatches_in_place"
     cmd = cmd + " --render.host %s"                           %(renderProject.host)
     cmd = cmd + " --render.project %s"                        %(renderProject.name)
