@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
         #Create Renderstacks (multi) for the raw data
         if p.createRawDataRenderMultiStacks == True:
-           print("Creating ACQ Stacks for session: " + sessionFolder)
+           print("Creating Raw Data Stacks for session: " + sessionFolder)
            create_rawdata_render_multi_stacks.run(p, sessionFolder)
 
         #Calculate median files
@@ -44,14 +44,14 @@ if __name__ == '__main__':
            create_lowres_stacks.run(p, sessionFolder)
 
         #Create TilePairs
-        if p.createTilePairs == True:
+        if p.createLRTilePairs == True:
            print("Create TilePairs for Session:" + sessionFolder)
-           create_tile_pairs.run(p, sessionFolder)
+           create_LR_tilepairs.run(p, sessionFolder)
 
         #Create PointMatches
-        if p.createPointMatches == True:
+        if p.createLRPointMatches == True:
            print("Create Pointmatches: "+ sessionFolder)
-           create_pointmatches.run(p, sessionFolder)
+           create_LR_pointmatches.run(p, sessionFolder)
 
         #Rough Align
         if p.createRoughAlignedStacks == True:

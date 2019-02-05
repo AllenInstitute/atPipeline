@@ -12,6 +12,7 @@ services:
            - MONGO_PORT=27017
            - NDVIZ_URL=${HOSTNAME}:5000
            - JAVA_OPTIONS=-Xms10g -Xmx10g -server -Djava.awt.headless=true
+           - WEB_SERVICE_MAX_TILE_SPECS_TO_RENDER=100  
        volumes:
            - e:\Documents\data:/mnt
        logging:
