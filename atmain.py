@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
         #Create Renderstacks (multi) for the raw data
         if p.createRawDataRenderMultiStacks == True:
-           print("Creating ACQ Stacks for session: " + sessionFolder)
+           print("Creating Raw Data Stacks for session: " + sessionFolder)
            create_rawdata_render_multi_stacks.run(p, sessionFolder)
 
         #Calculate median files
@@ -44,19 +44,49 @@ if __name__ == '__main__':
            create_lowres_stacks.run(p, sessionFolder)
 
         #Create TilePairs
-        if p.createTilePairs == True:
+        if p.createLRTilePairs == True:
            print("Create TilePairs for Session:" + sessionFolder)
-           create_tile_pairs.run(p, sessionFolder)
+           create_LR_tilepairs.run(p, sessionFolder)
 
         #Create PointMatches
-        if p.createPointMatches == True:
+        if p.createLRPointMatches == True:
            print("Create Pointmatches: "+ sessionFolder)
-           create_pointmatches.run(p, sessionFolder)
+           create_LR_pointmatches.run(p, sessionFolder)
 
         #Rough Align
         if p.createRoughAlignedStacks == True:
            print("Create Rough Aligned Stacks: "+ sessionFolder)
            create_rough_aligned_stacks.run(p, sessionFolder)
+
+        #Consolidate transforms
+        if p.applyLowResToHighRes == True:
+           print("Applying low resolution alignment transforms to high resoloution stack: "+ sessionFolder)
+           apply_lowres_to_highres.run(p, sessionFolder)
+
+        #Consolidate transforms
+        if p.consolidateRoughAlignedStackTransforms == True:
+           print("Consolidating Rough Aligned RenderTransforms: "+ sessionFolder)
+           consolidate_stack_transforms.run(p, sessionFolder)
+
+        #Create 2D point matches
+        if p.create2DPointMatches == True:
+           print("Create 2D pointmatches (tile on tile) for session: "+ sessionFolder)
+           create_2D_pointmatches.run(p, sessionFolder)
+
+       #Create HR tile pairs
+        if p.createHRTilePairs == True:
+           print("Create HighResolution tile pairs.")
+           create_HR_tilepairs.run(p, sessionFolder)
+
+        #Create HR pointmatches
+        if p.createHRPointMatches == True:
+           print("Create HighResolution point matches.")
+           create_HR_pointmatches.run(p, sessionFolder)
+
+        #Create FineAligned stack
+        if p.createFineAlignedStacks == True:
+           print("Create FineAligned Stacks.")
+           create_fine_aligned_stacks.run(p, sessionFolder)
 
 
     timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)

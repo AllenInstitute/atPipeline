@@ -11,7 +11,7 @@ def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
     for sectnum in range(p.firstSection, p.lastSection + 1):
         print("Processing section: " + str(sectnum))
@@ -32,7 +32,8 @@ def run(p, sessionFolder):
         cmd = cmd + " --statetableFile %s"        %(u.toDockerMountedPath(statetablefile,  p.prefixPath))
         cmd = cmd + " --projectDirectory %s"      %(u.toDockerMountedPath(projectroot,   p.prefixPath))
         cmd = cmd + " --dataOutputFolder %s"      %(p.dataOutputFolder.replace('\\', '/'))
-        cmd = cmd + " --outputStackPrefix ACQ_"
+        cmd = cmd + " --outputStackPrefix S%d_"   %(session)
+        cmd = cmd + " --reference_channel %s"      %(p.referenceChannel)
 
 		#Run =============
         print ("Running: " + cmd.replace('--', '\n--'))

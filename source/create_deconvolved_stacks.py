@@ -34,10 +34,10 @@ def run(p, sessionFolder):
        os.mkdir(deconv_dir)
 
     #stacks
-    ffStack   = "FF_Session%d"%(session)
-    dcvStack      = "DCV_Session%d"%(session)
+    ffStack   = "S%d_FlatFielded"%(session)
+    dcvStack  = "S%d_Deconvolved"%(session)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 	
     channels = [p.ch405,p.ch488,p.ch594,p.ch647]
     #Create json files and apply median.

@@ -1,9 +1,6 @@
 [submodule "docker/at_modules"]
 	path = docker/at_modules
 	url = ../../AllenInstitute/at_modules
-[submodule "docker/render-deploy"]
-	path = docker/render-deploy
-	url = ../../fcollman/render-deploy.git
 [submodule "docker/render-modules"]
 	path = docker/render-modules
 	url = ../../AllenInstitute/render-modules.git

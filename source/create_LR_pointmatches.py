@@ -4,29 +4,19 @@ import posixpath
 import atutils as u
 import timeit
 
-
 def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    # output directories
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
+
+    #output directories
     downsample_dir   = os.path.join(projectRoot, p.dataOutputFolder, "low_res")
-    numsections_file = os.path.join(downsample_dir, "numsections")
-
-    # stacks
-    lowres_stack = "LR_DRP_STI_Session%d"%(session)
-
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
 
     #point match collections
-    lowres_pm_collection = "%s_Lowres_3D"%renderProject.name
+    lowres_pm_collection = "%s_LowRes_3D"%renderProject.name
 
-    #get numsections
-    f = open(numsections_file)
-    numSections = int(f.readline())
-    print ("Number of sections to create pointmatches for: " + str(numSections))
-
-    jsondir  = os.path.join(projectRoot, p.dataOutputFolder, "tilepairfiles")
+    jsondir  = os.path.join(projectRoot, p.dataOutputFolder, "lowres_tilepairfiles")
     jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
 
     #SIFT Point Match Client
@@ -40,7 +30,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --name PointMatchFull"
     cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.0.3-SNAPSHOT-standalone.jar"
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
-    cmd = cmd + " --collection %s_lowres_round"             %(p.renderProjectName)
+    cmd = cmd + " --collection %s_lowres_round"             %(p.projectName)
     cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
     cmd = cmd + " --pairJson %s"                            %(u.toDockerMountedPath(jsonfile, p.prefixPath))
     cmd = cmd + " --renderWithFilter true"

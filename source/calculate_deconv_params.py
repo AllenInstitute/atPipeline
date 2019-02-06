@@ -11,7 +11,7 @@ def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    renderProject     = u.RenderProject("ATExplorer", p.renderHost, p.renderProjectName)
+    renderProject     = u.RenderProject("ATExplorer", p.renderHost, p.projectName)
 	
     #RUN python script to calculate scale and background factors for each channel.                     
     cmd = "python deconv_scale_factor_session.py"

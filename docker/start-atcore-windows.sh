@@ -4,7 +4,7 @@ echo "Build flag is "$BUILD
 
 #RENDER PYTHON APPS
 image_tag="fcollman/render-python-apps"
-container_name="rpa-master"
+container_name="rpa"
 
 echo " ======== Building and starting Docker container with name: $container_name =============="
 
@@ -22,6 +22,7 @@ docker run -d --name $container_name \
 -v e:/Documents/data:/mnt/  \
 -v c:/pDisk/atPipeline/pipeline:/pipeline  \
 -v c:/pDisk/atPipeline/docker/render-python-apps:/usr/local/render-python-apps  \
+-v c:/pDisk/atPipeline/docker/render-modules:/shared/render-modules  \
 -i -t $image_tag /bin/bash
 
 echo "Done.."

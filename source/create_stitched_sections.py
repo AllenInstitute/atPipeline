@@ -18,10 +18,10 @@ def run(p, sessionFolder):
        os.mkdir(stitching_dir)
 
     #stacks
-    flatfield_stack  = "FF_Session%d"%(session)
-    stitched_stack   = "STI_Session%d"%(session)
+    flatfield_stack  = "S%d_FlatFielded"%(session)
+    stitched_stack   = "S%d_Stitched"%(session)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.renderProjectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
 	#Create json files and start stitching...
     for sectnum in range(p.firstSection, p.lastSection + 1):

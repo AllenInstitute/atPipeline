@@ -1,0 +1,97 @@
+{
+ "assemble_from_file": "",
+ "showtiming": 1,
+ "solve_type": "3D",
+ "render_output": "null",
+ "last_section": 20,
+ "first_section": 10,
+ "log_level": "INFO",
+ "profile_data_load": false,
+ "ingest_from_file": "",
+ "fullsize_transform": false,
+ "output_mode": "stack",
+ "close_stack": true,
+ "overwrite_zlayer": true,
+ "n_parallel_jobs": 32,
+ "poly_order": 1,
+
+ "regularization": {
+   "log_level": "ERROR",
+   "freeze_first_tile": false,
+   "poly_factors": null,
+   "default_lambda": 10000,
+   "translation_factor": 0.00001
+ },
+
+ "hdf5_options": {
+   "log_level": "ERROR",
+   "output_dir": "/pipeline/forcron/EMalignment/atalign",
+   "chunks_per_file": -1
+ },
+
+ "matrix_assembly": {
+   "cross_pt_weight": 0.5,
+   "depth": 10,
+   "npts_max": 100,
+   "log_level": "ERROR",
+   "inverse_dz": true,
+   "choose_random": false,
+   "npts_min": 5,
+   "montage_pt_weight": 1.0
+ },
+
+ "output_stack": {
+   "client_scripts": "/allen/aibs/pipeline/image_processing/volume_assembly/render-jars/production/scripts",
+   "mongo_port": 0,
+   "owner": "ATExplorer",
+   "collection_type": "stack",
+   "log_level": "ERROR",
+   "project": "",
+   "mongo_host": "",
+   "mongo_authenticationDatabase": "",
+   "use_rest": false,
+   "name": "",
+   "port": 80,
+   "mongo_password": "",
+   "host": "",
+   "mongo_userName": "",
+   "db_interface": "render"
+ },
+
+ "input_stack": {
+   "client_scripts": "/allen/aibs/pipeline/image_processing/volume_assembly/render-jars/production/scripts",
+   "mongo_port": 0,
+   "owner": "ATExplorer",
+   "collection_type": "stack",
+   "log_level": "ERROR",
+   "project": "",
+   "mongo_host": "",
+   "mongo_authenticationDatabase": "",
+   "use_rest": false,
+   "name": "RA_Cons_Session1",
+   "port": 80,
+   "mongo_password": "",
+   "host": "",
+   "mongo_userName": "",
+   "db_interface": "render"
+ },
+
+ "pointmatch": {
+   "client_scripts": "/allen/aibs/pipeline/image_processing/volume_assembly/render-jars/production/scripts",
+   "mongo_port": 0,
+   "owner": "ATExplorer",
+   "collection_type": "pointmatch",
+   "log_level": "ERROR",
+   "project": "",
+   "mongo_host": "",
+   "mongo_authenticationDatabase": "",
+   "name": "",
+   "port": 80,
+   "mongo_password": "",
+   "host": "",
+   "mongo_userName": "",
+   "db_interface": "render"
+ },
+
+ "transformation": "rigid"
+}
