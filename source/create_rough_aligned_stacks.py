@@ -55,4 +55,3 @@ if __name__ == "__main__":
 
     timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
     print("Elapsed time: " + timeDuration + " minutes")
-

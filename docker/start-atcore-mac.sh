@@ -1,21 +1,20 @@
 #! /usr/bin/bash
 
-#RENDER PYTHON APPS
-image_tag="fcollman/render-python-apps"
-container="renderapps_multchan"
+image_tag="atpipeline/atcore"
+container_name="atcore"
 
-echo " ======== Building and starting Docker container: $container =============="
-echo "Building image with tag: $image_tag"
-docker build -t $image_tag ./DockerInit/Dockerfile-RenderPythonApps-mac  
+echo " ======== Starting Docker container with name: $container_name =============="
 
-docker kill $container
-docker rm $container
+echo "Killing container with name: $container_name"
+docker kill $container_name
+docker rm $container_name 
 
-echo "Starting container: $container"
-docker run -d --name $container \
--v /Users/synbio/Documents/data:/mnt/data/  \
--v /Users/synbio/ATExplorer/ThirdParty/atPipeline:/pipeline  \
--v /Users/synbio/ATExplorer/ThirdParty/Render-Python-Apps:/usr/local/render-python-apps  \
+echo "Starting container with name: $container_name"
+docker run -d --name $container_name \
+-v /Users/eric/nobackup:/mnt \
+-v /Users/eric/tra/atPipeline/pipeline:/pipeline \
+-v /Users/eric/tra/atPipeline/docker/render-python-apps:/usr/local/render-python-apps  \
 -i -t $image_tag /bin/bash
 
 echo "Done.."
+

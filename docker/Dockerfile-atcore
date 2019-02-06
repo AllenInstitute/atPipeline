@@ -1,0 +1,100 @@
+#
+# Docker file to build entire AT pipeline software stack into a single container
+# Based on
+#   https://raw.githubusercontent.com/fcollman/render-deploy/base-image/shared/Dockerfile
+#
+# TODO: Seperate builder for artifacts
+# TODO: Check-out git repos as part of build process
+# TODO: Set up CI
+#
+
+FROM continuumio/miniconda:4.5.12
+RUN conda update conda && conda update python
+RUN conda install nomkl
+#install java
+RUN set -ex && \
+    echo 'deb http://deb.debian.org/debian stretch-backports main' \
+      > /etc/apt/sources.list.d/stretch-backports.list && \
+    apt-get update -y && \
+    apt-get install -t \
+      stretch-backports \
+      openjdk-8-jdk \
+      ca-certificates-java -y &&\
+    rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /shared
+WORKDIR /shared
+RUN apt-get update && \
+    apt-get install --no-install-recommends gcc build-essential libgeos-dev imagemagick xvfb nano vim -y  
+
+# add a simple script that can auto-detect the appropriate JAVA_HOME value
+# based on whether the JDK or only the JRE is installed
+RUN { \
+		echo '#!/bin/sh'; \
+		echo 'set -e'; \
+		echo; \
+		echo 'dirname "$(dirname "$(readlink -f "$(which javac || which java)")")"'; \
+	} > /usr/local/bin/docker-java-home \
+	&& chmod +x /usr/local/bin/docker-java-home
+
+# do some fancy footwork to create a JAVA_HOME that's cross-architecture-safe
+RUN ln -svT "/usr/lib/jvm/java-8-openjdk-$(dpkg --print-architecture)" /docker-java-home
+
+# Spark setup
+ENV SPARK_VERSION 2.0.2
+ENV SPARK_PACKAGE spark-${SPARK_VERSION}-bin-hadoop2.7
+ENV SPARK_HOME /usr/spark-${SPARK_VERSION}
+ENV SPARK_DIST_CLASSPATH="$HADOOP_HOME/etc/hadoop/*:$HADOOP_HOME/share/hadoop/common/lib/*:$HADOOP_HOME/share/hadoop/common/*:$HADOOP_HOME/share"
+ENV PATH $PATH:${SPARK_HOME}/bin
+RUN curl -sL --retry 3 \
+"https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop2.7.tgz" \
+ | gunzip \
+ | tar x -C /usr/ \
+&& mv /usr/$SPARK_PACKAGE $SPARK_HOME \
+&& chown -R root:root $SPARK_HOME
+
+# Build the render client scripts
+ENV JAVA_HOME /docker-java-home
+ENV RENDER_JAVA_HOME /docker-java-home
+ENV RENDER_CLIENT_SCRIPTS=/shared/render/render-ws-java-client/src/main/scripts
+
+# Work around OpenJDK bug with surefire plugin
+ENV _JAVA_OPTIONS -Djdk.net.URLClassPath.disableClassPathURLCheck=true
+
+RUN apt-get install -y maven
+
+WORKDIR /shared/render/
+COPY ./render/ /shared/render
+RUN mvn clean
+# use -T 1C option to multi-thread maven, using 1 thread per available core
+RUN mvn -T 1C -Dproject.build.sourceEncoding=UTF-8 package
+
+# Install render-python
+WORKDIR /shared/render-python
+COPY ./render-python/ /shared/render-python
+RUN pip install -e /shared/render-python
+
+# Install render-modules
+
+WORKDIR /shared/render-modules
+COPY ./render-modules/ /shared/render-modules
+RUN pip install -e /shared/render-modules
+
+# Install render-python-apps
+RUN apt-get install libspatialindex-dev -y
+WORKDIR /shared/render-python-apps
+COPY ./render-python-apps/ /shared/render-python-apps
+RUN pip install -e /shared/render-python-apps
+
+# Install at_modules
+WORKDIR /shared/at_modules
+COPY ./at_modules/ /shared/at_modules
+ENV _JAVA_OPTIONS -Djdk.net.URLClassPath.disableClassPathURLCheck=true
+RUN mvn install
+
+# Clean stuff up
+RUN apt-get remove --purge gcc build-essential libgeos-dev -y && apt-get autoremove -y &&\
+    rm -rf /var/lib/apt/lists/*
+
+ENTRYPOINT [ "/usr/bin/tini", "--" ]
+CMD [ "/bin/bash" ]
