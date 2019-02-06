@@ -30,7 +30,7 @@ def run(p, sessionFolder):
     jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
 
     #SIFT Point Match Client
-    cmd = "docker exec " + "rpa-master"
+    cmd = "docker exec " + p.rpaContainer
     cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
     cmd = cmd + " --conf spark.default.parallelism=4750"
     cmd = cmd + " --driver-memory 19g"
@@ -38,7 +38,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --executor-cores 44"
     cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
     cmd = cmd + " --name PointMatchFull"
-    cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.0.2-SNAPSHOT-standalone.jar"
+    cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.0.3-SNAPSHOT-standalone.jar"
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
     cmd = cmd + " --collection %s_lowres_round"             %(p.renderProjectName)
     cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
