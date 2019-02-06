@@ -13,7 +13,7 @@ def run(p, sessionFolder):
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
-    outputFolder  = os.path.join(projectRoot, p.dataOutputFolder, "json_tilespecs_consolidation_master")
+    outputFolder  = os.path.join(projectRoot, p.dataOutputFolder)
 
     match_collection_name = "%s_HR_2D"%(renderProject.name)
     delta = 250
@@ -27,10 +27,10 @@ def run(p, sessionFolder):
     cmd = cmd + " --render.memGB %s"                          %(p.memGB)
     cmd = cmd + " --render.port %s"                           %(p.port)
     cmd = cmd + " --pool_size %s"                             %(p.poolSize)
-    cmd = cmd + " --stack S%d_RoughAligned"             %(session)
+    cmd = cmd + " --stack S%d_RoughAligned"                   %(session)
     cmd = cmd + " --minZ %d"                                  %(p.firstSection)
     cmd = cmd + " --maxZ %d"                                  %(p.lastSection)
-    cmd = cmd + " --dataRoot %s"                              %(u.toDockerMountedPath(p.dataRootFolder, p.prefixPath))
+    cmd = cmd + " --dataRoot %s"                              %(u.toDockerMountedPath(outputFolder, p.prefixPath))
     cmd = cmd + " --matchCollection %s"                       %(match_collection_name)
     cmd = cmd + " --delta %d"                                 %(delta)
     cmd = cmd + " --output_json Test"
