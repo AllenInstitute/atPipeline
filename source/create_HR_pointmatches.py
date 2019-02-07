@@ -14,7 +14,7 @@ def run(p, sessionFolder):
     input_stack = "S%d_RoughAligned_Consolidated"%(session)
 
     #point match collection
-    match_collection_name = "%s_HR"%(renderProject.name)
+    match_collection_name = "%s_HR_3D"%(renderProject.name)
 
     jsonInputFolder  = os.path.join(projectRoot, p.dataOutputFolder, "high_res_tilepairfiles")
     jsonInput = os.path.join(jsonInputFolder, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))

@@ -15,7 +15,7 @@ def run(p, sessionFolder):
     renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
     outputFolder  = os.path.join(projectRoot, p.dataOutputFolder)
 
-    match_collection_name = "%s_HR"%(renderProject.name)
+    match_collection_name = "%s_HR_2D"%(renderProject.name)
     delta = 250
 
     cmd = "docker exec " + p.atCoreContainer

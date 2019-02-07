@@ -22,7 +22,8 @@ def run(p, sessionFolder):
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
 	#point match collections
-    match_collection_name = "%s_HR_3D"%(renderProject.name)
+    pm_collection2D     = "%s_HR_2D"%(renderProject.name)
+    pm_collection3D     = "%s_HR_3D"%(renderProject.name)
 
     with open(u.fine_alignment_template) as json_data:
        ra = json.load(json_data)
@@ -31,7 +32,9 @@ def run(p, sessionFolder):
     if os.path.isdir(dataOutputFolder) == False:
         os.mkdir(dataOutputFolder)
 
-    u.saveFineAlignJSON(ra, input_json, p.renderHost, 80, renderProject.owner, renderProject.name, input_stack, output_stack, match_collection_name, output_stack, p.clientScripts, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
+    u.saveFineAlignJSON(ra, input_json, p.renderHost, 80, renderProject.owner, renderProject.name,
+                            input_stack, output_stack, pm_collection2D, pm_collection3D,
+                            p.clientScripts, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
 
     #Run docker command
     cmd = "docker exec " + p.atCoreContainer
