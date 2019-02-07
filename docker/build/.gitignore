@@ -3,4 +3,5 @@ render-python
 render-modules
 render-python-apps
 at_modules
+vizrelay
 Dockerfile*
