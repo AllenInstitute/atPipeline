@@ -58,7 +58,7 @@ if __name__ == '__main__':
            print("Create Rough Aligned Stacks: "+ sessionFolder)
            create_rough_aligned_stacks.run(p, sessionFolder)
 
-        #Consolidate transforms
+        #Apply lowres transforms to highres stacks
         if p.applyLowResToHighRes == True:
            print("Applying low resolution alignment transforms to high resoloution stack: "+ sessionFolder)
            apply_lowres_to_highres.run(p, sessionFolder)

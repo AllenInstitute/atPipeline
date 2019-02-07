@@ -1,7 +1,7 @@
 version: "2.0"
 services:
     render:
-       image: fcollman/render-ws
+       image: atpipeline/render-ws
        links:
            - mongo
        ports:
