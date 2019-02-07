@@ -29,7 +29,7 @@ def run(p, sessionFolder):
     scale = 0.05
 
     #Run docker command
-    cmd = "docker exec " + p.rpaContainer
+    cmd = "docker exec " + p.atCoreContainer
     cmd = cmd + " python -m renderapps.rough_align.ApplyLowRes2HighRes"
     cmd = cmd + " --render.host %s"                %renderProject.host
     cmd = cmd + " --render.owner %s "              %renderProject.owner

@@ -14,7 +14,7 @@ def run(p, sessionFolder):
 
     renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
-    cmd = "docker exec "+ p.rpaContainer
+    cmd = "docker exec "+ p.atCoreContainer
     cmd = cmd + " python -m rendermodules.stack.consolidate_transforms"
     cmd = cmd + " --render.host %s"                           %(renderProject.host)
     cmd = cmd + " --render.project %s"                        %(renderProject.name)
