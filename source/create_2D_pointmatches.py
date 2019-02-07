@@ -15,10 +15,10 @@ def run(p, sessionFolder):
     renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
     outputFolder  = os.path.join(projectRoot, p.dataOutputFolder)
 
-    match_collection_name = "%s_HR_2D"%(renderProject.name)
+    match_collection_name = "%s_HR"%(renderProject.name)
     delta = 250
 
-    cmd = "docker exec " + p.rpaContainer
+    cmd = "docker exec " + p.atCoreContainer
     cmd = cmd + " python -m renderapps.stitching.create_montage_pointmatches_in_place"
     cmd = cmd + " --render.host %s"                           %(renderProject.host)
     cmd = cmd + " --render.project %s"                        %(renderProject.name)

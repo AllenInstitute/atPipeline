@@ -46,7 +46,7 @@ class ATDataIni:
         self.dataOutputFolder                         = os.path.join(general['PROCESSED_DATA_FOLDER'])
 
         #Process parameters
-        self.rpaContainer                             = general['RENDER_PYTHON_APPS_CONTAINER']
+        self.atCoreContainer                             = general['RENDER_PYTHON_APPS_CONTAINER']
         self.atmContainer                             = general['AT_MODULES_CONTAINER']
         self.renderHost                               = general['RENDER_HOST']
         self.renderProjectOwner                       = general['RENDER_PROJECT_OWNER']

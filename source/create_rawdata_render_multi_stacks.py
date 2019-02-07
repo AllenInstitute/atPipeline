@@ -20,7 +20,7 @@ def run(p, sessionFolder):
         statetablefile = p.getStateTableFileName(ribbon, session, sectnum)
 
         #upload acquisition stacks
-        cmd = "docker exec " + p.rpaContainer
+        cmd = "docker exec " + p.atCoreContainer
         cmd = cmd + " python -m renderapps.dataimport.create_fast_stacks_multi"
         cmd = cmd + " --render.host %s"           %renderProject.host
         cmd = cmd + " --render.owner %s "         %renderProject.owner

@@ -28,7 +28,7 @@ def run(p, sessionFolder):
     renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
     # docker commands
-    cmd = "docker exec " + p.rpaContainer
+    cmd = "docker exec " + p.atCoreContainer
     cmd = cmd + " python -m renderapps.materialize.make_downsample_image_stack"
     cmd = cmd + " --render.host %s"                                %(renderProject.host)
     cmd = cmd + " --render.project %s"                             %(renderProject.name)

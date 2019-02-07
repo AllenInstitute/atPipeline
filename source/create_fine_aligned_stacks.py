@@ -34,7 +34,7 @@ def run(p, sessionFolder):
     u.saveFineAlignJSON(ra, input_json, p.renderHost, 80, renderProject.owner, renderProject.name, input_stack, output_stack, match_collection_name, output_stack, p.clientScripts, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
 
     #Run docker command
-    cmd = "docker exec " + p.rpaContainer
+    cmd = "docker exec " + p.atCoreContainer
     cmd = cmd + " python -m rendermodules.solver.solve"
     cmd = cmd + " --input_json %s" %(u.toDockerMountedPath(input_json, p.prefixPath))
     cmd = cmd + " --output_json %s"%(u.toDockerMountedPath(output_json, p.prefixPath))

@@ -22,7 +22,7 @@ def run(p, sessionFolder):
     jsonfile = os.path.join(jsonOutputFolder, "tilepairs-%d-%d-%d-nostitch.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
 
     #Run the TilePairClient
-    cmd = "docker exec " + p.rpaContainer
+    cmd = "docker exec " + p.atCoreContainer
     cmd = cmd + " java -cp /shared/render/render-ws-java-client/target/render-ws-java-client-2.0.3-SNAPSHOT-standalone.jar"
     cmd = cmd + " org.janelia.render.client.TilePairClient"
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
