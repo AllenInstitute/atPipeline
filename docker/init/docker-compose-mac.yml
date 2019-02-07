@@ -27,7 +27,7 @@ services:
        security_opt:
          - seccomp:unconfined
     vizrelay:
-       image: fcollman/vizrelay
+       image: atpipeline/vizrelay
        ports:
            - 5000:5000
        volumes:

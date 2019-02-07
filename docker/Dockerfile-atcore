@@ -9,8 +9,7 @@
 #
 
 FROM continuumio/miniconda:4.5.12
-RUN conda update conda && conda update python
-RUN conda install nomkl
+RUN conda update conda && conda update python && conda install nomkl
 #install java
 RUN set -ex && \
     echo 'deb http://deb.debian.org/debian stretch-backports main' \
@@ -25,7 +24,7 @@ RUN set -ex && \
 RUN mkdir -p /shared
 WORKDIR /shared
 RUN apt-get update && \
-    apt-get install --no-install-recommends gcc build-essential libgeos-dev imagemagick xvfb nano vim -y  
+    apt-get install --no-install-recommends gcc build-essential libgeos-dev imagemagick xvfb vim maven -y  
 
 # add a simple script that can auto-detect the appropriate JAVA_HOME value
 # based on whether the JDK or only the JRE is installed
@@ -58,10 +57,8 @@ ENV JAVA_HOME /docker-java-home
 ENV RENDER_JAVA_HOME /docker-java-home
 ENV RENDER_CLIENT_SCRIPTS=/shared/render/render-ws-java-client/src/main/scripts
 
-# Work around OpenJDK bug with surefire plugin
+# Work around OpenJDK bug with surefire plugin for both render and at_modules
 ENV _JAVA_OPTIONS -Djdk.net.URLClassPath.disableClassPathURLCheck=true
-
-RUN apt-get install -y maven
 
 WORKDIR /shared/render/
 COPY ./render/ /shared/render
@@ -89,7 +86,6 @@ RUN pip install -e /shared/render-python-apps
 # Install at_modules
 WORKDIR /shared/at_modules
 COPY ./at_modules/ /shared/at_modules
-ENV _JAVA_OPTIONS -Djdk.net.URLClassPath.disableClassPathURLCheck=true
 RUN mvn install
 
 # Clean stuff up
