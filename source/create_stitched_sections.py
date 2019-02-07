@@ -34,8 +34,8 @@ def run(p, sessionFolder):
 
         u.savestitchingjson(stitching_template, stitching_json, renderProject.owner, renderProject.name, flatfield_stack, stitched_stack, z, p.renderHost)
 
-        cmd = "docker exec " + p.atmContainer
-        cmd = cmd + " java -cp ./target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
+        cmd = "docker exec " + p.rpaContainer
+        cmd = cmd + " java -cp /shared/at_modules/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
         cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(stitching_json, p.prefixPath))
 
         #Run =============
