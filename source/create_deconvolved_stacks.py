@@ -57,7 +57,7 @@ def run(p, sessionFolder):
                                             dcvStack, u.toDockerMountedPath(deconv_dir, p.prefixPath), z, psfFile, ch["NUM_ITER"], 
                                             ch["BGRD_SIZE"], ch["SCALE_FACTOR"], True)
                                             
-                cmd = "docker exec " + p.rpaContainer
+                cmd = "docker exec " + p.atCoreContainer
                 cmd = cmd + " python -m renderapps.intensity_correction.apply_deconvolution_multi"
                 cmd = cmd + " --render.port 80"
                 cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(deconv_json, p.prefixPath))

@@ -20,7 +20,7 @@ def run(p, sessionFolder):
     jsonInput = os.path.join(jsonInputFolder, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
 
     #SIFT Point Match Client
-    cmd = "docker exec " + p.rpaContainer
+    cmd = "docker exec " + p.atCoreContainer
     cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
     cmd = cmd + " --conf spark.default.parallelism=4750"
     cmd = cmd + " --driver-memory 19g"

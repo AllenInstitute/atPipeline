@@ -36,7 +36,7 @@ def run(p, sessionFolder):
         z = ribbon*100 + sectnum
 
         u.saveflatfieldjson(ff, flatfield_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, flatfield_stack, u.toDockerMountedPath(flatfield_dir, p.prefixPath), z, True)
-        cmd = "docker exec " + p.rpaContainer
+        cmd = "docker exec " + p.atCoreContainer
         cmd = cmd + " python -m rendermodules.intensity_correction.apply_multiplicative_correction"
         cmd = cmd + " --render.port 80"
         cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(flatfield_json, p.prefixPath))

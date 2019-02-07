@@ -25,7 +25,7 @@ def run(p, sessionFolder):
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
     # command string
-    cmd = "docker exec " + p.rpaContainer
+    cmd = "docker exec " + p.atCoreContainer
     cmd = cmd + " python -m renderapps.stitching.detect_and_drop_stitching_mistakes"
     cmd = cmd + " --render.owner %s"                        %(renderProject.owner)
     cmd = cmd + " --render.host %s"                         %(renderProject.host)

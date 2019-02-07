@@ -46,7 +46,7 @@ class ATDataIni:
         self.dataOutputFolder                         = os.path.join(general['PROCESSED_DATA_FOLDER'])
 
         #Process parameters
-        self.rpaContainer                             = general['RENDER_PYTHON_APPS_CONTAINER']
+        self.atCoreContainer                          = general['RENDER_PYTHON_APPS_CONTAINER']
         self.atmContainer                             = general['AT_MODULES_CONTAINER']
         self.renderHost                               = general['RENDER_HOST']
         self.renderProjectOwner                       = general['RENDER_PROJECT_OWNER']
@@ -233,7 +233,7 @@ def saveRoughAlignJSON(template, outFile, renderHost, port, owner, project, inpu
     template['log_level']                                    = "INFO"
     dump_json(template, outFile)
 
-def saveFineAlignJSON(template, outFile, renderHost, port, owner, project, input_stack, output_stack, lowresPmCollection, roughalignedStack, clientScripts, logLevel, nFirst, nLast, dataOutputFolder):
+def saveFineAlignJSON(template, outFile, renderHost, port, owner, project, input_stack, output_stack, collection_2D, collection_3D, clientScripts, logLevel, nFirst, nLast, dataOutputFolder):
     template['regularization']['log_level']                  = logLevel
     template['matrix_assembly']['log_level']                 = logLevel
 
@@ -257,7 +257,7 @@ def saveFineAlignJSON(template, outFile, renderHost, port, owner, project, input
     template['pointmatch']['owner']                          = owner
     template['pointmatch']['log_level']                      = logLevel
     template['pointmatch']['project']                        = project
-    template['pointmatch']['name']                           = lowresPmCollection
+    template['pointmatch']['name']                           = [collection_2D, collection_3D]
     template['pointmatch']['port']                           = port
     template['pointmatch']['host']                           = renderHost
 
