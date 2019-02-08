@@ -25,7 +25,11 @@ def main():
         p = u.ATDataIni(parameterFile)
 
         #Copy parameter file to root of processed data output folder
-        #shutil.copy2(parameterFile, os.path.join(p.dataRootFolder, p.dataOutputFolder))
+        outFolder = os.path.join(p.dataRootFolder, p.dataOutputFolder)
+        if os.path.isdir(outFolder) == False:
+            os.mkdir(outFolder)
+
+        shutil.copy2(parameterFile, outFolder)
 
         for sessionFolder in p.sessionFolders:
             #Start with the creation of state table files
