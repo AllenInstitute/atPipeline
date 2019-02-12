@@ -5,6 +5,9 @@ import json
 import platform
 import configparser
 import ast
+import argparse
+import shutil
+import timeit
 
 #Some hardcoded paths..
 dockerMountName = "/mnt"
@@ -109,6 +112,37 @@ class ATDataIni:
     def getStateTableFileName(self, ribbon, session, sectnum):
         return os.path.join(self.dataRootFolder, self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
 
+
+def validateATCoreInputAndOutput():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('parameter_file', help='Input file')
+    args = parser.parse_args()
+    parameterFile = args.parameter_file
+
+    #Check that input file exists, if not bail
+    if os.path.isfile(parameterFile) == False:
+        raise ValueError("The input file: " + parameterFile + " don't exist. Bailing..")
+
+    parameters = ATDataIni(parameterFile)
+
+    #Copy parameter file to root of processed data output folder
+    outFolder = os.path.join(parameters.dataRootFolder, parameters.dataOutputFolder)
+    if os.path.isdir(outFolder) == False:
+        pathlib.Path(outFolder).mkdir(parents=True, exist_ok=True)
+
+    shutil.copy2(parameterFile, outFolder)
+    return parameters
+
+
+def runAtCoreModule(method):
+    timeStart = timeit.default_timer()
+    parameters =validateATCoreInputAndOutput()
+
+    for sessionFolder in parameters.sessionFolders:
+        method(parameters, sessionFolder)
+
+    timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
+    print("Elapsed time: " + timeDuration + " minutes")
 
 class RenderProject:
     def __init__(self, owner, host, name):

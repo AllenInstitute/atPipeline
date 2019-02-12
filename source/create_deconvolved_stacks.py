@@ -9,15 +9,15 @@ import time
 import csv
 
 def set_channel_dict(file_dir, channel):
-    
+
     with open(file_dir) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
 
     channel_dir = {
             'chNum' =
-            'chName'= 
+            'chName'=
             'bgScale' =
-            'scaleFactor' =  
+            'scaleFactor' =
             }
 
 def run(p, sessionFolder):
@@ -38,7 +38,7 @@ def run(p, sessionFolder):
     dcvStack  = "S%d_Deconvolved"%(session)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
-	
+
     channels = [p.ch405,p.ch488,p.ch594,p.ch647]
     #Create json files and apply median.
     for sectnum in range(p.firstSection, p.lastSection + 1):
@@ -53,10 +53,10 @@ def run(p, sessionFolder):
                 psfFile = psf_dir + "psf_%s.tiff"%ch["CHANNEL"]
                 z = ribbon*100 + sectnum
 
-                u.savedeconvjson(dd, deconv_json, renderProject.owner, renderProject.name, ffStack, 
-                                            dcvStack, u.toDockerMountedPath(deconv_dir, p.prefixPath), z, psfFile, ch["NUM_ITER"], 
+                u.savedeconvjson(dd, deconv_json, renderProject.owner, renderProject.name, ffStack,
+                                            dcvStack, u.toDockerMountedPath(deconv_dir, p.prefixPath), z, psfFile, ch["NUM_ITER"],
                                             ch["BGRD_SIZE"], ch["SCALE_FACTOR"], True)
-                                            
+
                 cmd = "docker exec " + p.atCoreContainer
                 cmd = cmd + " python -m renderapps.intensity_correction.apply_deconvolution_multi"
                 cmd = cmd + " --render.port 80"
@@ -69,12 +69,6 @@ def run(p, sessionFolder):
                 print (line)
 
 if __name__ == "__main__":
-    timeStart = timeit.default_timer()
-    f = os.path.join('..', 'ATData.ini')
-    p = u.ATDataIni(f)
 
-    for sessionFolder in p.sessionFolders:
-        run(p, sessionFolder)
-
-    timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
-    print("Elapsed time: " + timeDuration + " minutes")
+    #This script need a valid INI file to be passed as an argument
+    u.runAtCoreModule(run)
