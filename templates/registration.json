@@ -1,0 +1,18 @@
+{
+    "baseDataUrl": "http://ibs-forrestc-ux1.corp.alleninstitute.org/render-ws/v1",
+    "referencestack": "Stitched_deconv_1_DAPI_1_dropped",
+    "initialSigma": 2.5,
+    "maxEpsilon": 2,
+    "minOctaveSize": 1600,
+    "maxOctaveSize": 2000,
+    "modelType": 1,
+    "project": "M335503_Ai139_smallvol",
+    "percentSaturated": 0.9,
+    "outputStack": "Registered_Deconvolved_2_DAPI_2",
+    "section": 500,
+    "owner": "6_ribbon_experiments",
+    "steps":5,
+    "stack": "Stitched_deconv_2_DAPI_2_dropped",
+    "contrastEnhance" : false,
+    "tileDistance" : 1000
+}
