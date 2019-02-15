@@ -13,11 +13,16 @@ fi
 docker rm $container_name 
 
 echo " ==== STARTING docker container: $container_name ===="
+
+
 docker run -d --name $container_name \
 -v /c/data:/mnt/  \
 -v $PWD/../pipeline:/pipeline  \
 -v $PWD/render-python-apps:/shared/render-python-apps  \
 -v $PWD/render-modules:/shared/render-modules  \
 -i -t $image_tag /bin/bash
+
+echo "Updating EMAligner"
+docker exec -it $container_name sh -c "pip install git+https://github.com/AllenInstitute/EM_aligner_python/@multiple_match_collections"
 
 echo " ==== STARTED docker container: $container_name ===="
