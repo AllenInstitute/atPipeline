@@ -1,48 +1,67 @@
+import at_logging
+logger = at_logging.setup_custom_logger('atPipeline')
 import os
 import sys
-import logging
 import timeit
 import pathlib
 import docker
 import argparse
+import at_docker_manager
 from source import *
 import source.atutils as u
 
+
+def setupScriptArguments():
+    #Get processing parameters
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-startAll', help='Start the AT backend', action='store_true')
+    parser.add_argument('-killAll', help='Stop the AT backend', action='store_true')
+    parser.add_argument("--start", help="Start a specific backend container, e.g. atcore")
+    parser.add_argument('--stop', help='Stop a specific backend cointainer')
+    return parser.parse_args()
+
 def main():
-    logger = logging.getLogger("atPipeline")
-    logger.setLevel(logging.DEBUG)
 
+    logger.info("============ Managing the atBackend =============")
+    args = setupScriptArguments()
+    atCoreCtrName="atcore"
+    renderServices="atcore"
+
+    cwd = 'c:\\pDisk\\atPipeline'
+
+    dManager = at_docker_manager.DockerManager()
+    atCoreMounts = {
+        '/c/data'                                           : {'bind': '/mnt'},
+        os.path.join(cwd, 'pipeline')                       : {'bind': '/pipeline'},
+        os.path.join(cwd, 'docker', 'render-python-apps')   : {'bind': '/shared/render-python-apps'},
+        os.path.join(cwd, 'docker', 'render-modules')       : {'bind': '/shared/render-modules'}
+    }
     try:
-        #Get processing parameters
-        parser = argparse.ArgumentParser()
-        parser.add_argument('-startAll', help='Start the AT backend')
-        parser.add_argument('-stopAll', help='Stop the AT backend')
 
-        parser.add_argument("--start", help="Start a specific backend container, e.g. atcore")
-        args = parser.parse_args()
-
-        mounts={'/c/data':{'bind': '/mnt/'}}
-        dClient = docker.from_env()
-        atcore = dClient.containers.get("atcore")
-        render = dClient.containers.get("init_render_1")
         if args.start:
-            if args.start == "atcore":
-                output = dClient.containers.run('atpipeline/atcore', 'echo "hello"', volumes=mounts, detach=True)
+            if args.start == atCoreCtrName:
+                if dManager.startContainer(atCoreCtrName, atCoreMounts) == True:
+                    logger.info("Started atcore container")
+                else:
+                    logger.error("Failed starting container")
+            #---- render containers
 
-        print (output.logs())
-##
-##        if render.status != "running":
-##            raise ValueError("The Render docker container is not running!")
-##
-##        if atcore.status != "running":
-##            raise ValueError("The atcore docker container is not running!")
+        if args.stop:
+            if args.stop == atCoreCtrName:
+                if dManager.stopContainer(atCoreCtrName) == True:
+                    logger.info("Stopped atcore container")
+                else:
+                    logger.error("Failed stopping container")
+
+        if args.killAll:
+            dManager.killAllContainers()
 
 
     except ValueError as error:
         print ("A value error occured: " + str(error))
-    except :
+
+    except Exception as e:
         print ("An error occured..")
-        e = sys.exc_info()[0]
         print (e)
 
 

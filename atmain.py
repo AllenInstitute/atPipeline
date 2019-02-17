@@ -1,5 +1,7 @@
+import at_logging
+logger = at_logging.setup_custom_logger('atPipeline')
 import os
-import logging
+
 import timeit
 import pathlib
 import docker
