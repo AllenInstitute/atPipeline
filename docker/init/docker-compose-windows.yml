@@ -14,7 +14,7 @@ services:
            - JAVA_OPTIONS=-Xms10g -Xmx10g -server -Djava.awt.headless=true
            - WEB_SERVICE_MAX_TILE_SPECS_TO_RENDER=100  
        volumes:
-           - e:\Documents\data:/mnt
+           - /c/data:/mnt
        logging:
            options:
                max-size: "5g"
@@ -32,7 +32,7 @@ services:
        ports:
            - 5000:5000
        volumes:
-           - C:\\pDisk\atPipeline\\docker\\init\\vizrelay_config.json:/app/config.json
+           - ./vizrelay_config.json:/app/config.json
     ndviz:
       image: neurodata/ndviz:beta
       ports:

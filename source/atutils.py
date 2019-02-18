@@ -14,7 +14,7 @@ import pathlib
 dockerMountName = "/mnt"
 
 if platform.system() == "Windows":
-   templates_folder = "c:\\pDisk\\atPipeline\\templates"
+   templates_folder = "c:\\ATPipeline\\templates"
 elif platform.system() == "Linux":
    templates_folder = "../templates"
 else:

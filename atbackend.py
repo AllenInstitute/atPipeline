@@ -27,7 +27,7 @@ def main():
     atCoreCtrName="atcore"
     renderServices="atcore"
 
-    cwd = 'c:\\pDisk\\atPipeline'
+    cwd = 'c:\\ATPipeline'
 
     dManager = at_docker_manager.DockerManager()
     atCoreMounts = {
@@ -39,12 +39,11 @@ def main():
     try:
 
         if args.start:
-            if args.start == atCoreCtrName:
-                if dManager.startContainer(atCoreCtrName, atCoreMounts) == True:
-                    logger.info("Started atcore container")
-                else:
-                    logger.error("Failed starting container")
-            #---- render containers
+            if dManager.startContainer(atCoreCtrName, atCoreMounts) == True:
+                logger.info("Started atcore container")
+            else:
+                logger.error("Failed starting container")
+        #---- render containers
 
         if args.stop:
             if args.stop == atCoreCtrName:

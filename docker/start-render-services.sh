@@ -1,4 +1,4 @@
-/#!/usr/bin/env bash
+#!/usr/bin/env bash
 DOCKER_COMPOSE=""
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
     DOCKER_COMPOSE=./init/docker-compose-linux.yml

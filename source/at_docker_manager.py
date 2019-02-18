@@ -2,6 +2,8 @@ import docker
 import logging
 #A simple docker manager, wrapping some of the DockerSDK1
 
+#logger = logging.getLogger('atPipeline')
+
 class DockerManager:
     def __init__(self):
         self.dClient = docker.from_env()
