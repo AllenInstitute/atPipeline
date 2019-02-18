@@ -8,6 +8,7 @@ import ast
 import argparse
 import shutil
 import timeit
+import pathlib
 
 #Some hardcoded paths..
 dockerMountName = "/mnt"
