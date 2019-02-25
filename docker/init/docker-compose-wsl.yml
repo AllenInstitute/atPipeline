@@ -1,7 +1,7 @@
 version: "2.0"
 services:
     render:
-       image: atpipeline/render-ws:dev
+       image: atpipeline/render-ws
        links:
            - mongo
        ports:
@@ -10,10 +10,11 @@ services:
        environment:
            - MONGO_HOST=mongo
            - MONGO_PORT=27017
-           - NDVIZ_URL=127.0.0.1:5000
-           - JAVA_OPTIONS=-Xms6g -Xmx6g -server -Djava.awt.headless=true
+           - NDVIZ_URL=${HOSTNAME}:5000
+           - JAVA_OPTIONS=-Xms10g -Xmx10g -server -Djava.awt.headless=true
+           - WEB_SERVICE_MAX_TILE_SPECS_TO_RENDER=100  
        volumes:
-           - /Users/eric/nobackup:/mnt
+           - /c/data:/mnt
        logging:
            options:
                max-size: "5g"
@@ -27,7 +28,7 @@ services:
        security_opt:
          - seccomp:unconfined
     vizrelay:
-       image: atpipeline/vizrelay:dev
+       image: fcollman/vizrelay
        ports:
            - 5000:5000
        volumes:
@@ -36,6 +37,7 @@ services:
       image: neurodata/ndviz:beta
       ports:
           - "8001:8080"
+
 volumes:
     mongodata:
  
