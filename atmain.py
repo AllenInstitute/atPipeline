@@ -1,5 +1,5 @@
+import logging
 import at_logging
-logger = at_logging.setup_custom_logger('atPipeline')
 import os
 
 import timeit
@@ -9,7 +9,8 @@ from source import *
 import source.atutils as u
 
 def main():
-    logger = logging.getLogger("atPipeline")
+    logger = at_logging.setup_custom_logger('atPipeline')
+    #logger = logging.getLogger("atPipeline")
     logger.setLevel(logging.DEBUG)
     timeStart = timeit.default_timer()
 
@@ -112,8 +113,10 @@ def main():
         timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
         print("Elapsed time: " + timeDuration + " minutes")
 
-    except ValueError as error:
-        print ("An error occured: " + str(error))
+    except ValueError as e:
+        print ("A Value error occured: " + str(e))
+    except OSError as e:
+        print ("An OSError occured: " + str(e))
 
 
 if __name__ == '__main__':
