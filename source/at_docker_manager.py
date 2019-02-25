@@ -1,8 +1,6 @@
 import docker
 import logging
-#A simple docker manager, wrapping some of the DockerSDK1
-
-#logger = logging.getLogger('atPipeline')
+#A simple docker manager, wrapping some of the DockerSDK
 
 class DockerManager:
     def __init__(self):
@@ -12,7 +10,7 @@ class DockerManager:
     def startContainer(self, ctrName, mounts : 'Dictionary of mounts'):
 
         if self.removeContainer(ctrName) == True:
-            logger.info("Removed atcore container")
+            self.logger.info("Removed atcore container")
 
         #This will do nothing, forever
         cmd = "tail -f /dev/null"
@@ -21,9 +19,12 @@ class DockerManager:
         if ctr == None:
            return False
 
-        if ctr.status == "running" or ctr.status == "created":
-            return True
-        return False
+        if ctr.status != "running" or ctr.status != "created":
+            #Failing starting a container is considered a showstopper. Raise an exception
+            raise Exception("Failed starting container: " + ctrName)
+
+        logger.info("Started the: " + ctrName + " container")
+        return True
 
     def getContainer(self, ctrName):
         containers = self.dClient.containers.list(all=True)
