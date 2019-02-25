@@ -46,12 +46,6 @@ def run(p, sessionFolder):
         print (line)
 
 if __name__ == "__main__":
-    timeStart = timeit.default_timer()
-    f = os.path.join('..', 'ATData.ini')
-    p = u.ATDataIni(f)
 
-    for sessionFolder in p.sessionFolders:
-        run(p, sessionFolder)
-
-    timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
-    print("Elapsed time: " + timeDuration + " minutes")
+    #This script need a valid INI file to be passed as an argument
+    u.runAtCoreModule(run)

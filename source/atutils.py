@@ -5,6 +5,10 @@ import json
 import platform
 import configparser
 import ast
+import argparse
+import shutil
+import timeit
+import pathlib
 
 #Some hardcoded paths..
 dockerMountName = "/mnt"
@@ -22,6 +26,7 @@ flatfield_template     = os.path.join(templates_folder, "flatfield.json")
 deconvolution_template = os.path.join(templates_folder, "deconvolution.json")
 alignment_template     = os.path.join(templates_folder, "roughalign.json")
 fine_alignment_template= os.path.join(templates_folder, "fine_align.json")
+registrationTemplate   = os.path.join(templates_folder, "registration.json")
 
 def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")
@@ -109,6 +114,37 @@ class ATDataIni:
     def getStateTableFileName(self, ribbon, session, sectnum):
         return os.path.join(self.dataRootFolder, self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
 
+
+def validateATCoreInputAndOutput():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('parameter_file', help='Input file')
+    args = parser.parse_args()
+    parameterFile = args.parameter_file
+
+    #Check that input file exists, if not bail
+    if os.path.isfile(parameterFile) == False:
+        raise ValueError("The input file: " + parameterFile + " don't exist. Bailing..")
+
+    parameters = ATDataIni(parameterFile)
+
+    #Copy parameter file to root of processed data output folder
+    outFolder = os.path.join(parameters.dataRootFolder, parameters.dataOutputFolder)
+    if os.path.isdir(outFolder) == False:
+        pathlib.Path(outFolder).mkdir(parents=True, exist_ok=True)
+
+    shutil.copy2(parameterFile, outFolder)
+    return parameters
+
+
+def runAtCoreModule(method):
+    timeStart = timeit.default_timer()
+    parameters =validateATCoreInputAndOutput()
+
+    for sessionFolder in parameters.sessionFolders:
+        method(parameters, sessionFolder)
+
+    timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
+    print("Elapsed time: " + timeDuration + " minutes")
 
 class RenderProject:
     def __init__(self, owner, host, name):
@@ -268,6 +304,25 @@ def saveFineAlignJSON(template, outFile, renderHost, port, owner, project, input
     template['first_section']                                = nFirst
     template['log_level']                                    = "INFO"
     dump_json(template, outFile)
+
+def saveRegistrationJSON(t, outFileName, renderHost, owner, project, stack, referenceStack, outputStack, section):
+    t['baseDataUrl']                                         = "http://%s/render-ws/v1"%(renderHost)
+    t['owner']                                               = owner
+    t['project']                                             = project
+    t['stack']                                               = stack
+    t['referencestack']                                      = referenceStack
+    t['outputStack']                                         = outputStack
+    t['section']                                             = section
+    t['steps']                                               = 5
+    t['maxEpsilon']                                          = 2
+    t['minOctaveSize']                                       = 1000
+    t['maxOctaveSize']                                       = 2000
+    t['initialSigma']                                        = 2.5
+    t['percentSaturated']                                    = 0.9
+    t['contrastEnhance']                                     = False
+
+    #Write the JSON
+    dump_json(t, outFileName)
 
 def main():
     pass

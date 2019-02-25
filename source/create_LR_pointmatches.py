@@ -28,7 +28,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --executor-cores 44"
     cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
     cmd = cmd + " --name PointMatchFull"
-    cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.0.3-SNAPSHOT-standalone.jar"
+    cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
     cmd = cmd + " --collection %s_lowres_round"             %(p.projectName)
     cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
@@ -55,13 +55,8 @@ def run(p, sessionFolder):
         print (line)
 
 if __name__ == "__main__":
-    timeStart = timeit.default_timer()
-    f = os.path.join('..', 'ATData.ini')
-    p = u.ATDataIni(f)
 
-    for sessionFolder in p.sessionFolders:
-        run(p, sessionFolder)
+    #This script need a valid INI file to be passed as an argument
+    u.runAtCoreModule(run)
 
-    timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
-    print("Elapsed time: " + timeDuration + " minutes")
 
