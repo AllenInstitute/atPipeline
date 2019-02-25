@@ -1,7 +1,7 @@
 version: "2.0"
 services:
     render:
-       image: atpipeline/render-ws
+       image: atpipeline/render-ws:dev
        links:
            - mongo
        ports:
@@ -27,7 +27,7 @@ services:
        security_opt:
          - seccomp:unconfined
     vizrelay:
-       image: atpipeline/vizrelay
+       image: atpipeline/vizrelay:dev
        ports:
            - 5000:5000
        volumes:
@@ -36,13 +36,6 @@ services:
       image: neurodata/ndviz:beta
       ports:
           - "8001:8080"
-# render-python:
-#   image: fcollman/render-python-apps 
-#   volumes:
-#       - e:/data:/mnt/data/  
-#       - c:/pDisk/atExplorer/ThirdParty/atPipeline:/pipeline  
-#       - c:/pDisk/atExplorer/ThirdParty/Render-Python-Apps:/usr/local/render-python-apps  
-
 volumes:
     mongodata:
  
