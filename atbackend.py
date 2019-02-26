@@ -26,7 +26,7 @@ def startRenderBackend(composeFile):
     if os.path.exists(composeFile) == False:
         raise Exception("The docker compose file: " + composeFile + " don't exist!")
 
-    cmd = 'docker-compose -f ' + composeFile
+    cmd = "docker-compose -f " + str(composeFile)
     cmd = cmd + " up -d"
     print ("Running: " + cmd.replace('--', '\n--'))
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -42,7 +42,7 @@ def main():
     atCoreCtrName="atcore"
     renderServices="atcore"
 
-    cwd = 'c:\\ATPipeline'
+    cwd = pathlib.Path().absolute().resolve()
 
     dManager = at_docker_manager.DockerManager()
 
@@ -54,9 +54,11 @@ def main():
         os.path.join(cwd, 'docker', 'render-modules')       : {'bind': '/shared/render-modules'}
     }
 
+
     #docker compose file
-    cwd = pathlib.Path().absolute()
+
     composeFile = os.path.join(cwd, "docker", "init", "docker-compose.yml")
+
 
     try:
         if args.start:
@@ -82,7 +84,6 @@ def main():
 
             #Start the atcore container
             dManager.startContainer("atcore", atCoreMounts)
-
 
     except ValueError as e:
         logger.error("ValueError: " + str(e))
