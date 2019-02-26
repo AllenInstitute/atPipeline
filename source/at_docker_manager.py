@@ -11,17 +11,20 @@ class DockerManager:
 
     def startContainer(self, ctrName, mounts : 'Dictionary of mounts'):
 
-        ctrCheck = self.dClient.containers.get(ctrName)
-        if ctrCheck.status == 'running':
-            logger.warning("The container: " + ctrName + " is already running")
-            return False
+        try:
+            ctrCheck = self.dClient.containers.get(ctrName)
+            if ctrCheck.status == 'running':
+                logger.warning("The container: " + ctrName + " is already running")
+                return False
 
-        if self.removeContainer(ctrName) == True:
-            logger.info("Removed atcore container")
+            if self.removeContainer(ctrName) == True:
+                logger.info("Removed " + ctrName + " container")
+        except docker.errors.NotFound:
+            pass
 
         #This will do nothing, forever
         cmd = "tail -f /dev/null"
-        ctr = self.dClient.containers.run('atpipeline/atcore', command=cmd, volumes= mounts, name=ctrName, detach=True)
+        ctr = self.dClient.containers.run('atpipeline/atcore:dev', command=cmd, volumes= mounts, name=ctrName, detach=True)
 
         if ctr == None:
            return False
