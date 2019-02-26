@@ -59,9 +59,9 @@ docker tag atpipeline/render-ws:dev atpipeline/render-ws
 docker tag atpipeline/atcore:dev atpipeline/atcore
 docker tag atpipeline/vizrelay:dev atpipeline/vizrelay
 
-docker push atpipeline/render-ws
-docker push atpipeline/atcore
-docker push atpipeline/vizrelay
+docker push atpipeline/render-ws:dev
+docker push atpipeline/atcore:dev
+docker push atpipeline/vizrelay:dev
 ```
 ### Using the atcore container
 

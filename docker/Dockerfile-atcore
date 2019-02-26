@@ -88,6 +88,9 @@ WORKDIR /shared/at_modules
 COPY ./at_modules/ /shared/at_modules
 RUN mvn install
 
+# Install the latest EMAligner (0.3.4 does not support multiple match collections)
+RUN pip install git+https://github.com/AllenInstitute/EM_aligner_python/
+
 # Clean stuff up
 RUN apt-get remove --purge gcc build-essential libgeos-dev -y && apt-get autoremove -y &&\
     rm -rf /var/lib/apt/lists/*
