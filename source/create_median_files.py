@@ -41,6 +41,10 @@ def run(p, sessionFolder):
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in proc.stdout.readlines():
         print (line)
+    print ("PROC_RETURN_CODE:" + proc.returncode)
+
+    if proc.returncode:
+        raise Exception("Error generating medain files")
 
 
 if __name__ == "__main__":
