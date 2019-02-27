@@ -16,7 +16,7 @@ dockerMountName = "/mnt"
 if platform.system() == "Windows":
    templates_folder = "c:\\pDisk\\ATPipeline\\templates"
 elif platform.system() == "Linux":
-   templates_folder = "../templates"
+   templates_folder = "templates"
 else:
    templates_folder = "../templates"
 
