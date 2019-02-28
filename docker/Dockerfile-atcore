@@ -66,13 +66,15 @@ RUN mvn clean
 # use -T 1C option to multi-thread maven, using 1 thread per available core
 RUN mvn -T 1C -Dproject.build.sourceEncoding=UTF-8 package
 
+# Install EM_Aligner from github
+RUN pip install git+https://github.com/AllenInstitute/EM_aligner_python
+
 # Install render-python
 WORKDIR /shared/render-python
 COPY ./render-python/ /shared/render-python
 RUN pip install -e /shared/render-python
 
 # Install render-modules
-
 WORKDIR /shared/render-modules
 COPY ./render-modules/ /shared/render-modules
 RUN pip install -e /shared/render-modules
@@ -88,8 +90,7 @@ WORKDIR /shared/at_modules
 COPY ./at_modules/ /shared/at_modules
 RUN mvn install
 
-# Install the latest EMAligner (0.3.4 does not support multiple match collections)
-RUN pip install git+https://github.com/AllenInstitute/EM_aligner_python/
+WORKDIR /work
 
 # Clean stuff up
 RUN apt-get remove --purge gcc build-essential libgeos-dev -y && apt-get autoremove -y &&\
