@@ -44,7 +44,8 @@ def run(p, sessionFolder):
 
         proc.wait()
         if proc.returncode:
-            raise Exception("")
+            print ("PROC_RETURN_CODE:" + str(proc.returncode))
+            raise Exception("Error generating median files")
 
 
 if __name__ == "__main__":

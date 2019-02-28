@@ -25,7 +25,7 @@ def run(p, sessionFolder):
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
-    with open(u.median_template) as json_data:
+    with open(p.median_template) as json_data:
          med = json.load(json_data)
 
     u.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, u.toDockerMountedPath(median_dir, p.prefixPath), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
@@ -41,10 +41,11 @@ def run(p, sessionFolder):
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in proc.stdout.readlines():
         print (line)
-    print ("PROC_RETURN_CODE:" + str(proc.returncode))
-
+    
+    proc.wait()
     if proc.returncode:
-        raise Exception("Error generating medain files")
+        print ("PROC_RETURN_CODE:" + str(proc.returncode))
+        raise Exception("Error generating median files")
 
 
 if __name__ == "__main__":

@@ -11,7 +11,6 @@ import subprocess
 from source import *
 import source.atutils as u
 
-
 def setupScriptArguments():
     #Get processing parameters
     parser = argparse.ArgumentParser()
@@ -50,8 +49,8 @@ def main():
     atCoreMounts = {
         '/c/data'                                           : {'bind': '/mnt'},
         os.path.join(cwd, 'pipeline')                       : {'bind': '/pipeline'},
-        os.path.join(cwd, 'docker', 'render-python-apps')   : {'bind': '/shared/render-python-apps'},
-        os.path.join(cwd, 'docker', 'render-modules')       : {'bind': '/shared/render-modules'}
+#        os.path.join(cwd, 'docker', 'render-python-apps')   : {'bind': '/shared/render-python-apps'},
+#        os.path.join(cwd, 'docker', 'render-modules')       : {'bind': '/shared/render-modules'}
     }
 
 

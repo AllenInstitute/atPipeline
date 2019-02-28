@@ -24,7 +24,7 @@ def run(p, sessionFolder):
 	#point match collections
     lowresPmCollection = "%s_lowres_round"%renderProject.name
 
-    with open(u.alignment_template) as json_data:
+    with open(p.alignment_template) as json_data:
        ra = json.load(json_data)
 
     #Create folder if not exists
@@ -44,6 +44,12 @@ def run(p, sessionFolder):
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in proc.stdout.readlines():
         print (line)
+
+    proc.wait()
+    if proc.returncode:
+        print ("PROC_RETURN_CODE:" + str(proc.returncode))
+        raise Exception("Error generating median files")
+
 
 if __name__ == "__main__":
 

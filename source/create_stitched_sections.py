@@ -26,7 +26,7 @@ def run(p, sessionFolder):
 	#Create json files and start stitching...
     for sectnum in range(p.firstSection, p.lastSection + 1):
 
-        with open(u.stitching_template) as json_data:
+        with open(p.stitching_template) as json_data:
              stitching_template = json.load(json_data)
 
         stitching_json = os.path.join(stitching_dir, "flatfield""_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))
@@ -43,6 +43,12 @@ def run(p, sessionFolder):
         proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         for line in proc.stdout.readlines():
             print (line)
+
+        proc.wait()
+        if proc.returncode:
+            print ("PROC_RETURN_CODE:" + str(proc.returncode))
+            raise Exception("Error generating median files")
+
 
 if __name__ == "__main__":
 

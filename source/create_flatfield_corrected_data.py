@@ -28,7 +28,7 @@ def run(p, sessionFolder):
     #Create json files and apply median.
     for sectnum in range(p.firstSection, p.lastSection + 1):
 
-        with open(u.flatfield_template) as json_data:
+        with open(p.flatfield_template) as json_data:
              ff = json.load(json_data)
 
         flatfield_json = os.path.join(flatfield_dir, "flatfield""_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))
@@ -46,6 +46,11 @@ def run(p, sessionFolder):
         proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         for line in proc.stdout.readlines():
             print (line)
+        proc.wait()
+        if proc.returncode:
+            print ("PROC_RETURN_CODE:" + str(proc.returncode))
+            raise Exception(os.path.basename(__file__) + " threw an Exception")
+
 
 if __name__ == "__main__":
 
