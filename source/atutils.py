@@ -13,21 +13,6 @@ import pathlib
 #Some hardcoded paths..
 dockerMountName = "/mnt"
 
-if platform.system() == "Windows":
-   templates_folder = "c:\\pDisk\\atPipeline\\templates"
-elif platform.system() == "Linux":
-   templates_folder = "../templates"
-else:
-   templates_folder = "../templates"
-
-median_template        = os.path.join(templates_folder, "median.json")
-stitching_template     = os.path.join(templates_folder, "stitching.json")
-flatfield_template     = os.path.join(templates_folder, "flatfield.json")
-deconvolution_template = os.path.join(templates_folder, "deconvolution.json")
-alignment_template     = os.path.join(templates_folder, "roughalign.json")
-fine_alignment_template= os.path.join(templates_folder, "fine_align.json")
-registrationTemplate   = os.path.join(templates_folder, "registration.json")
-
 def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")
 
@@ -39,6 +24,18 @@ class ATDataIni:
         deconv                                        = config['DECONV']
         align                                         = config['ALIGN']
         tp_client                                     = config['TILE_PAIR_CLIENT']
+        SPARK_SEC                                     = config['SPARK']
+
+        #SPARK stuff
+        self.SPARK = {}
+        self.SPARK['driverMemory']                    = SPARK_SEC['DRIVER_MEMORY']
+        self.SPARK['executorMemory']                  = SPARK_SEC['EXECUTOR_MEMORY']
+        self.SPARK['executorCores']                   = SPARK_SEC['EXECUTOR_CORES']
+        self.SPARK['maxFeatureCacheGb']               = SPARK_SEC['MAX_FEATURE_CACHE_GB']
+
+
+        self.JSONTemplatesFolder                      = general['JSON_TEMPLATES_FOLDER']
+
 
         self.ch405                                    = config['DECONV_405']
         self.ch488                                    = config['DECONV_488']
@@ -87,26 +84,35 @@ class ATDataIni:
         self.createFineAlignedStacks                  = toBool(general['CREATE_FINE_ALIGNED_STACKS'])
 
         #Tilepair client
-        self.excludeCornerNeighbors           = toBool(tp_client['EXCLUDE_CORNER_NEIGHBOURS'])
-        self.excludeSameSectionNeighbors      = toBool(tp_client['EXCLUDE_SAME_SECTION_NEIGHBOR'])
-        self.zNeighborDistance                = int(tp_client['Z_NEIGHBOR_DISTANCE'])
-        self.xyNeighborFactor                 = float(tp_client['XY_NEIGHBOR_FACTOR'])
+        self.excludeCornerNeighbors                   = toBool(tp_client['EXCLUDE_CORNER_NEIGHBOURS'])
+        self.excludeSameSectionNeighbors              = toBool(tp_client['EXCLUDE_SAME_SECTION_NEIGHBOR'])
+        self.zNeighborDistance                        = int(tp_client['Z_NEIGHBOR_DISTANCE'])
+        self.xyNeighborFactor                         = float(tp_client['XY_NEIGHBOR_FACTOR'])
 
         #Deconvolution parameters
-        self.channels                         = ast.literal_eval(deconv['CHANNELS'])
-        self.bgrdSize                         = ast.literal_eval(deconv['BGRD_SIZE'])
-        self.scaleFactor                      = ast.literal_eval(deconv['SCALE_FACTOR'])
-        self.numIter                          = int(deconv['NUM_ITER'])
+        self.channels                                 = ast.literal_eval(deconv['CHANNELS'])
+        self.bgrdSize                                 = ast.literal_eval(deconv['BGRD_SIZE'])
+        self.scaleFactor                              = ast.literal_eval(deconv['SCALE_FACTOR'])
+        self.numIter                                  = int(deconv['NUM_ITER'])
 
         #Alignment parameters
-        self.poolSize                         = int(align['POOL_SIZE'])
-        self.edgeThreshold                    = int(align['EDGE_THRESHOLD'])
-        self.scale                            = float(align['SCALE'])
-        self.distance                         = int(align['DISTANCE'])
-        self.siftMin                          = float(align['SIFTMIN'])
-        self.siftMax                          = float(align['SIFTMAX'])
-        self.siftSteps                        = int(align['SIFTSTEPS'])
-        self.renderScale                      = float(align['RENDERSCALE'])
+        self.poolSize                                 = int(align['POOL_SIZE'])
+        self.edgeThreshold                            = int(align['EDGE_THRESHOLD'])
+        self.scale                                    = float(align['SCALE'])
+        self.distance                                 = int(align['DISTANCE'])
+        self.siftMin                                  = float(align['SIFTMIN'])
+        self.siftMax                                  = float(align['SIFTMAX'])
+        self.siftSteps                                = int(align['SIFTSTEPS'])
+        self.renderScale                              = float(align['RENDERSCALE'])
+
+        #JSON Templates
+        self.median_template                          = os.path.join(self.JSONTemplatesFolder, "median.json")
+        self.stitching_template                       = os.path.join(self.JSONTemplatesFolder, "stitching.json")
+        self.flatfield_template                       = os.path.join(self.JSONTemplatesFolder, "flatfield.json")
+        self.deconvolution_template                   = os.path.join(self.JSONTemplatesFolder, "deconvolution.json")
+        self.alignment_template                       = os.path.join(self.JSONTemplatesFolder, "roughalign.json")
+        self.fine_alignment_template                  = os.path.join(self.JSONTemplatesFolder, "fine_align.json")
+        self.registrationTemplate                     = os.path.join(self.JSONTemplatesFolder, "registration.json")
 
         for session in self.sessions:
           self.sessionFolders.append(os.path.join(self.dataRootFolder, "raw", "data", self.ribbons[0], session))

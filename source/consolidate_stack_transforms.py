@@ -35,6 +35,12 @@ def run(p, sessionFolder):
     for line in proc.stdout.readlines():
     	print (line)
 
+    proc.wait()
+    if proc.returncode:
+        print ("PROC_RETURN_CODE:" + str(proc.returncode))
+        raise Exception("consolidate_stack_transforms threw an Exception")
+
+
 if __name__ == "__main__":
 
     #This script need a valid INI file to be passed as an argument

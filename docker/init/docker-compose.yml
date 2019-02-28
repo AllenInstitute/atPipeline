@@ -1,7 +1,7 @@
 version: "2.0"
 services:
     render:
-       image: atpipeline/render-ws
+       image: atpipeline/render-ws:dev
        links:
            - mongo
        ports:
@@ -14,7 +14,7 @@ services:
            - JAVA_OPTIONS=-Xms10g -Xmx10g -server -Djava.awt.headless=true
            - WEB_SERVICE_MAX_TILE_SPECS_TO_RENDER=100  
        volumes:
-           - e:\Documents\data:/mnt
+           - /c/data:/mnt
        logging:
            options:
                max-size: "5g"
@@ -28,16 +28,15 @@ services:
        security_opt:
          - seccomp:unconfined
     vizrelay:
-       image: fcollman/vizrelay
+       image: atpipeline/vizrelay:dev
        ports:
            - 5000:5000
        volumes:
-           - C:\\pDisk\atPipeline\\docker\\init\\vizrelay_config.json:/app/config.json
+           - ./vizrelay_config.json:/app/config.json
     ndviz:
       image: neurodata/ndviz:beta
       ports:
           - "8001:8080"
-
 volumes:
     mongodata:
  

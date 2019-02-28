@@ -43,6 +43,11 @@ def run(p, sessionFolder):
     for line in proc.stdout.readlines():
         print (line)
 
+    proc.wait()
+    if proc.returncode:
+        print ("PROC_RETURN_CODE:" + str(proc.returncode))
+        raise Exception("org.janelia.render.client.TilePairClient threw an Exception")
+
     #Prepare json file for the SIFTPointMatch Client
     jsonfileedit      = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"%(p.zNeighborDistance, p.firstSection, p.lastSection))
     copyfile(jsonfile, jsonfileedit)

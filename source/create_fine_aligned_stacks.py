@@ -25,7 +25,7 @@ def run(p, sessionFolder):
     pm_collection2D     = "%s_HR_2D"%(renderProject.name)
     pm_collection3D     = "%s_HR_3D"%(renderProject.name)
 
-    with open(u.fine_alignment_template) as json_data:
+    with open(p.fine_alignment_template) as json_data:
        ra = json.load(json_data)
 
     #Create folder if not exists
@@ -47,6 +47,12 @@ def run(p, sessionFolder):
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in proc.stdout.readlines():
         print (line)
+
+    proc.wait()
+    if proc.returncode:
+        print ("PROC_RETURN_CODE:" + str(proc.returncode))
+        raise Exception(os.path.basename(__file__) + " threw an Exception")
+
 
 if __name__ == "__main__":
 

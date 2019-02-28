@@ -23,9 +23,10 @@ def run(p, sessionFolder):
     cmd = "docker exec " + p.atCoreContainer
     cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
     cmd = cmd + " --conf spark.default.parallelism=4750"
-    cmd = cmd + " --driver-memory 19g"
-    cmd = cmd + " --executor-memory 50g"
-    cmd = cmd + " --executor-cores 44"
+    cmd = cmd + " --driver-memory %s"                       %(p.SPARK['driverMemory'])
+    cmd = cmd + " --executor-memory %s"                     %(p.SPARK['executorMemory'])
+    cmd = cmd + " --executor-cores %s"                      %(p.SPARK['executorCores'])
+
     cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
     cmd = cmd + " --name PointMatchFull"
     cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"
@@ -53,6 +54,12 @@ def run(p, sessionFolder):
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in proc.stdout.readlines():
         print (line)
+
+    proc.wait()
+    if proc.returncode:
+        print ("PROC_RETURN_CODE:" + str(proc.returncode))
+        raise Exception(os.path.basename(__file__) + " threw an Exception")
+
 
 if __name__ == "__main__":
 

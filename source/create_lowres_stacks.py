@@ -53,6 +53,11 @@ def run(p, sessionFolder):
     for line in proc.stdout.readlines():
         print (line)
 
+    proc.wait()
+    if proc.returncode:
+        print ("PROC_RETURN_CODE:" + str(proc.returncode))
+        raise Exception(os.path.basename(__file__) + " threw an Exception")
+
 
 if __name__ == "__main__":
 
