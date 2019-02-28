@@ -42,6 +42,10 @@ def run(p, sessionFolder):
         for line in proc.stdout.readlines():
             print (line)
 
+        proc.wait()
+        if proc.returncode:
+            raise Exception("")
+
 
 if __name__ == "__main__":
 
