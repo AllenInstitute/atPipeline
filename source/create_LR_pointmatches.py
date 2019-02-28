@@ -35,8 +35,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
     cmd = cmd + " --pairJson %s"                            %(u.toDockerMountedPath(jsonfile, p.prefixPath))
     cmd = cmd + " --renderWithFilter true"
-    cmd = cmd + " --maxFeatureCacheGb %s"                   %(p.SPARK['maxFeatureCacheGb'])
-    #cmd = cmd + " --maxFeatureCacheGb 40"
+    cmd = cmd + " --maxFeatureCacheGb 40"
     cmd = cmd + " --matchModelType RIGID"
     cmd = cmd + " --matchMinNumInliers 15"
     #cmd = cmd + " --matchMaxEpsilon 15.0"
