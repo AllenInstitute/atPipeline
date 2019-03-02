@@ -11,12 +11,12 @@ def run(p, sessionFolder):
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
     #output directories
-    downsample_dir   = os.path.join(projectRoot, p.dataOutputFolder, "low_res")
+    downsample_dir   = os.path.join(p.dataOutputFolder, "low_res")
 
     #point match collections
     lowres_pm_collection = "%s_LowRes_3D"%renderProject.name
 
-    jsondir  = os.path.join(projectRoot, p.dataOutputFolder, "lowres_tilepairfiles")
+    jsondir  = os.path.join(p.dataOutputFolder, "lowres_tilepairfiles")
     jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
 
     #SIFT Point Match Client
@@ -30,7 +30,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
     cmd = cmd + " --name PointMatchFull"
     cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"
-    cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
+    cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.renderHostPort)
     cmd = cmd + " --collection %s_lowres_round"             %(p.projectName)
     cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
     cmd = cmd + " --pairJson %s"                            %(u.toDockerMountedPath(jsonfile, p.prefixPath))

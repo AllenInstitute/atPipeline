@@ -13,7 +13,7 @@ def run(p, sessionFolder):
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
-    outputFolder  = os.path.join(projectRoot, p.dataOutputFolder)
+    outputFolder  = p.dataOutputFolder
 
     match_collection_name = "%s_HR_2D"%(renderProject.name)
     delta = 250
@@ -25,7 +25,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --render.owner %s"                          %(renderProject.owner)
     cmd = cmd + " --render.client_scripts %s"                 %(p.clientScripts)
     cmd = cmd + " --render.memGB %s"                          %(p.memGB)
-    cmd = cmd + " --render.port %s"                           %(p.port)
+    cmd = cmd + " --render.port %s"                           %(p.renderHostPort)
     cmd = cmd + " --pool_size %s"                             %(p.poolSize)
     cmd = cmd + " --stack S%d_RoughAligned"                   %(session)
     cmd = cmd + " --minZ %d"                                  %(p.firstSection)

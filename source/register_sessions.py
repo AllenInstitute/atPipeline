@@ -10,7 +10,7 @@ def run(p, sessionFolder):
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
-    jsonOutputFolder  = os.path.join(projectRoot, p.dataOutputFolder, "registration")
+    jsonOutputFolder  = os.path.join(p.dataOutputFolder, "registration")
 
     # Make sure that the output folder exist
     if os.path.isdir(jsonOutputFolder) == False:
@@ -40,13 +40,16 @@ def run(p, sessionFolder):
         cmd = cmd + " at_modules.Register"
         cmd = cmd + " --input_json %s"%inputJSON
 
-        #Run =============
-        print ("Running: " + cmd.replace('--', '\n--'))
+    #Run =============
+    print ("Running: " + cmd.replace('--', '\n--'))
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in proc.stdout.readlines():
+        print (line)
 
-        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        for line in proc.stdout.readlines():
-            print (line)
-
+    proc.wait()
+    if proc.returncode:
+        print ("PROC_RETURN_CODE:" + str(proc.returncode))
+        raise Exception(os.path.basename(__file__) + " threw an Exception")
 
 if __name__ == "__main__":
     #This script need a valid INI file to be passed as an argument

@@ -13,7 +13,7 @@ def run(p, sessionFolder):
     input_stack = "S%d_RoughAligned_Consolidated"%(session)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
-    jsonOutputFolder  = os.path.join(projectRoot, p.dataOutputFolder, "high_res_tilepairfiles")
+    jsonOutputFolder  = os.path.join(p.dataOutputFolder, "high_res_tilepairfiles")
 
     # Make sure that the output folder exist
     if os.path.isdir(jsonOutputFolder) == False:
@@ -25,7 +25,7 @@ def run(p, sessionFolder):
     cmd = "docker exec " + p.atCoreContainer
     cmd = cmd + " java -cp /shared/render/render-ws-java-client/target/render-ws-java-client-2.1.0-SNAPSHOT-standalone.jar"
     cmd = cmd + " org.janelia.render.client.TilePairClient"
-    cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
+    cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.renderHostPort)
     cmd = cmd + " --owner %s"							    %(renderProject.owner)
     cmd = cmd + " --project %s"                             %(renderProject.name)
     cmd = cmd + " --stack %s"                               %(input_stack)

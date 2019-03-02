@@ -11,7 +11,7 @@ def run(p, sessionFolder):
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
-    dataOutputFolder       = os.path.join(projectRoot, p.dataOutputFolder, "rough_aligned")
+    dataOutputFolder       = os.path.join(p.dataOutputFolder, "rough_aligned")
     input_json     = os.path.join(dataOutputFolder, "roughalignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
     output_json    = os.path.join(dataOutputFolder, "output_roughalignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
 

@@ -26,12 +26,12 @@ def run(p, sessionFolder):
         cmd = cmd + " --render.owner %s "         %renderProject.owner
         cmd = cmd + " --render.project %s"        %renderProject.name
         cmd = cmd + " --render.client_scripts %s" %p.clientScripts
-        cmd = cmd + " --render.port %d"           %p.port
+        cmd = cmd + " --render.port %d"           %p.renderHostPort
         cmd = cmd + " --render.memGB %s"          %p.memGB
         cmd = cmd + " --log_level %s"             %p.logLevel
-        cmd = cmd + " --statetableFile %s"        %(u.toDockerMountedPath(statetablefile,  p.prefixPath))
-        cmd = cmd + " --projectDirectory %s"      %(u.toDockerMountedPath(projectroot,   p.prefixPath))
-        cmd = cmd + " --dataOutputFolder %s"      %(p.dataOutputFolder.replace('\\', '/'))
+        cmd = cmd + " --statetableFile %s"        %(posixpath.join(p.dockerDataOutputFolder, "statetables", statetablefile))
+        cmd = cmd + " --projectDirectory %s"      %(p.dockerDataInputFolder)
+        cmd = cmd + " --dataOutputFolder %s"      %(p.dockerDataOutputFolder)
         cmd = cmd + " --outputStackPrefix S%d_"   %(session)
         cmd = cmd + " --reference_channel %s"      %(p.referenceChannel)
 
