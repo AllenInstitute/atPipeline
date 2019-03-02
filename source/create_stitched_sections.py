@@ -11,7 +11,7 @@ def run(p, sessionFolder):
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
-    stitching_dir    = os.path.join(projectroot, p.dataOutputFolder, "stitching")
+    stitching_dir    = os.path.join(p.dataOutputFolder, "stitching")
 
     #Make sure output folder exist
     if os.path.isdir(stitching_dir) == False:
@@ -29,14 +29,14 @@ def run(p, sessionFolder):
         with open(p.stitching_template) as json_data:
              stitching_template = json.load(json_data)
 
-        stitching_json = os.path.join(stitching_dir, "flatfield""_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))
+        stitching_json_file = "stitching_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum)
         z = ribbon*100 + sectnum
 
-        u.savestitchingjson(stitching_template, stitching_json, renderProject.owner, renderProject.name, flatfield_stack, stitched_stack, z, p.renderHost)
+        u.savestitchingjson(stitching_template, os.path.join(stitching_dir, stitching_json_file), renderProject, flatfield_stack, stitched_stack, z)
 
         cmd = "docker exec " + p.atCoreContainer
         cmd = cmd + " java -cp /shared/at_modules/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
-        cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(stitching_json, p.prefixPath))
+        cmd = cmd + " --input_json %s"%(posixpath.join(p.dockerDataOutputFolder, "stitching", stitching_json_file))
 
         #Run =============
         print ("Running: " + cmd.replace('--', '\n--'))

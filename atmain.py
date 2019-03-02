@@ -29,32 +29,32 @@ def main():
             #Start with the creation of state table files
             if parameters.createStateTables == True:
                print("Creating statetables for session: " + sessionFolder)
-               create_state_tables.run(parameters, sessionFolder)
+               #create_state_tables.run(parameters, sessionFolder)
 
             #Create Renderstacks (multi) for the raw data
             if parameters.createRawDataRenderMultiStacks == True:
                print("Creating Raw Data Stacks for session: " + sessionFolder)
-               create_rawdata_render_multi_stacks.run(parameters, sessionFolder)
+               #create_rawdata_render_multi_stacks.run(parameters, sessionFolder)
 
             #Calculate median files
             if parameters.createMedianFiles == True:
                print("Calculating Median Files for session: " + sessionFolder)
-               create_median_files.run(parameters, sessionFolder)
+               #create_median_files.run(parameters, sessionFolder)
 
             #Creating Flatfiled corrected data
             if parameters.createFlatFieldCorrectedData == True:
                print("Creating FlatField corrected data for session: " + sessionFolder)
-               create_flatfield_corrected_data.run(parameters, sessionFolder)
+               #create_flatfield_corrected_data.run(parameters, sessionFolder)
 
             #Stitch the data
             if parameters.createStitchedSections == True:
                print("Stitching data for session: " + sessionFolder)
-               create_stitched_sections.run(parameters, sessionFolder)
+               #create_stitched_sections.run(parameters, sessionFolder)
 
             #Drop stitching mistakes
             if parameters.dropStitchingMistakes == True:
                print("Stitching data for session: " + sessionFolder)
-               drop_stitching_mistakes.run(parameters, sessionFolder)
+               #drop_stitching_mistakes.run(parameters, sessionFolder)
 
             #Create lowres stacks
             if parameters.createLowResStacks == True:

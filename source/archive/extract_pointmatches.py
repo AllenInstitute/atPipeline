@@ -34,7 +34,7 @@ def run(p, sessionFolder):
 	#Extract point matches
 	cmd = "docker exec " + p.rpaContainer
 	cmd = cmd + " sh %s/run_tilepair_and_sift.sh"%pm_script_dir
-	cmd = cmd + " --render.port %s"%p.port
+	cmd = cmd + " --render.port %s"%p.renderHostPort
 	cmd = cmd + " --render.host %s"%renderProject.host
 	cmd = cmd + " --render.client_scripts %s"%p.clientScripts
 	cmd = cmd + " --render.memGB %s"%p.memGB

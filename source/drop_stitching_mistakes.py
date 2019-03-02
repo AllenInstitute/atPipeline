@@ -11,7 +11,7 @@ def run(p, sessionFolder):
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
 	# output directories
-    dropped_dir = os.path.join(projectroot, p.dataOutputFolder, "dropped")
+    dropped_dir = os.path.join(p.dataOutputFolder, "dropped")
 
 	# Make sure output folder exist
     if os.path.isdir(dropped_dir) == False:
@@ -31,13 +31,13 @@ def run(p, sessionFolder):
     cmd = cmd + " --render.host %s"                         %(renderProject.host)
     cmd = cmd + " --render.project %s"                      %(renderProject.name)
     cmd = cmd + " --render.client_scripts %s"               %(p.clientScripts)
-    cmd = cmd + " --render.port %d"                         %(p.port)
+    cmd = cmd + " --render.port %d"                         %(p.renderHostPort)
     cmd = cmd + " --render.memGB %s"                        %(p.memGB)
     cmd = cmd + " --log_level %s"                           %(p.logLevel)
     cmd = cmd + " --prestitchedStack %s"                    %(acquisition_Stack)
     cmd = cmd + " --poststitchedStack %s"                   %(stitched_dapi_Stack)
     cmd = cmd + " --outputStack %s"                         %(dropped_dapi_Stack)
-    cmd = cmd + " --jsonDirectory %s"                       %(u.toDockerMountedPath(dropped_dir, p.prefixPath))
+    cmd = cmd + " --jsonDirectory %s"                       %(posixpath.join(p.dockerDataOutputFolder, "dropped"))
     cmd = cmd + " --edge_threshold %d"                      %(p.edgeThreshold)
     cmd = cmd + " --pool_size %d"                           %(p.poolSize)
     cmd = cmd + " --distance_threshold %d"                  %(p.distance)
