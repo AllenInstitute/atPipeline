@@ -1,6 +1,7 @@
 import os
 import subprocess
 import atutils as u
+import posixpath
 
 def run(p, sessionFolder):
 

@@ -13,13 +13,14 @@ def run(p, sessionFolder):
     inputStack = "S%d_Stitched_Dropped_LowRes"%(session)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
-    jsondir           = os.path.join(p.dataOutputFolder, "lowres_tilepairfiles")
+    jsondir           = os.path.join(p.dataOutputFolder,            "lowres_tilepairfiles")
+    docker_jsondir    = posixpath.join(p.dockerDataOutputFolder,    "lowres_tilepairfiles")
 
     # Make sure output folder exist
     if os.path.isdir(jsondir) == False:
         os.mkdir(jsondir)
 
-    jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
+    jsonfile = "tilepairs-%d-%d-%d-nostitch.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection)
 
     #Run the TilePairClient
     cmd = "docker exec " + p.atCoreContainer
@@ -31,7 +32,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --stack %s"                               %(inputStack)
     cmd = cmd + " --minZ %d"                                %(p.firstSection)
     cmd = cmd + " --maxZ %d"                                %(p.lastSection)
-    cmd = cmd + " --toJson %s"                              %(u.toDockerMountedPath(jsonfile, p.prefixPath))
+    cmd = cmd + " --toJson %s"                              %(posixpath.join(docker_jsondir, jsonfile))
     cmd = cmd + " --excludeCornerNeighbors %s"              %(p.excludeCornerNeighbors)
     cmd = cmd + " --excludeSameSectionNeighbors %s"         %(p.excludeSameSectionNeighbors)
     cmd = cmd + " --zNeighborDistance %s"                   %(p.zNeighborDistance)
@@ -50,6 +51,7 @@ def run(p, sessionFolder):
 
     #Prepare json file for the SIFTPointMatch Client
     jsonfileedit      = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"%(p.zNeighborDistance, p.firstSection, p.lastSection))
+    jsonfile          = os.path.join(jsondir, jsonfile)
     copyfile(jsonfile, jsonfileedit)
 
     for line in fileinput.input(jsonfileedit, inplace=True):

@@ -10,14 +10,11 @@ def run(p, sessionFolder):
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
-    #output directories
-    downsample_dir   = os.path.join(p.dataOutputFolder, "low_res")
-
     #point match collections
     lowres_pm_collection = "%s_LowRes_3D"%renderProject.name
 
-    jsondir  = os.path.join(p.dataOutputFolder, "lowres_tilepairfiles")
-    jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
+    docker_jsondir  = posixpath.join(p.dockerDataOutputFolder,    "lowres_tilepairfiles")
+    jsonfile        = "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection)
 
     #SIFT Point Match Client
     cmd = "docker exec " + p.atCoreContainer
@@ -33,7 +30,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.renderHostPort)
     cmd = cmd + " --collection %s_lowres_round"             %(p.projectName)
     cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
-    cmd = cmd + " --pairJson %s"                            %(u.toDockerMountedPath(jsonfile, p.prefixPath))
+    cmd = cmd + " --pairJson %s"                            %(posixpath.join(docker_jsondir,jsonfile))
     cmd = cmd + " --renderWithFilter true"
     cmd = cmd + " --maxFeatureCacheGb 40"
     cmd = cmd + " --matchModelType RIGID"
@@ -60,10 +57,7 @@ def run(p, sessionFolder):
         print ("PROC_RETURN_CODE:" + str(proc.returncode))
         raise Exception(os.path.basename(__file__) + " threw an Exception")
 
-
 if __name__ == "__main__":
 
     #This script need a valid INI file to be passed as an argument
     u.runAtCoreModule(run)
-
-

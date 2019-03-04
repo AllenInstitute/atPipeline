@@ -163,11 +163,12 @@ def runAtCoreModule(method):
     print("Elapsed time: " + timeDuration + " minutes")
 
 class RenderProject:
-    def __init__(self, owner, host, name, host_port="80"):
-        self.name = name
-        self.host = host
-        self.owner = owner
-        self.host_port = host_port
+    def __init__(self, owner, host, name, host_port="80", client_scripts="/shared/render/render-ws-java-client/src/main/scripts"):
+        self.name           = name
+        self.host           = host
+        self.owner          = owner
+        self.hostPort       = host_port
+        self.clientScripts  = client_scripts
 
 def parse_session_folder(path):
     proj = path.split("raw")
@@ -201,7 +202,7 @@ def dump_json(data, fileName):
 def savemedianjson(template, outFile, render_project, acq_stack, median_stack, median_dir, minz, maxz, close_stack):
     template['render']['host']    = render_project.host
     template['render']['owner']   = render_project.owner
-    template['render']['project'] = render_project.project
+    template['render']['project'] = render_project.name
     template['input_stack']       = acq_stack
     template['output_stack']      = median_stack
     template['minZ']              = minz
@@ -245,39 +246,39 @@ def savestitchingjson(template, outfile, render_project, flatfield_stack, stitch
     template['section']                = sectnum
     dump_json(template, outfile)
 
-def saveRoughAlignJSON(template, outFile, renderProject, input_stack, output_stack, lowresPmCollection, clientScripts, logLevel, nFirst, nLast, dataOutputFolder):
+def saveRoughAlignJSON(template, outFile, renderProject, input_stack, output_stack, lowresPmCollection, logLevel, nFirst, nLast, dataOutputFolder):
     template['regularization']['log_level']                  = logLevel
     template['matrix_assembly']['log_level']                 = logLevel
 
-    template['output_stack']['client_scripts']               = clientScripts
+    template['output_stack']['client_scripts']               = renderProject.clientScripts
     template['output_stack']['owner']                        = renderProject.owner
     template['output_stack']['log_level']                    = logLevel
     template['output_stack']['project']                      = renderProject.name
-    template['output_stack']['port']                         = renderProject.host_port
+    template['output_stack']['port']                         = renderProject.hostPort
     template['output_stack']['host']                         = renderProject.host
     template['output_stack']['name']                         = output_stack
 
-    template['input_stack']['client_scripts']                = clientScripts
+    template['input_stack']['client_scripts']                = renderProject.clientScripts
     template['input_stack']['owner']                         = renderProject.name
     template['input_stack']['log_level']                     = logLevel
     template['input_stack']['project']                       = renderProject.name
-    template['input_stack']['port']                          = renderProject.host_port
-    template['input_stack']['host']                          = renderHost
+    template['input_stack']['port']                          = renderProject.hostPort
+    template['input_stack']['host']                          = renderProject.host
     template['input_stack']['name']                          = input_stack
 
-    template['pointmatch']['client_scripts']                 = clientScripts
+    template['pointmatch']['client_scripts']                 = renderProject.clientScripts
     template['pointmatch']['owner']                          = renderProject.owner
     template['pointmatch']['log_level']                      = logLevel
     template['pointmatch']['project']                        = renderProject.name
     template['pointmatch']['name']                           = lowresPmCollection
-    template['pointmatch']['port']                           = renderProject.host_port
+    template['pointmatch']['port']                           = renderProject.hostPort
     template['pointmatch']['host']                           = renderProject.host
 
     template['hdf5_options']['log_level']                    = logLevel
     template['hdf5_options']['output_dir']                   = dataOutputFolder
 
-    template['last_section']                                 = nLast
     template['first_section']                                = nFirst
+    template['last_section']                                 = nLast
     template['log_level']                                    = "INFO"
     dump_json(template, outFile)
 

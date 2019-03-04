@@ -12,8 +12,8 @@ def run(p, sessionFolder):
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
-    median_dir         = os.path.join(p.dataOutputFolder, "medians")
-    docker_median_dir  = posixpath.join(p.dockerDataOutputFolder, "medians")
+    median_dir         = os.path.join(p.dataOutputFolder,           "medians")
+    docker_median_dir  = posixpath.join(p.dockerDataOutputFolder,   "medians")
 
     median_json_file   = "median_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection)
 
