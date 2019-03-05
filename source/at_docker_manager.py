@@ -9,6 +9,11 @@ class DockerManager:
         self.dClient = docker.from_env()
         logger = logging.getLogger('atPipeline')
 
+    def reStartContainer(self, ctrName, mounts):
+        logger.info("Restarting the container: " + ctrName )
+        self.stopContainer(ctrName)
+        return self.startContainer(ctrName, mounts)
+
     def startContainer(self, ctrName, mounts : 'Dictionary of mounts'):
 
         try:
@@ -24,7 +29,7 @@ class DockerManager:
 
         #This will do nothing, forever
         cmd = "tail -f /dev/null"
-        ctr = self.dClient.containers.run('atpipeline/atcore:dev', command=cmd, volumes= mounts, name=ctrName, detach=True)
+        ctr = self.dClient.containers.run('atpipeline/atcore:dev', volumes=mounts, command=cmd, cap_add=["SYS_ADMIN"], privileged=True, name=ctrName, detach=True)
 
         if ctr == None:
            return False
@@ -33,7 +38,7 @@ class DockerManager:
             #Failing starting a container is considered a showstopper. Raise an exception
             raise Exception("Failed starting container: " + ctrName)
 
-        logger.info("Started the: " + ctrName + " container")
+        logger.info("Started the " + ctrName + " container")
         return True
 
     def getContainer(self, ctrName):
@@ -45,11 +50,18 @@ class DockerManager:
 
     def stopContainer(self, ctrName):
         ctr = self.getContainer(ctrName)
-        if ctr != None:
-            ctr.kill()
-            return True
 
-        return False
+        if ctr == None:
+            logger.info("The container: " + ctrName + " does not exist")
+            return False
+
+        if ctr and ctr.status != 'running':
+            logger.info("The container: " + ctrName + " is not running")
+            return False
+
+        ctr.kill()
+        return True
+
 
     def killAllContainers(self):
         containers = self.dClient.containers.list(all=True)

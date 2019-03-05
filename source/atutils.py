@@ -149,7 +149,10 @@ def validateATCoreInputAndOutput():
     if os.path.isdir(outFolder) == False:
         pathlib.Path(outFolder).mkdir(parents=True, exist_ok=True)
 
-    shutil.copy2(parameterFile, os.path.join(outFolder, parameters.projectName + ".ini"))
+    dest = os.path.join(outFolder, parameters.projectName + ".ini")
+    print("Copying file " + parameterFile + " to " + dest)
+
+    shutil.copyfile(parameterFile, dest)
     return parameters
 
 def runAtCoreModule(method):

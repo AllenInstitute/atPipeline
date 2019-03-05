@@ -16,6 +16,7 @@ def setupScriptArguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('-startAll', help='Start the whole AT backend', action='store_true')
     parser.add_argument('-killAll', help='Stop the AT backend', action='store_true')
+    parser.add_argument("--restart", help="Restart a specific backend container, e.g. atcore")
     parser.add_argument("--start", help="Start a specific backend container, e.g. atcore")
     parser.add_argument('--stop', help='Stop a specific backend cointainer')
     return parser.parse_args()
@@ -47,9 +48,9 @@ def main():
 
     #TODO: put this in H/W config file
     atCoreMounts = {
-        '/c/data'                                           : {'bind': '/data_input_mount_1'},
-        '/c/data/data_output'                               : {'bind': '/data_output_mount_1'},
-        os.path.join(cwd, 'pipeline')                       : {'bind': '/pipeline'},
+        '/nas5/data'                                        : {'bind': '/data_input_mount_1', 'mode' : 'ro'},
+        '/nas5/processed_data'                              : {'bind': '/data_output_mount_1', 'mode' : 'rw'},
+        os.path.join(cwd, 'pipeline')                       : {'bind' : '/pipeline', 'mode' : 'ro'}
 #        os.path.join(cwd, 'docker', 'render-python-apps')   : {'bind': '/shared/render-python-apps'},
 #        os.path.join(cwd, 'docker', 'render-modules')       : {'bind': '/shared/render-modules'}
     }
@@ -58,6 +59,9 @@ def main():
     composeFile = os.path.join(cwd, "docker", "init", "docker-compose.yml")
 
     try:
+        if args.restart:
+            dManager.reStartContainer(atCoreCtrName, atCoreMounts)
+
         if args.start:
             dManager.startContainer(atCoreCtrName, atCoreMounts)
 
@@ -73,7 +77,6 @@ def main():
             dManager.killAllContainers()
 
         if args.startAll:
-
             #start the render backend first
             if startRenderBackend(composeFile) == False:
                 raise Exception("Failed starting the RenderBackend")
@@ -86,7 +89,6 @@ def main():
 
     except Exception as e:
         logger.error("Exception: " + str(e))
-
 
 
 if __name__ == '__main__':

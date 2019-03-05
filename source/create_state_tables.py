@@ -8,6 +8,19 @@ def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
+    outputFolder = p.dataOutputFolder
+    #Make sure that the output folder exist
+    if os.path.isdir(outputFolder) == False:
+        print ("Creating folder: " + outputFolder)
+        os.mkdir(outputFolder)
+
+    outputFolder = os.path.join(p.dataOutputFolder, "statetables")
+    #Make sure output folder exist
+    if os.path.isdir(outputFolder) == False:
+        print ("Creating folder: " + outputFolder)
+        os.mkdir(outputFolder)
+
+
     for sectnum in range(p.firstSection, p.lastSection + 1):
         print("Processing section: " + str(sectnum))
 
@@ -37,7 +50,7 @@ def run(p, sessionFolder):
             proc.wait()
             if proc.returncode:
                 print ("PROC_RETURN_CODE:" + str(proc.returncode))
-                raise Exception("Error generating median files")
+                raise Exception("Error generating state table files")
 
 if __name__ == "__main__":
     #This script need a valid INI file to be passed as an argument
