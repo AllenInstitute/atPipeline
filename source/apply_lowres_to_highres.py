@@ -10,7 +10,7 @@ def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    lowresStack             = "S%d_Stitched_Dropped_LowRes"%(session)
+    lowresStack             = "S%d_LowRes"%(session)
 
     inputStack              = "S%d_Stitched_Dropped"%(session)
     outputStack             = "S%d_RoughAligned"%(session)

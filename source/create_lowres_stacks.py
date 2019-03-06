@@ -23,7 +23,7 @@ def run(p, sessionFolder):
 
     # stacks
     input_stack  = "S%d_Stitched_Dropped"   %(session)
-    output_stack = "S%d_Stitched_Dropped_LowRes"%(session)
+    output_stack = "S%d_LowRes"%(session)
 
     renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 

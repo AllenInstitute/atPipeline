@@ -10,7 +10,7 @@ def run(p, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
-    inputStack = "S%d_Stitched_Dropped_LowRes"%(session)
+    inputStack = "S%d_LowRes"%(session)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
     jsondir           = os.path.join(projectRoot, p.dataOutputFolder, "lowres_tilepairfiles")
