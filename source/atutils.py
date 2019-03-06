@@ -235,13 +235,13 @@ def savedeconvjson(template,outFile, owner, project, flatfield_stack,deconv_stac
     template['close_stack']       = close_stack
     dump_json(template, outFile)
 
-def savestitchingjson(template, outfile, owner, project, flatfield_stack, stitched_stack, sectnum, render_host):
-    template['owner']                  = owner
-    template['project']                = project
+def savestitchingjson(template, outfile, render_project, flatfield_stack, stitched_stack, sectnum):
+    template['baseDataUrl']            = "http://%s/render-ws/v1"%(render_project.host)
+    template['owner']                  = render_project.owner
+    template['project']                = render_project.name
     template['stack']                  = flatfield_stack
     template['outputStack']            = stitched_stack
     template['section']                = sectnum
-    template['baseDataUrl']            = "http://%s/render-ws/v1"%(render_host)
     dump_json(template, outfile)
 
 def saveRoughAlignJSON(template, outFile, renderHost, port, owner, project, input_stack, output_stack, lowresPmCollection, clientScripts, logLevel, nFirst, nLast, dataOutputFolder):
