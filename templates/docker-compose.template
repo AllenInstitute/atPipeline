@@ -1,0 +1,43 @@
+version: "2.0"
+services:
+    render:
+       image: atpipeline/render-ws:dev
+       links:
+           - mongo
+       ports:
+           - 8080:8080
+           - 80:8080
+       environment:
+           - MONGO_HOST=mongo
+           - MONGO_PORT=27017
+           - NDVIZ_URL=${HOSTNAME}:5000
+           - JAVA_OPTIONS=-Xms10g -Xmx10g -server -Djava.awt.headless=true
+           - WEB_SERVICE_MAX_TILE_SPECS_TO_RENDER=100  
+       volumes:
+           - c:\data:/data_input_mount_1
+           - c:\data\processed:/data_output_mount_1
+       logging:
+           options:
+               max-size: "5g"
+    mongo:
+       image: mongo:3.4.2
+       ports:
+           - "27017"
+       volumes:
+           - mongodata:/data/db
+       restart: always
+       security_opt:
+         - seccomp:unconfined
+    vizrelay:
+       image: atpipeline/vizrelay:dev
+       ports:
+           - 5000:5000
+       volumes:
+           - ./vizrelay_config.json:/app/config.json
+    ndviz:
+      image: neurodata/ndviz:beta
+      ports:
+          - "8001:8080"
+volumes:
+    mongodata:
+ 

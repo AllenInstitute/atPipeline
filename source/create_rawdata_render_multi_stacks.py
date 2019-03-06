@@ -45,7 +45,7 @@ def run(p, sessionFolder):
         proc.wait()
         if proc.returncode:
             print ("PROC_RETURN_CODE:" + str(proc.returncode))
-            raise Exception("Error generating median files")
+            raise Exception("Error generating Render Stacks")
 
 
 if __name__ == "__main__":

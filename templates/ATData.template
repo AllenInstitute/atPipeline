@@ -1,37 +1,41 @@
 [GENERAL]
 
-
-#JSON Template folder location
-JSON_TEMPLATES_FOLDER=c:\\pDisk\\ATPipeline\\templates
-
-#Render host parameters
-RENDER_HOST=W10DTMJ03EG6Z.corp.alleninstitute.org
-PORT=80
-MEM_GB=5G
-LOG_LEVEL=INFO
-RENDER_PYTHON_APPS_CONTAINER=atcore
-AT_MODULES_CONTAINER=atmodules
-
-#Owner for data in renders database
-RENDER_PROJECT_OWNER=Junk
-
-#(Render)Project name in renders database, and sub-foldername for processed data
-PROJECT_NAME=QT_3_new
-
-#This will not change, probably..
-CLIENT_SCRIPTS=/shared/render/render-ws-java-client/src/main/scripts
+#SYSTEM_CONFIG_FILE
+SYSTEM_CONFIG_FILE=c:\\pDisk\\ATPipeline\\SYSTEM_CONFIG.ini
 
 #The DATA_INPUT_ROOT_FOLDER is the portion of the data path that prefixes the root folder of the data to process
 #E.g., for the ATIF data named M3434 residing in C:\Documents\Mine\Data\M3434\data...(etc), the data input root folder path would be
 #C:\Documents\Mine\Data
 DATA_INPUT_ROOT_FOLDER=C:\data
 
-#The data folder, relative to DATA_INPUT_ROOT_FOLDER, containg the actual data
-PROJECT_DATA_FOLDER=M33
-
 #The 'processed' folder contain intermediate processed data (including this file for reference)
 #This one is an ABSOLUTE path
-DATA_OUTPUT_FOLDER=c:\data_output\ProcessedData
+DATA_OUTPUT_ROOT_FOLDER=c:\data\data_output
+
+#DOCKER mounts
+DOCKER_DATA_INPUT_ROOT_FOLDER=/data_input_mount_1
+DOCKER_DATA_OUTPUT_ROOT_FOLDER=/data_output_mount_1
+
+#JSON Template folder location
+JSON_TEMPLATES_FOLDER=c:\\pDisk\\ATPipeline\\templates
+
+#Render host parameters
+RENDER_HOST=W10DTMJ03EG6Z.corp.alleninstitute.org
+RENDER_HOST_PORT=80
+MEM_GB=5G
+LOG_LEVEL=INFO
+RENDER_PYTHON_APPS_CONTAINER=atcore
+AT_MODULES_CONTAINER=atmodules
+
+#This will not change, probably..
+CLIENT_SCRIPTS=/shared/render/render-ws-java-client/src/main/scripts
+
+#(Render)Project name in renders database, and sub-foldername for processed data
+#PROJECT_NAME is EQUAL to the name of the root folder of the input data
+PROJECT_NAME=M33
+
+#Owner for data in renders database
+RENDER_PROJECT_OWNER=Junk
 
 #Registration channel for all sessions. If there is a session with no DAPI present, another channel
 #need to be specified while that session is processed
@@ -47,7 +51,7 @@ SESSIONS=["Session01"]
 START_SECTION=0
 
 #End section to process
-END_SECTION=2
+END_SECTION=1
 
 #First Ribbon
 FIRST_RIBBON=4
@@ -74,34 +78,34 @@ CREATE_STITCHED_SECTIONS=yes
 DROP_STITCHING_MISTAKES=yes
 
 #Create lowres stacks for pointmatches
-CREATE_LOWRES_STACKS=no
+CREATE_LOWRES_STACKS=yes
 
 #Create Tile Pairs
-CREATE_LOWRES_TILEPAIRS=no
+CREATE_LOWRES_TILEPAIRS=yes
 
 #Create Point matches
-CREATE_LOWRES_POINTMATCHES=no
+CREATE_LOWRES_POINTMATCHES=yes
 
 #Create Rough aligned stacks
-CREATE_ROUGH_ALIGNED_STACKS=no
+CREATE_ROUGH_ALIGNED_STACKS=yes
 
 #Apply lowres alignment transforms to high res stacks
-APPLY_LOWRES_TO_HIGHRES=no
+APPLY_LOWRES_TO_HIGHRES=yes
 
 #Cosolidate Rough aligned stack transforms
-CONSOLIDATE_ROUGH_ALIGNED_STACK_TRANSFORMS=no
+CONSOLIDATE_ROUGH_ALIGNED_STACK_TRANSFORMS=yes
 
 #Create 2D pointmatches
-CREATE_2D_POINTMATCHES=no
+CREATE_2D_POINTMATCHES=yes
 
 #Create HR Tilepairs
-CREATE_HR_TILEPAIRS=no
+CREATE_HR_TILEPAIRS=yes
 
 #Create HR Pointmatches
-CREATE_HR_POINTMATCHES=no
+CREATE_HR_POINTMATCHES=yes
 
 #Create FineAligned stacks
-CREATE_FINE_ALIGNED_STACKS=no
+CREATE_FINE_ALIGNED_STACKS=yes
 
 #Parameters for the tilepair client
 [TILE_PAIR_CLIENT]

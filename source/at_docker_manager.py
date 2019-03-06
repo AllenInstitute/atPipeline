@@ -1,5 +1,7 @@
 import docker
 import logging
+import os
+import subprocess
 
 logger = logging.getLogger('atPipeline')
 #A simple docker manager, wrapping some of the DockerSDK
@@ -62,7 +64,6 @@ class DockerManager:
         ctr.kill()
         return True
 
-
     def killAllContainers(self):
         containers = self.dClient.containers.list(all=True)
         for ctr in containers:
@@ -79,3 +80,22 @@ class DockerManager:
             return True
 
         return False
+
+    def startRenderBackend(self, composeFile):
+
+        if os.path.exists(composeFile) == False:
+            raise Exception("The docker compose file: " + composeFile + " don't exist!")
+
+        cmd = "docker-compose -f " + str(composeFile)
+        cmd = cmd + " up -d"
+        print ("Running: " + cmd.replace('--', '\n--'))
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+        for line in proc.stdout.readlines():
+            print (line)
+
+        cmd = "docker ps"
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+        for line in p.stdout.readlines():
+            print (line)
+
+        return True
