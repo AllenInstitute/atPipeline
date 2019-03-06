@@ -30,7 +30,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
     cmd = cmd + " --name PointMatchFull"
     cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"
-    cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
+    cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.renderHostPort)
     cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
     cmd = cmd + " --collection %s"                          %(match_collection_name)
     cmd = cmd + " --pairJson %s"                            %(u.toDockerMountedPath(jsonInput, p.prefixPath))

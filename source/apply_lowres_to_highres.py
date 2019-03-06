@@ -35,7 +35,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --render.owner %s "              %renderProject.owner
     cmd = cmd + " --render.project %s"             %renderProject.name
     cmd = cmd + " --render.client_scripts %s"      %p.clientScripts
-    cmd = cmd + " --render.port %d"                %p.port
+    cmd = cmd + " --render.port %d"                %p.renderHostPort
     cmd = cmd + " --render.memGB %s"               %p.memGB
     cmd = cmd + " --pool_size %d"                  %(p.poolSize)
     cmd = cmd + " --tilespec_directory %s"         %(u.toDockerMountedPath(roughalign_ts_dir, p.prefixPath))

@@ -19,7 +19,7 @@ def run(p, sessionFolder):
     inputStack     = "S%d_Stitched_Dropped_LowRes"%(session)
     outputStack    = "S%d_RoughAligned_LowRes"%(session)
 
-    renderProject  = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
+    renderProject  = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName, p.renderHostPort, p.clientScripts)
 
 	#point match collections
     lowresPmCollection = "%s_lowres_round"%renderProject.name
@@ -48,7 +48,7 @@ def run(p, sessionFolder):
     proc.wait()
     if proc.returncode:
         print ("PROC_RETURN_CODE:" + str(proc.returncode))
-        raise Exception("Error generating median files")
+        raise Exception("Error creating rough aligned stacks")
 
 
 if __name__ == "__main__":

@@ -31,7 +31,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --render.host %s"                         %(renderProject.host)
     cmd = cmd + " --render.project %s"                      %(renderProject.name)
     cmd = cmd + " --render.client_scripts %s"               %(p.clientScripts)
-    cmd = cmd + " --render.port %d"                         %(p.port)
+    cmd = cmd + " --render.port %d"                         %(p.renderHostPort)
     cmd = cmd + " --render.memGB %s"                        %(p.memGB)
     cmd = cmd + " --log_level %s"                           %(p.logLevel)
     cmd = cmd + " --prestitchedStack %s"                    %(acquisition_Stack)

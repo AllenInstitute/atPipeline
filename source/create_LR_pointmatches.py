@@ -13,9 +13,6 @@ def run(p, sessionFolder):
     #output directories
     downsample_dir   = os.path.join(projectRoot, p.dataOutputFolder, "low_res")
 
-    #point match collections
-    lowres_pm_collection = "%s_LowRes_3D"%renderProject.name
-
     jsondir  = os.path.join(projectRoot, p.dataOutputFolder, "lowres_tilepairfiles")
     jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
 
@@ -30,7 +27,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
     cmd = cmd + " --name PointMatchFull"
     cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"
-    cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
+    cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.renderHostPort)
     cmd = cmd + " --collection %s_lowres_round"             %(p.projectName)
     cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
     cmd = cmd + " --pairJson %s"                            %(u.toDockerMountedPath(jsonfile, p.prefixPath))
@@ -60,10 +57,7 @@ def run(p, sessionFolder):
         print ("PROC_RETURN_CODE:" + str(proc.returncode))
         raise Exception(os.path.basename(__file__) + " threw an Exception")
 
-
 if __name__ == "__main__":
 
     #This script need a valid INI file to be passed as an argument
     u.runAtCoreModule(run)
-
-

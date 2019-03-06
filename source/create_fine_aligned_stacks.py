@@ -12,8 +12,8 @@ def run(p, sessionFolder):
 
     #Output directories
     dataOutputFolder       = os.path.join(projectRoot, p.dataOutputFolder, "fine_aligned")
-    input_json     = os.path.join(dataOutputFolder, "input_fine_alignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
-    output_json    = os.path.join(dataOutputFolder, "output_fine_alignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
+    input_json     	= os.path.join(dataOutputFolder, "input_fine_alignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
+    output_json    	= os.path.join(dataOutputFolder, "output_fine_alignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
 
     #stacks
     input_stack       = "S%d_RoughAligned_Consolidated"%(session)

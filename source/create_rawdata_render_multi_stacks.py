@@ -26,7 +26,7 @@ def run(p, sessionFolder):
         cmd = cmd + " --render.owner %s "         %renderProject.owner
         cmd = cmd + " --render.project %s"        %renderProject.name
         cmd = cmd + " --render.client_scripts %s" %p.clientScripts
-        cmd = cmd + " --render.port %d"           %p.port
+        cmd = cmd + " --render.port %d"           %p.renderHostPort
         cmd = cmd + " --render.memGB %s"          %p.memGB
         cmd = cmd + " --log_level %s"             %p.logLevel
         cmd = cmd + " --statetableFile %s"        %(u.toDockerMountedPath(statetablefile,  p.prefixPath))
@@ -45,7 +45,7 @@ def run(p, sessionFolder):
         proc.wait()
         if proc.returncode:
             print ("PROC_RETURN_CODE:" + str(proc.returncode))
-            raise Exception("Error generating median files")
+            raise Exception("Error generating Render Stacks")
 
 
 if __name__ == "__main__":

@@ -36,10 +36,8 @@ def run(p, sessionFolder):
             proc.wait()
             if proc.returncode:
                 print ("PROC_RETURN_CODE:" + str(proc.returncode))
-                raise Exception("Error generating median files")
-
+                raise Exception("Error generating state table files")
 
 if __name__ == "__main__":
-
     #This script need a valid INI file to be passed as an argument
     u.runAtCoreModule(run)
