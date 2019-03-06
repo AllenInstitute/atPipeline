@@ -10,7 +10,7 @@ def run(p, sessionFolder):
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
-    jsonOutputFolder  = os.path.join(p.dataOutputFolder, "registration")
+    jsonOutputFolder  = os.path.join(projectRoot, p.dataOutputFolder, "registration")
 
     # Make sure that the output folder exist
     if os.path.isdir(jsonOutputFolder) == False:

@@ -11,9 +11,7 @@ import timeit
 import pathlib
 
 #Some hardcoded paths..
-#This should be read from a HW config file (used by docker-compose as well)
-dockerInputDataMount    = "/input_data_mount_1"
-dockerOutputDataMount   = "/output_data_mount_1"
+dockerMountName = "/data_mount_1"
 
 def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")
@@ -28,33 +26,10 @@ class ATDataIni:
         tp_client                                     = config['TILE_PAIR_CLIENT']
         SPARK_SEC                                     = config['SPARK']
 
-        #SPARK stuff
-        self.SPARK = {}
-        self.SPARK['driverMemory']                    = SPARK_SEC['DRIVER_MEMORY']
-        self.SPARK['executorMemory']                  = SPARK_SEC['EXECUTOR_MEMORY']
-        self.SPARK['executorCores']                   = SPARK_SEC['EXECUTOR_CORES']
-        self.SPARK['maxFeatureCacheGb']               = SPARK_SEC['MAX_FEATURE_CACHE_GB']
-
-
-        self.JSONTemplatesFolder                      = general['JSON_TEMPLATES_FOLDER']
-
-        self.ch405                                    = config['DECONV_405']
-        self.ch488                                    = config['DECONV_488']
-        self.ch594                                    = config['DECONV_594']
-        self.ch647                                    = config['DECONV_647']
-
-        #What data to process?? These paths should be part of HW ini file
-        #Keep docker patsh separated from host paths
-        self.projectName                              = general['PROJECT_NAME']
-        self.dataInputRootFolder                      = general['DATA_INPUT_ROOT_FOLDER']
-        self.dataOutputRootFolder                     = general['DATA_OUTPUT_ROOT_FOLDER']
-        self.dataInputFolder                          = os.path.join(self.dataInputRootFolder, self.projectName)
-        self.dataOutputFolder                         = os.path.join(self.dataOutputRootFolder, self.projectName)
-
-        self.dockerDataInputRootFolder                = general['DOCKER_DATA_INPUT_ROOT_FOLDER']
-        self.dockerDataOutputRootFolder               = general['DOCKER_DATA_OUTPUT_ROOT_FOLDER']
-        self.dockerDataInputFolder                    = posixpath.join(self.dockerDataInputRootFolder, self.projectName)
-        self.dockerDataOutputFolder                   = posixpath.join(self.dockerDataOutputRootFolder, self.projectName)
+        #What data to process??
+        self.prefixPath                               = general['PREFIX_PATH']
+        self.dataRootFolder                           = os.path.join(self.prefixPath, general['DATA_FOLDER'])
+        self.dataOutputFolder                         = os.path.join(general['PROCESSED_DATA_FOLDER'])
 
         #Process parameters
         self.atCoreContainer                          = general['RENDER_PYTHON_APPS_CONTAINER']
@@ -62,6 +37,9 @@ class ATDataIni:
         self.renderHost                               = general['RENDER_HOST']
         self.renderProjectOwner                       = general['RENDER_PROJECT_OWNER']
         self.renderHostPort                           = int(general['RENDER_HOST_PORT'])
+        self.projectName                              = general['PROJECT_NAME']
+
+        self.dataOutputFolder                         = os.path.join(  self.dataOutputFolder, self.projectName)
         self.clientScripts                            = general['CLIENT_SCRIPTS']
 
         self.memGB                                    = general['MEM_GB']
@@ -90,6 +68,22 @@ class ATDataIni:
         self.createHRTilePairs                        = toBool(general['CREATE_HR_TILEPAIRS'])
         self.createHRPointMatches                     = toBool(general['CREATE_HR_POINTMATCHES'])
         self.createFineAlignedStacks                  = toBool(general['CREATE_FINE_ALIGNED_STACKS'])
+
+
+        #SPARK stuff
+        self.SPARK = {}
+        self.SPARK['driverMemory']                    = SPARK_SEC['DRIVER_MEMORY']
+        self.SPARK['executorMemory']                  = SPARK_SEC['EXECUTOR_MEMORY']
+        self.SPARK['executorCores']                   = SPARK_SEC['EXECUTOR_CORES']
+        self.SPARK['maxFeatureCacheGb']               = SPARK_SEC['MAX_FEATURE_CACHE_GB']
+
+
+        self.JSONTemplatesFolder                      = general['JSON_TEMPLATES_FOLDER']
+
+        self.ch405                                    = config['DECONV_405']
+        self.ch488                                    = config['DECONV_488']
+        self.ch594                                    = config['DECONV_594']
+        self.ch647                                    = config['DECONV_647']
 
         #Tilepair client
         self.excludeCornerNeighbors                   = toBool(tp_client['EXCLUDE_CORNER_NEIGHBOURS'])
@@ -123,14 +117,11 @@ class ATDataIni:
         self.registrationTemplate                     = os.path.join(self.JSONTemplatesFolder, "registration.json")
 
         for session in self.sessions:
-          self.sessionFolders.append(posixpath.join(self.dockerDataInputRootFolder, self.projectName, "raw", "data", self.ribbons[0], session))
+          self.sessionFolders.append(os.path.join(self.dataRootFolder, "raw", "data", self.ribbons[0], session))
 
     def getStateTableFileName(self, ribbon, session, sectnum):
-        return "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum)
+        return os.path.join(self.dataRootFolder, self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
 
-#output posix path
-def toDockerMountedPath(path1, path2):
-    return posixpath.join(path1, path2)
 
 def validateATCoreInputAndOutput():
     parser = argparse.ArgumentParser()
@@ -145,15 +136,13 @@ def validateATCoreInputAndOutput():
     parameters = ATDataIni(parameterFile)
 
     #Copy parameter file to root of processed data output folder
-    outFolder = os.path.join(parameters.dataOutputRootFolder)
+    outFolder = os.path.join(parameters.dataRootFolder, parameters.dataOutputFolder)
     if os.path.isdir(outFolder) == False:
         pathlib.Path(outFolder).mkdir(parents=True, exist_ok=True)
 
-    dest = os.path.join(outFolder, parameters.projectName + ".ini")
-    print("Copying file " + parameterFile + " to " + dest)
-
-    shutil.copyfile(parameterFile, dest)
+    shutil.copy2(parameterFile, outFolder)
     return parameters
+
 
 def runAtCoreModule(method):
     timeStart = timeit.default_timer()
@@ -176,7 +165,7 @@ class RenderProject:
 def parse_session_folder(path):
     proj = path.split("raw")
     projectdirectory = proj[0]
-    tok = path.split('/')
+    tok = path.split(os.sep)
     ribbondir = tok[len(tok)-2]
     sessiondir = tok[len(tok)-1]
     ribbon = int(ribbondir[6:])
@@ -197,6 +186,12 @@ def getChannelNamesInSessionFolder(directory):
         for name in dirs:
             directory_list.append(os.path.join(root, name))
     return dirs
+
+def toDockerMountedPath(path, prefix):
+    #Remove prefix
+    p = path.split(prefix)[1]
+    p = posixpath.normpath(p.replace('\\', '/'))
+    return posixpath.join(dockerMountName, p[1:])
 
 def dump_json(data, fileName):
     with open(fileName, 'w') as outfile:

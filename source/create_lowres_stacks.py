@@ -14,8 +14,8 @@ def run(p, sessionFolder):
     lastRibbon = int(p.ribbons[-1][6:])
 
     # output directories
-    downsample_dir   = os.path.join(p.dataOutputFolder, "low_res")
-    numsections_file = os.path.join(downsample_dir,     "numsections")
+    downsample_dir   = os.path.join(projectRoot, p.dataOutputFolder, "low_res")
+    numsections_file = os.path.join(downsample_dir,                   "numsections")
 
     # Make sure output folder exist
     if os.path.isdir(downsample_dir) == False:
@@ -23,7 +23,7 @@ def run(p, sessionFolder):
 
     # stacks
     input_stack  = "S%d_Stitched_Dropped"   %(session)
-    output_stack = "S%d_Stitched_Dropped_LowRes"%(session)
+    output_stack = "S%d_LowRes"%(session)
 
     renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
@@ -38,12 +38,12 @@ def run(p, sessionFolder):
     cmd = cmd + " --render.port %s"                                %(p.renderHostPort)
     cmd = cmd + " --input_stack %s"                                %(input_stack)
     cmd = cmd + " --output_stack %s"                               %(output_stack)
-    cmd = cmd + " --image_directory %s"                            %(posixpath.join(p.dockerDataOutputFolder, "low_res"))
+    cmd = cmd + " --image_directory %s"                            %(u.toDockerMountedPath(downsample_dir, p.prefixPath))
     cmd = cmd + " --pool_size %s"                                  %(p.poolSize)
     cmd = cmd + " --scale %s"                                      %(p.scale)
     cmd = cmd + " --minZ %s"                                       %(firstRibbon*100)
     cmd = cmd + " --maxZ %s"                                       %((lastRibbon + 1)*100 - 1)
-    cmd = cmd + " --numsectionsfile %s"                            %(posixpath.join(p.dockerDataOutputFolder, "low_res", "numsections"))
+    cmd = cmd + " --numsectionsfile %s"                            %(u.toDockerMountedPath(numsections_file, p.prefixPath))
     cmd = cmd + " --log_level %s"                                  %(p.logLevel)
 
     # Run =============

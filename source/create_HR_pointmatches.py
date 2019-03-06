@@ -16,7 +16,7 @@ def run(p, sessionFolder):
     #point match collection
     match_collection_name = "%s_HR_3D"%(renderProject.name)
 
-    jsonInputFolder  = os.path.join(p.dataOutputFolder, "high_res_tilepairfiles")
+    jsonInputFolder  = os.path.join(projectRoot, p.dataOutputFolder, "high_res_tilepairfiles")
     jsonInput = os.path.join(jsonInputFolder, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
 
     #SIFT Point Match Client

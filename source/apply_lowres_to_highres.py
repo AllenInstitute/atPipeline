@@ -19,7 +19,7 @@ def run(p, sessionFolder):
     firstribbon             = p.firstRibbon
     lastribbon              = p.lastRibbon
 
-    roughalign_ts_dir = os.path.join(p.dataOutputFolder, "rough_aligned_tilespecs")
+    roughalign_ts_dir = os.path.join(projectRoot, p.dataOutputFolder, "rough_aligned_tilespecs")
 
     # Make sure output folder exist
     if os.path.isdir(roughalign_ts_dir) == False:

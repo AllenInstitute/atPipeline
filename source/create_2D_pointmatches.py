@@ -13,7 +13,7 @@ def run(p, sessionFolder):
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
-    outputFolder  = p.dataOutputFolder
+    outputFolder  = os.path.join(projectRoot, p.dataOutputFolder)
 
     match_collection_name = "%s_HR_2D"%(renderProject.name)
     delta = 250

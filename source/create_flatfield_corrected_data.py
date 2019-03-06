@@ -12,11 +12,11 @@ def run(p, sessionFolder):
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
-    flatfield_output_dir    = os.path.join(p.dataOutputFolder, "flatfield")
+    flatfield_dir    = os.path.join(projectroot, p.dataOutputFolder, "flatfield")
 
     #Make sure output folder exists
-    if os.path.isdir(flatfield_output_dir) == False:
-       os.mkdir(flatfield_output_dir)
+    if os.path.isdir(flatfield_dir) == False:
+       os.mkdir(flatfield_dir)
 
     #stacks
     acq_stack        = "S%d_Session%d"%(session,session)
@@ -31,15 +31,15 @@ def run(p, sessionFolder):
         with open(p.flatfield_template) as json_data:
              ff = json.load(json_data)
 
-        flatfield_json_file = "flatfield_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum)
+        flatfield_json = os.path.join(flatfield_dir, "flatfield_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))
 
         z = ribbon*100 + sectnum
 
-        u.saveflatfieldjson(ff, os.path.join(flatfield_output_dir, flatfield_json_file), renderProject, acq_stack, median_stack, flatfield_stack, posixpath.join(p.dockerDataOutputFolder, "flatfield"), z, True)
+        u.saveflatfieldjson(ff, flatfield_json, renderProject, acq_stack, median_stack, flatfield_stack, u.toDockerMountedPath(flatfield_dir, p.prefixPath), z, True)
         cmd = "docker exec " + p.atCoreContainer
         cmd = cmd + " python -m rendermodules.intensity_correction.apply_multiplicative_correction"
         cmd = cmd + " --render.port 80"
-        cmd = cmd + " --input_json %s"%(posixpath.join(p.dockerDataOutputFolder, "flatfield", flatfield_json_file))
+        cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(flatfield_json, p.prefixPath))
 
         #Run =============
         print ("Running: " + cmd.replace('--', '\n--'))

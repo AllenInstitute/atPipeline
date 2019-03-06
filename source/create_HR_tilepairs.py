@@ -13,7 +13,7 @@ def run(p, sessionFolder):
     input_stack = "S%d_RoughAligned_Consolidated"%(session)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
-    jsonOutputFolder  = os.path.join(p.dataOutputFolder, "high_res_tilepairfiles")
+    jsonOutputFolder  = os.path.join(projectRoot, p.dataOutputFolder, "high_res_tilepairfiles")
 
     # Make sure that the output folder exist
     if os.path.isdir(jsonOutputFolder) == False:
