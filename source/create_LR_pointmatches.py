@@ -13,9 +13,6 @@ def run(p, sessionFolder):
     #output directories
     downsample_dir   = os.path.join(projectRoot, p.dataOutputFolder, "low_res")
 
-    #point match collections
-    lowres_pm_collection = "%s_LowRes_3D"%renderProject.name
-
     jsondir  = os.path.join(projectRoot, p.dataOutputFolder, "lowres_tilepairfiles")
     jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
 
