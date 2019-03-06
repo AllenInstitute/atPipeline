@@ -197,10 +197,10 @@ def dump_json(data, fileName):
     with open(fileName, 'w') as outfile:
          json.dump(data, outfile, indent=4)
 
-def savemedianjson(template, outFile, render_host, owner, project, acq_stack, median_stack, median_dir, minz, maxz, close_stack):
-    template['render']['host']    = render_host
-    template['render']['owner']   = owner
-    template['render']['project'] = project
+def savemedianjson(template, outFile, render_project, acq_stack, median_stack, median_dir, minz, maxz, close_stack):
+    template['render']['host']    = render_project.host
+    template['render']['owner']   = render_project.owner
+    template['render']['project'] = render_project.name
     template['input_stack']       = acq_stack
     template['output_stack']      = median_stack
     template['minZ']              = minz
@@ -209,10 +209,10 @@ def savemedianjson(template, outFile, render_host, owner, project, acq_stack, me
     template['close_stack']       = close_stack
     dump_json(template, outFile)
 
-def saveflatfieldjson(template, outFile, render_host, owner, project, acq_stack, median_stack, flatfield_stack, flatfield_dir, sectnum, close_stack):
-    template['render']['host']    = render_host
-    template['render']['owner']   = owner
-    template['render']['project'] = project
+def saveflatfieldjson(template, outFile, render_project, acq_stack, median_stack, flatfield_stack, flatfield_dir, sectnum, close_stack):
+    template['render']['host']    = render_project.host
+    template['render']['owner']   = render_project.owner
+    template['render']['project'] = render_project.name
     template['input_stack']       = acq_stack
     template['correction_stack']  = median_stack
     template['output_stack']      = flatfield_stack
@@ -221,7 +221,7 @@ def saveflatfieldjson(template, outFile, render_host, owner, project, acq_stack,
     template['close_stack']       = close_stack
     dump_json(template, outFile)
 
-def savedeconvjson(template,outFile,owner, project, flatfield_stack,deconv_stack,deconv_dir,sectnum,psf_file, num_iter,bgrd_size,scale_factor,close_stack):
+def savedeconvjson(template,outFile, owner, project, flatfield_stack,deconv_stack,deconv_dir,sectnum,psf_file, num_iter,bgrd_size,scale_factor,close_stack):
     template['render']['owner']   = owner
     template['render']['project'] = project
     template['input_stack']       = flatfield_stack
