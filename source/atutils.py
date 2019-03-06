@@ -11,7 +11,7 @@ import timeit
 import pathlib
 
 #Some hardcoded paths..
-dockerMountName = "/mnt"
+dockerMountName = "/data_mount_1"
 
 def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")

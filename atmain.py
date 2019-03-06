@@ -17,7 +17,7 @@ def main():
 
         dockerClient = docker.from_env()
         atcore = dockerClient.containers.get("atcore")
-        render = dockerClient.containers.get("init_render_1")
+        render = dockerClient.containers.get("tk_render")
 
         if render.status != "running":
             raise ValueError("The Render docker container is not running!")
