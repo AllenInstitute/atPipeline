@@ -257,7 +257,7 @@ def saveRoughAlignJSON(template, outFile, renderProject, input_stack, output_sta
     template['output_stack']['name']                         = output_stack
 
     template['input_stack']['client_scripts']                = renderProject.clientScripts
-    template['input_stack']['owner']                         = renderProject.name
+    template['input_stack']['owner']                         = renderProject.owner
     template['input_stack']['log_level']                     = logLevel
     template['input_stack']['project']                       = renderProject.name
     template['input_stack']['port']                          = renderProject.hostPort

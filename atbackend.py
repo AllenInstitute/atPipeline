@@ -36,8 +36,8 @@ def main():
     atCoreMounts = {
         'c:\data'                                        : {'bind': '/data_mount_1', 'mode' : 'rw'},
         os.path.join(cwd, 'pipeline')                    : {'bind' : '/pipeline', 'mode' : 'ro'},
-        os.path.join(cwd, 'docker', 'render-python-apps')   : {'bind': '/shared/render-python-apps'},
-        os.path.join(cwd, 'docker', 'render-modules')       : {'bind': '/shared/render-modules'}
+#        os.path.join(cwd, 'docker', 'render-python-apps')   : {'bind': '/shared/render-python-apps'},
+#        os.path.join(cwd, 'docker', 'render-modules')       : {'bind': '/shared/render-modules'}
     }
 
     #docker compose file
