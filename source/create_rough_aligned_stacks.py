@@ -31,7 +31,7 @@ def run(p, sessionFolder):
     if os.path.isdir(dataOutputFolder) == False:
         os.mkdir(dataOutputFolder)
 
-    u.saveRoughAlignJSON(ra, input_json, p.renderHost, 80, renderProject.owner, renderProject.name, inputStack, outputStack, lowresPmCollection, p.clientScripts, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
+    u.saveRoughAlignJSON(ra, input_json, renderProject, inputStack, outputStack, lowresPmCollection, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
 
     #Run docker command
     cmd = "docker exec " + p.atCoreContainer

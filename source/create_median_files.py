@@ -41,7 +41,7 @@ def run(p, sessionFolder):
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in proc.stdout.readlines():
         print (line)
-    
+
     proc.wait()
     if proc.returncode:
         print ("PROC_RETURN_CODE:" + str(proc.returncode))
