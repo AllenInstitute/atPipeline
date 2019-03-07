@@ -38,12 +38,12 @@ def run(p, sessionFolder):
     cmd = cmd + " --render.port %s"                                %(p.renderHostPort)
     cmd = cmd + " --input_stack %s"                                %(input_stack)
     cmd = cmd + " --output_stack %s"                               %(output_stack)
-    cmd = cmd + " --image_directory %s"                            %(u.toDockerMountedPath(downsample_dir, p.prefixPath))
+    cmd = cmd + " --image_directory %s"                            %(u.toDockerMountedPath(downsample_dir, p))
     cmd = cmd + " --pool_size %s"                                  %(p.poolSize)
     cmd = cmd + " --scale %s"                                      %(p.scale)
     cmd = cmd + " --minZ %s"                                       %(firstRibbon*100)
     cmd = cmd + " --maxZ %s"                                       %((lastRibbon + 1)*100 - 1)
-    cmd = cmd + " --numsectionsfile %s"                            %(u.toDockerMountedPath(numsections_file, p.prefixPath))
+    cmd = cmd + " --numsectionsfile %s"                            %(u.toDockerMountedPath(numsections_file, p))
     cmd = cmd + " --log_level %s"                                  %(p.logLevel)
 
     # Run =============

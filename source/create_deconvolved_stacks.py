@@ -45,7 +45,7 @@ def run(p, sessionFolder):
 
         for ch in channels:
             if ch["LABEL"] != None:
-                with open(p.deconvolution_template) as json_data:
+                with open(p.systemParameters.deconvolution_template) as json_data:
                     dd = json.load(json_data)
 
                 deconv_json = os.path.join(deconv_dir, "deconvolved""_%s_%s_%s_%d_%s.json"%(renderProject.name, ribbon, session, sectnum, ch["LABEL"]))
@@ -54,13 +54,13 @@ def run(p, sessionFolder):
                 z = ribbon*100 + sectnum
 
                 u.savedeconvjson(dd, deconv_json, renderProject.owner, renderProject.name, ffStack,
-                                            dcvStack, u.toDockerMountedPath(deconv_dir, p.prefixPath), z, psfFile, ch["NUM_ITER"],
+                                            dcvStack, u.toDockerMountedPath(deconv_dir, p), z, psfFile, ch["NUM_ITER"],
                                             ch["BGRD_SIZE"], ch["SCALE_FACTOR"], True)
 
                 cmd = "docker exec " + p.atCoreContainer
                 cmd = cmd + " python -m renderapps.intensity_correction.apply_deconvolution_multi"
                 cmd = cmd + " --render.port 80"
-                cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(deconv_json, p.prefixPath))
+                cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(deconv_json, p))
 
             #Run =============
             print ("Running: " + cmd.replace('--', '\n--'))

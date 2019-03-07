@@ -33,7 +33,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.renderHostPort)
     cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
     cmd = cmd + " --collection %s"                          %(match_collection_name)
-    cmd = cmd + " --pairJson %s"                            %(u.toDockerMountedPath(jsonInput, p.prefixPath))
+    cmd = cmd + " --pairJson %s"                            %(u.toDockerMountedPath(jsonInput, p))
     cmd = cmd + " --renderWithFilter true"
     cmd = cmd + " --maxFeatureCacheGb %s"                   %(p.SPARK['maxFeatureCacheGb'])
     #cmd = cmd + " --maxFeatureCacheGb 40"

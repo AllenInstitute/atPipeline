@@ -28,18 +28,18 @@ def run(p, sessionFolder):
     #Create json files and apply median.
     for sectnum in range(p.firstSection, p.lastSection + 1):
 
-        with open(p.flatfield_template) as json_data:
+        with open(p.systemParameters.flatfield_template) as json_data:
              ff = json.load(json_data)
 
         flatfield_json = os.path.join(flatfield_dir, "flatfield_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))
 
         z = ribbon*100 + sectnum
 
-        u.saveflatfieldjson(ff, flatfield_json, renderProject, acq_stack, median_stack, flatfield_stack, u.toDockerMountedPath(flatfield_dir, p.prefixPath), z, True)
+        u.saveflatfieldjson(ff, flatfield_json, renderProject, acq_stack, median_stack, flatfield_stack, u.toDockerMountedPath(flatfield_dir, p), z, True)
         cmd = "docker exec " + p.atCoreContainer
         cmd = cmd + " python -m rendermodules.intensity_correction.apply_multiplicative_correction"
         cmd = cmd + " --render.port 80"
-        cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(flatfield_json, p.prefixPath))
+        cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(flatfield_json, p))
 
         #Run =============
         print ("Running: " + cmd.replace('--', '\n--'))

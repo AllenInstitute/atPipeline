@@ -25,7 +25,7 @@ def run(p, sessionFolder):
     pm_collection2D     = "%s_HR_2D"%(renderProject.name)
     pm_collection3D     = "%s_HR_3D"%(renderProject.name)
 
-    with open(p.fine_alignment_template) as json_data:
+    with open(p.systemParameters.fine_alignment_template) as json_data:
        ra = json.load(json_data)
 
     #Create folder if not exists
@@ -34,13 +34,13 @@ def run(p, sessionFolder):
 
     u.saveFineAlignJSON(ra, input_json, p.renderHost, 80, renderProject.owner, renderProject.name,
                             input_stack, output_stack, pm_collection2D, pm_collection3D,
-                            p.clientScripts, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
+                            p.clientScripts, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p))
 
     #Run docker command
     cmd = "docker exec " + p.atCoreContainer
     cmd = cmd + " python -m rendermodules.solver.solve"
-    cmd = cmd + " --input_json %s" %(u.toDockerMountedPath(input_json, p.prefixPath))
-    cmd = cmd + " --output_json %s"%(u.toDockerMountedPath(output_json, p.prefixPath))
+    cmd = cmd + " --input_json %s" %(u.toDockerMountedPath(input_json, p))
+    cmd = cmd + " --output_json %s"%(u.toDockerMountedPath(output_json, p))
 
     #Run =============
     print ("Running: " + cmd.replace('--', '\n--'))

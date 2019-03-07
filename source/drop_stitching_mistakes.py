@@ -37,7 +37,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --prestitchedStack %s"                    %(acquisition_Stack)
     cmd = cmd + " --poststitchedStack %s"                   %(stitched_dapi_Stack)
     cmd = cmd + " --outputStack %s"                         %(dropped_dapi_Stack)
-    cmd = cmd + " --jsonDirectory %s"                       %(u.toDockerMountedPath(dropped_dir, p.prefixPath))
+    cmd = cmd + " --jsonDirectory %s"                       %(u.toDockerMountedPath(dropped_dir, p))
     cmd = cmd + " --edge_threshold %d"                      %(p.edgeThreshold)
     cmd = cmd + " --pool_size %d"                           %(p.poolSize)
     cmd = cmd + " --distance_threshold %d"                  %(p.distance)

@@ -38,7 +38,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --render.port %d"                %p.renderHostPort
     cmd = cmd + " --render.memGB %s"               %p.memGB
     cmd = cmd + " --pool_size %d"                  %(p.poolSize)
-    cmd = cmd + " --tilespec_directory %s"         %(u.toDockerMountedPath(roughalign_ts_dir, p.prefixPath))
+    cmd = cmd + " --tilespec_directory %s"         %(u.toDockerMountedPath(roughalign_ts_dir, p))
     cmd = cmd + " --scale %s"                      %scale
     cmd = cmd + " --input_stack %s"                %inputStack
     cmd = cmd + " --lowres_stack %s"               %lowresStack

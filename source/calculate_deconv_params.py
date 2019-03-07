@@ -15,7 +15,7 @@ def run(p, sessionFolder):
 	
     #RUN python script to calculate scale and background factors for each channel.                     
     cmd = "python deconv_scale_factor_session.py"
-    cmd = cmd + "  --drive %s"%(u.toDockerMountedPath(projectroot, p.prefixPath))
+    cmd = cmd + "  --drive %s"%(u.toDockerMountedPath(projectroot, p))
     cmd = cmd + " --project %s"%renderProject.name
     cmd = cmd + " --ribbon %s"%ribbon
     cmd = cmd + " --session %s"%session

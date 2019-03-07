@@ -30,7 +30,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.renderHostPort)
     cmd = cmd + " --collection %s_lowres_round"             %(p.projectName)
     cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
-    cmd = cmd + " --pairJson %s"                            %(u.toDockerMountedPath(jsonfile, p.prefixPath))
+    cmd = cmd + " --pairJson %s"                            %(u.toDockerMountedPath(jsonfile, p))
     cmd = cmd + " --renderWithFilter true"
     cmd = cmd + " --maxFeatureCacheGb 40"
     cmd = cmd + " --matchModelType RIGID"

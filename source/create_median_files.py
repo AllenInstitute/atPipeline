@@ -6,7 +6,7 @@ import posixpath
 import atutils as u
 import timeit
 
-def run(p, sessionFolder):
+def run(p : u.ATDataIni, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
@@ -25,15 +25,15 @@ def run(p, sessionFolder):
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
-    with open(p.median_template) as json_data:
+    with open(p.systemParameters.median_template) as json_data:
          med = json.load(json_data)
 
-    u.savemedianjson(med, median_json, renderProject, acq_stack, median_stack, u.toDockerMountedPath(median_dir, p.prefixPath), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
+    u.savemedianjson(med, median_json, renderProject, acq_stack, median_stack, u.toDockerMountedPath(median_dir, p), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
 
     cmd = "docker exec " + p.atCoreContainer
     cmd = cmd + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
     cmd = cmd + " --render.port 80"
-    cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(median_json,  p.prefixPath))
+    cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(median_json,  p))
 
     #Run =============
     print ("Running: " + cmd.replace('--', '\n--'))

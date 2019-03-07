@@ -24,20 +24,20 @@ def run(p, sessionFolder):
 	#point match collections
     lowresPmCollection = "%s_lowres_round"%renderProject.name
 
-    with open(p.alignment_template) as json_data:
+    with open(p.systemParameters.alignment_template) as json_data:
        ra = json.load(json_data)
 
     #Create folder if not exists
     if os.path.isdir(dataOutputFolder) == False:
         os.mkdir(dataOutputFolder)
 
-    u.saveRoughAlignJSON(ra, input_json, renderProject, inputStack, outputStack, lowresPmCollection, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
+    u.saveRoughAlignJSON(ra, input_json, renderProject, inputStack, outputStack, lowresPmCollection, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p))
 
     #Run docker command
     cmd = "docker exec " + p.atCoreContainer
     cmd = cmd + " python -m rendermodules.solver.solve"
-    cmd = cmd + " --input_json %s" %(u.toDockerMountedPath(input_json, p.prefixPath))
-    cmd = cmd + " --output_json %s"%(u.toDockerMountedPath(output_json, p.prefixPath))
+    cmd = cmd + " --input_json %s" %(u.toDockerMountedPath(input_json, p))
+    cmd = cmd + " --output_json %s"%(u.toDockerMountedPath(output_json, p))
 
     #Run =============
     print ("Running: " + cmd.replace('--', '\n--'))

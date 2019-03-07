@@ -31,7 +31,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --stack %s"                               %(inputStack)
     cmd = cmd + " --minZ %d"                                %(p.firstSection)
     cmd = cmd + " --maxZ %d"                                %(p.lastSection)
-    cmd = cmd + " --toJson %s"                              %(u.toDockerMountedPath(jsonfile, p.prefixPath))
+    cmd = cmd + " --toJson %s"                              %(u.toDockerMountedPath(jsonfile, p))
     cmd = cmd + " --excludeCornerNeighbors %s"              %(p.excludeCornerNeighbors)
     cmd = cmd + " --excludeSameSectionNeighbors %s"         %(p.excludeSameSectionNeighbors)
     cmd = cmd + " --zNeighborDistance %s"                   %(p.zNeighborDistance)

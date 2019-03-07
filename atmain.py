@@ -12,8 +12,8 @@ def main():
     timeStart = timeit.default_timer()
 
     try:
-        #Get processing parameters
-        parameters =u.validateATCoreInputAndOutput()
+        #Setup and validate parameters
+        parameters          = u.setupParameters()
 
         dockerClient = docker.from_env()
         atcore = dockerClient.containers.get("atcore")

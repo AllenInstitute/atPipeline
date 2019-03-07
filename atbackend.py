@@ -9,70 +9,68 @@ import argparse
 import at_docker_manager
 from source import *
 import source.atutils as u
+import ast
+import at_system_config
 
-def setupScriptArguments():
+def scriptArguments():
     #Get processing parameters
     parser = argparse.ArgumentParser()
-    parser.add_argument('-startAll', help='Start the whole AT backend',         action='store_true')
-    parser.add_argument('-startRenderBackend', help='Start the Render backend', action='store_true')
-    parser.add_argument('-killAll', help='Stop the AT backend', action='store_true')
-    parser.add_argument("--restart", help="Restart a specific backend container, e.g. atcore")
-    parser.add_argument("--start", help="Start a specific backend container, e.g. atcore")
-    parser.add_argument('--stop', help='Stop a specific backend cointainer')
+    parser.add_argument('-startAll',            help='Start the whole AT backend',          action='store_true')
+    parser.add_argument('-startRenderBackend',  help='Start the Render backend',            action='store_true')
+    parser.add_argument('-killAll',             help='Stop the AT backend',                 action='store_true')
+    parser.add_argument('-ra', '--restartAll',  help="Restart all AT backend container",    action='store_true' )
+
+    parser.add_argument('-s', '--start',        help="Start a specific backend container, e.g. atcore",     nargs='?',const='atcore', type=str)
+    parser.add_argument('-k', '--kill',         help='Stop a specific backend cointainer',                  nargs='?',const='atcore', type=str)
+    parser.add_argument('-r', '--restart',      help="Restart a specific backend container, e.g. atcore",   nargs='?',const='atcore', type=str)
+
     return parser.parse_args()
 
 def main():
 
-    logger.info("============ Managing the atBackend =============")
-    args = setupScriptArguments()
-
-    atCoreCtrName="atcore"
-
-    cwd = pathlib.Path().absolute().resolve()
-
-    dManager = at_docker_manager.DockerManager()
-
-    #TODO: put this in H/W config file
-    atCoreMounts = {
-        'c:\data'                                        : {'bind': '/data_mount_1', 'mode' : 'rw'},
-        os.path.join(cwd, 'pipeline')                    : {'bind' : '/pipeline', 'mode' : 'ro'},
-#        os.path.join(cwd, 'docker', 'render-python-apps')   : {'bind': '/shared/render-python-apps'},
-#        os.path.join(cwd, 'docker', 'render-modules')       : {'bind': '/shared/render-modules'}
-    }
-
-    #docker compose file
-    composeFile = os.path.join(cwd, "docker-compose.yml")
-
     try:
-        if args.restart:
-            dManager.reStartContainer(atCoreCtrName, atCoreMounts)
 
-        if args.start:
-            dManager.startContainer(atCoreCtrName, atCoreMounts)
+        parameters = at_system_config.ATSystemConfig("SystemConfig.ini")
+
+        logger.info("============ Managing the atBackend =============")
+        args = scriptArguments()
+        atCoreCtrName="atcore"
+
+        cwd = pathlib.Path().absolute().resolve()
+
+        dManager = at_docker_manager.DockerManager()
+        dManager.setupMounts(parameters.dataRoots, parameters.mountRenderPythonApps, parameters.mountRenderModules)
+        dManager.setComposeFile(os.path.join(cwd, "docker-compose.yml"))
+
+        if args.restart:
+            dManager.reStartContainer(args.restart)
+
+        elif args.start:
+            dManager.startContainer(args.start)
 
         #---- render containers ??
-        if args.stop:
-            if args.stop == atCoreCtrName:
-                if dManager.stopContainer(atCoreCtrName) == True:
-                    logger.info("Stopped atcore container")
-                else:
-                    logger.error("Failed stopping container")
+        elif args.kill:
+            dManager.stopContainer(args.stop)
 
-        if args.killAll:
+        elif args.killAll:
             dManager.killAllContainers()
 
-        if args.startAll:
+        elif args.startAll:
             #start the render backend first
-            if dManager.startRenderBackend(composeFile) == False:
+            if dManager.startRenderBackend() == False:
                 raise Exception("Failed starting the RenderBackend")
 
             #Start the atcore container
-            dManager.startContainer("atcore", atCoreMounts)
+            dManager.startContainer("atcore")
 
-        if args.startRenderBackend:
+        elif args.startRenderBackend:
             #start the render backend first
-            if dManager.startRenderBackend(composeFile) == False:
+            if dManager.startRenderBackend() == False:
                 raise Exception("Failed starting the RenderBackend")
+
+        elif args.restartAll:
+            dManager.reStartAll()
+
 
     except ValueError as e:
         logger.error("ValueError: " + str(e))

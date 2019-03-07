@@ -26,7 +26,7 @@ def run(p, sessionFolder):
 	#Create json files and start stitching...
     for sectnum in range(p.firstSection, p.lastSection + 1):
 
-        with open(p.stitching_template) as json_data:
+        with open(p.systemParameters.stitching_template) as json_data:
              stitching_template = json.load(json_data)
 
         stitching_json = os.path.join(stitching_dir, "flatfield""_%s_%s_%d.json"%(ribbon, session, sectnum))
@@ -36,7 +36,7 @@ def run(p, sessionFolder):
 
         cmd = "docker exec " + p.atCoreContainer
         cmd = cmd + " java -cp /shared/at_modules/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
-        cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(stitching_json, p.prefixPath))
+        cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(stitching_json, p))
 
         #Run =============
         print ("Running: " + cmd.replace('--', '\n--'))

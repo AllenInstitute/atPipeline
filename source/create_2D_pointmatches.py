@@ -30,7 +30,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --stack S%d_RoughAligned"                   %(session)
     cmd = cmd + " --minZ %d"                                  %(p.firstSection)
     cmd = cmd + " --maxZ %d"                                  %(p.lastSection)
-    cmd = cmd + " --dataRoot %s"                              %(u.toDockerMountedPath(outputFolder, p.prefixPath))
+    cmd = cmd + " --dataRoot %s"                              %(u.toDockerMountedPath(outputFolder, p))
     cmd = cmd + " --matchCollection %s"                       %(match_collection_name)
     cmd = cmd + " --delta %d"                                 %(delta)
     cmd = cmd + " --output_json Test"

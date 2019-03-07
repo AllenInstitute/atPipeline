@@ -19,8 +19,8 @@ def run(p, sessionFolder):
         else:
             cmd = "docker exec " + p.atCoreContainer
             cmd = cmd + " python /pipeline/make_state_table_ext_multi_pseudoz.py"
-            cmd = cmd + " --projectDirectory %s"        %(u.toDockerMountedPath(projectroot,    p.prefixPath))
-            cmd = cmd + " --outputFile %s"              %(u.toDockerMountedPath(statetablefile, p.prefixPath))
+            cmd = cmd + " --projectDirectory %s"        %(u.toDockerMountedPath(projectroot,    p))
+            cmd = cmd + " --outputFile %s"              %(u.toDockerMountedPath(statetablefile, p))
             cmd = cmd + " --ribbon %d"                  %ribbon
             cmd = cmd + " --session %d"                 %session
             cmd = cmd + " --section %d"                 %(sectnum)

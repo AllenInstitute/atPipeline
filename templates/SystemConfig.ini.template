@@ -1,0 +1,7 @@
+[GENERAL]
+#Each root will be mounted in backend docker containers as /data_mount_1 to /data_mount_N.
+DATA_ROOTS=["c:\data", "E:\Documents\data"]
+MOUNT_RENDER_PYTHON_APPS=false
+MOUNT_RENDER_MODULES=false
+
+

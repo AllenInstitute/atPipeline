@@ -8,10 +8,9 @@ import ast
 import argparse
 import shutil
 import timeit
+import at_system_config
 import pathlib
 
-#Some hardcoded paths..
-dockerMountName = "/data_mount_1"
 
 def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")
@@ -26,6 +25,7 @@ class ATDataIni:
         tp_client                                     = config['TILE_PAIR_CLIENT']
         SPARK_SEC                                     = config['SPARK']
 
+        self.systemConfigFile                         = general['SYSTEM_CONFIG_FILE']
         #What data to process??
         self.prefixPath                               = general['PREFIX_PATH']
         self.dataRootFolder                           = os.path.join(self.prefixPath, general['DATA_FOLDER'])
@@ -77,9 +77,6 @@ class ATDataIni:
         self.SPARK['executorCores']                   = SPARK_SEC['EXECUTOR_CORES']
         self.SPARK['maxFeatureCacheGb']               = SPARK_SEC['MAX_FEATURE_CACHE_GB']
 
-
-        self.JSONTemplatesFolder                      = general['JSON_TEMPLATES_FOLDER']
-
         self.ch405                                    = config['DECONV_405']
         self.ch488                                    = config['DECONV_488']
         self.ch594                                    = config['DECONV_594']
@@ -107,23 +104,21 @@ class ATDataIni:
         self.siftSteps                                = int(align['SIFTSTEPS'])
         self.renderScale                              = float(align['RENDERSCALE'])
 
-        #JSON Templates
-        self.median_template                          = os.path.join(self.JSONTemplatesFolder, "median.json")
-        self.stitching_template                       = os.path.join(self.JSONTemplatesFolder, "stitching.json")
-        self.flatfield_template                       = os.path.join(self.JSONTemplatesFolder, "flatfield.json")
-        self.deconvolution_template                   = os.path.join(self.JSONTemplatesFolder, "deconvolution.json")
-        self.alignment_template                       = os.path.join(self.JSONTemplatesFolder, "roughalign.json")
-        self.fine_alignment_template                  = os.path.join(self.JSONTemplatesFolder, "fine_align.json")
-        self.registrationTemplate                     = os.path.join(self.JSONTemplatesFolder, "registration.json")
-
         for session in self.sessions:
           self.sessionFolders.append(os.path.join(self.dataRootFolder, "raw", "data", self.ribbons[0], session))
+
+        #Read and append SYSTEM Configuration
+        self.systemParameters   = at_system_config.ATSystemConfig(self.systemConfigFile)
+
+        #Setup System parameters
+        self.systemParameters.setupDockerMountName(self.prefixPath)
+
 
     def getStateTableFileName(self, ribbon, session, sectnum):
         return os.path.join(self.dataRootFolder, self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
 
 
-def validateATCoreInputAndOutput():
+def setupParameters():
     parser = argparse.ArgumentParser()
     parser.add_argument('parameter_file', help='Input file')
     args = parser.parse_args()
@@ -146,7 +141,7 @@ def validateATCoreInputAndOutput():
 
 def runAtCoreModule(method):
     timeStart = timeit.default_timer()
-    parameters =validateATCoreInputAndOutput()
+    parameters = setupParameters()
 
     for sessionFolder in parameters.sessionFolders:
         method(parameters, sessionFolder)
@@ -187,11 +182,11 @@ def getChannelNamesInSessionFolder(directory):
             directory_list.append(os.path.join(root, name))
     return dirs
 
-def toDockerMountedPath(path, prefix):
+def toDockerMountedPath(path, paras : ATDataIni):
     #Remove prefix
-    p = path.split(prefix)[1]
+    p = path.split(paras.prefixPath)[1]
     p = posixpath.normpath(p.replace('\\', '/'))
-    return posixpath.join(dockerMountName, p[1:])
+    return posixpath.join(paras.systemParameters.dockerMountName, p[1:])
 
 def dump_json(data, fileName):
     with open(fileName, 'w') as outfile:
