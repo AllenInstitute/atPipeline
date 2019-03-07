@@ -1,5 +1,7 @@
 import docker
 import logging
+import os
+import subprocess
 
 logger = logging.getLogger('atPipeline')
 #A simple docker manager, wrapping some of the DockerSDK
@@ -8,6 +10,11 @@ class DockerManager:
     def __init__(self):
         self.dClient = docker.from_env()
         logger = logging.getLogger('atPipeline')
+
+    def reStartContainer(self, ctrName, mounts):
+        logger.info("Restarting the container: " + ctrName )
+        self.stopContainer(ctrName)
+        return self.startContainer(ctrName, mounts)
 
     def startContainer(self, ctrName, mounts : 'Dictionary of mounts'):
 
@@ -24,7 +31,7 @@ class DockerManager:
 
         #This will do nothing, forever
         cmd = "tail -f /dev/null"
-        ctr = self.dClient.containers.run('atpipeline/atcore:dev', command=cmd, volumes= mounts, name=ctrName, detach=True)
+        ctr = self.dClient.containers.run('atpipeline/atcore:dev', volumes=mounts, command=cmd, cap_add=["SYS_ADMIN"], privileged=True, name=ctrName, detach=True)
 
         if ctr == None:
            return False
@@ -33,7 +40,7 @@ class DockerManager:
             #Failing starting a container is considered a showstopper. Raise an exception
             raise Exception("Failed starting container: " + ctrName)
 
-        logger.info("Started the: " + ctrName + " container")
+        logger.info("Started the " + ctrName + " container")
         return True
 
     def getContainer(self, ctrName):
@@ -45,11 +52,17 @@ class DockerManager:
 
     def stopContainer(self, ctrName):
         ctr = self.getContainer(ctrName)
-        if ctr != None:
-            ctr.kill()
-            return True
 
-        return False
+        if ctr == None:
+            logger.info("The container: " + ctrName + " does not exist")
+            return False
+
+        if ctr and ctr.status != 'running':
+            logger.info("The container: " + ctrName + " is not running")
+            return False
+
+        ctr.kill()
+        return True
 
     def killAllContainers(self):
         containers = self.dClient.containers.list(all=True)
@@ -67,3 +80,22 @@ class DockerManager:
             return True
 
         return False
+
+    def startRenderBackend(self, composeFile):
+
+        if os.path.exists(composeFile) == False:
+            raise Exception("The docker compose file: " + composeFile + " don't exist!")
+
+        cmd = "docker-compose -f " + str(composeFile)
+        cmd = cmd + " up -d"
+        print ("Running: " + cmd.replace('--', '\n--'))
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+        for line in proc.stdout.readlines():
+            print (line)
+
+        cmd = "docker ps"
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+        for line in p.stdout.readlines():
+            print (line)
+
+        return True

@@ -11,7 +11,7 @@ import timeit
 import pathlib
 
 #Some hardcoded paths..
-dockerMountName = "/mnt"
+dockerMountName = "/data_mount_1"
 
 def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")
@@ -26,22 +26,6 @@ class ATDataIni:
         tp_client                                     = config['TILE_PAIR_CLIENT']
         SPARK_SEC                                     = config['SPARK']
 
-        #SPARK stuff
-        self.SPARK = {}
-        self.SPARK['driverMemory']                    = SPARK_SEC['DRIVER_MEMORY']
-        self.SPARK['executorMemory']                  = SPARK_SEC['EXECUTOR_MEMORY']
-        self.SPARK['executorCores']                   = SPARK_SEC['EXECUTOR_CORES']
-        self.SPARK['maxFeatureCacheGb']               = SPARK_SEC['MAX_FEATURE_CACHE_GB']
-
-
-        self.JSONTemplatesFolder                      = general['JSON_TEMPLATES_FOLDER']
-
-
-        self.ch405                                    = config['DECONV_405']
-        self.ch488                                    = config['DECONV_488']
-        self.ch594                                    = config['DECONV_594']
-        self.ch647                                    = config['DECONV_647']
-
         #What data to process??
         self.prefixPath                               = general['PREFIX_PATH']
         self.dataRootFolder                           = os.path.join(self.prefixPath, general['DATA_FOLDER'])
@@ -52,10 +36,12 @@ class ATDataIni:
         self.atmContainer                             = general['AT_MODULES_CONTAINER']
         self.renderHost                               = general['RENDER_HOST']
         self.renderProjectOwner                       = general['RENDER_PROJECT_OWNER']
+        self.renderHostPort                           = int(general['RENDER_HOST_PORT'])
         self.projectName                              = general['PROJECT_NAME']
+
         self.dataOutputFolder                         = os.path.join(  self.dataOutputFolder, self.projectName)
         self.clientScripts                            = general['CLIENT_SCRIPTS']
-        self.port                                     = int(general['PORT'])
+
         self.memGB                                    = general['MEM_GB']
         self.logLevel                                 = general['LOG_LEVEL']
         self.referenceChannel                         = general['REFERENCE_CHANNEL']
@@ -82,6 +68,22 @@ class ATDataIni:
         self.createHRTilePairs                        = toBool(general['CREATE_HR_TILEPAIRS'])
         self.createHRPointMatches                     = toBool(general['CREATE_HR_POINTMATCHES'])
         self.createFineAlignedStacks                  = toBool(general['CREATE_FINE_ALIGNED_STACKS'])
+
+
+        #SPARK stuff
+        self.SPARK = {}
+        self.SPARK['driverMemory']                    = SPARK_SEC['DRIVER_MEMORY']
+        self.SPARK['executorMemory']                  = SPARK_SEC['EXECUTOR_MEMORY']
+        self.SPARK['executorCores']                   = SPARK_SEC['EXECUTOR_CORES']
+        self.SPARK['maxFeatureCacheGb']               = SPARK_SEC['MAX_FEATURE_CACHE_GB']
+
+
+        self.JSONTemplatesFolder                      = general['JSON_TEMPLATES_FOLDER']
+
+        self.ch405                                    = config['DECONV_405']
+        self.ch488                                    = config['DECONV_488']
+        self.ch594                                    = config['DECONV_594']
+        self.ch647                                    = config['DECONV_647']
 
         #Tilepair client
         self.excludeCornerNeighbors                   = toBool(tp_client['EXCLUDE_CORNER_NEIGHBOURS'])
@@ -153,10 +155,12 @@ def runAtCoreModule(method):
     print("Elapsed time: " + timeDuration + " minutes")
 
 class RenderProject:
-    def __init__(self, owner, host, name):
-        self.name = name
-        self.host = host
-        self.owner = owner
+    def __init__(self, owner, host, name, host_port="80", client_scripts="/shared/render/render-ws-java-client/src/main/scripts"):
+        self.name           = name
+        self.host           = host
+        self.owner          = owner
+        self.hostPort       = host_port
+        self.clientScripts  = client_scripts
 
 def parse_session_folder(path):
     proj = path.split("raw")
@@ -193,10 +197,10 @@ def dump_json(data, fileName):
     with open(fileName, 'w') as outfile:
          json.dump(data, outfile, indent=4)
 
-def savemedianjson(template, outFile, render_host, owner, project, acq_stack, median_stack, median_dir, minz, maxz, close_stack):
-    template['render']['host']    = render_host
-    template['render']['owner']   = owner
-    template['render']['project'] = project
+def savemedianjson(template, outFile, render_project, acq_stack, median_stack, median_dir, minz, maxz, close_stack):
+    template['render']['host']    = render_project.host
+    template['render']['owner']   = render_project.owner
+    template['render']['project'] = render_project.name
     template['input_stack']       = acq_stack
     template['output_stack']      = median_stack
     template['minZ']              = minz
@@ -205,10 +209,10 @@ def savemedianjson(template, outFile, render_host, owner, project, acq_stack, me
     template['close_stack']       = close_stack
     dump_json(template, outFile)
 
-def saveflatfieldjson(template, outFile, render_host, owner, project, acq_stack, median_stack, flatfield_stack, flatfield_dir, sectnum, close_stack):
-    template['render']['host']    = render_host
-    template['render']['owner']   = owner
-    template['render']['project'] = project
+def saveflatfieldjson(template, outFile, render_project, acq_stack, median_stack, flatfield_stack, flatfield_dir, sectnum, close_stack):
+    template['render']['host']    = render_project.host
+    template['render']['owner']   = render_project.owner
+    template['render']['project'] = render_project.name
     template['input_stack']       = acq_stack
     template['correction_stack']  = median_stack
     template['output_stack']      = flatfield_stack
@@ -217,7 +221,7 @@ def saveflatfieldjson(template, outFile, render_host, owner, project, acq_stack,
     template['close_stack']       = close_stack
     dump_json(template, outFile)
 
-def savedeconvjson(template,outFile,owner, project, flatfield_stack,deconv_stack,deconv_dir,sectnum,psf_file, num_iter,bgrd_size,scale_factor,close_stack):
+def savedeconvjson(template,outFile, owner, project, flatfield_stack,deconv_stack,deconv_dir,sectnum,psf_file, num_iter,bgrd_size,scale_factor,close_stack):
     template['render']['owner']   = owner
     template['render']['project'] = project
     template['input_stack']       = flatfield_stack
@@ -231,47 +235,48 @@ def savedeconvjson(template,outFile,owner, project, flatfield_stack,deconv_stack
     template['close_stack']       = close_stack
     dump_json(template, outFile)
 
-def savestitchingjson(template, outfile, owner, project, flatfield_stack, stitched_stack, sectnum, render_host):
-    template['owner']                  = owner
-    template['project']                = project
+def savestitchingjson(template, outfile, render_project, flatfield_stack, stitched_stack, sectnum):
+    template['baseDataUrl']            = "http://%s/render-ws/v1"%(render_project.host)
+    template['owner']                  = render_project.owner
+    template['project']                = render_project.name
     template['stack']                  = flatfield_stack
     template['outputStack']            = stitched_stack
     template['section']                = sectnum
-    template['baseDataUrl']            = "http://%s/render-ws/v1"%(render_host)
     dump_json(template, outfile)
 
-def saveRoughAlignJSON(template, outFile, renderHost, port, owner, project, input_stack, output_stack, lowresPmCollection, clientScripts, logLevel, nFirst, nLast, dataOutputFolder):
+def saveRoughAlignJSON(template, outFile, renderProject, input_stack, output_stack, lowresPmCollection, logLevel, nFirst, nLast, dataOutputFolder):
     template['regularization']['log_level']                  = logLevel
     template['matrix_assembly']['log_level']                 = logLevel
 
-    template['output_stack']['client_scripts']               = clientScripts
-    template['output_stack']['owner']                        = owner
+    template['output_stack']['client_scripts']               = renderProject.clientScripts
+    template['output_stack']['owner']                        = renderProject.owner
     template['output_stack']['log_level']                    = logLevel
-    template['output_stack']['project']                      = project
-    template['output_stack']['port']                         = port
-    template['output_stack']['host']                         = renderHost
+    template['output_stack']['project']                      = renderProject.name
+    template['output_stack']['port']                         = renderProject.hostPort
+    template['output_stack']['host']                         = renderProject.host
     template['output_stack']['name']                         = output_stack
-    template['input_stack']['client_scripts']                = clientScripts
-    template['input_stack']['owner']                         = owner
+
+    template['input_stack']['client_scripts']                = renderProject.clientScripts
+    template['input_stack']['owner']                         = renderProject.owner
     template['input_stack']['log_level']                     = logLevel
-    template['input_stack']['project']                       = project
-    template['input_stack']['port']                          = port
-    template['input_stack']['host']                          = renderHost
+    template['input_stack']['project']                       = renderProject.name
+    template['input_stack']['port']                          = renderProject.hostPort
+    template['input_stack']['host']                          = renderProject.host
     template['input_stack']['name']                          = input_stack
 
-    template['pointmatch']['client_scripts']                 = clientScripts
-    template['pointmatch']['owner']                          = owner
+    template['pointmatch']['client_scripts']                 = renderProject.clientScripts
+    template['pointmatch']['owner']                          = renderProject.owner
     template['pointmatch']['log_level']                      = logLevel
-    template['pointmatch']['project']                        = project
+    template['pointmatch']['project']                        = renderProject.name
     template['pointmatch']['name']                           = lowresPmCollection
-    template['pointmatch']['port']                           = port
-    template['pointmatch']['host']                           = renderHost
+    template['pointmatch']['port']                           = renderProject.hostPort
+    template['pointmatch']['host']                           = renderProject.host
 
     template['hdf5_options']['log_level']                    = logLevel
     template['hdf5_options']['output_dir']                   = dataOutputFolder
 
-    template['last_section']                                 = nLast
     template['first_section']                                = nFirst
+    template['last_section']                                 = nLast
     template['log_level']                                    = "INFO"
     dump_json(template, outFile)
 

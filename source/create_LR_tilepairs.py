@@ -10,7 +10,7 @@ def run(p, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
-    inputStack = "S%d_Stitched_Dropped_LowRes"%(session)
+    inputStack = "S%d_LowRes"%(session)
 
     renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
     jsondir           = os.path.join(projectRoot, p.dataOutputFolder, "lowres_tilepairfiles")
@@ -25,7 +25,7 @@ def run(p, sessionFolder):
     cmd = "docker exec " + p.atCoreContainer
     cmd = cmd + " java -cp /shared/render/render-ws-java-client/target/render-ws-java-client-2.1.0-SNAPSHOT-standalone.jar"
     cmd = cmd + " org.janelia.render.client.TilePairClient"
-    cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.port)
+    cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.renderHostPort)
     cmd = cmd + " --owner %s"							    %(renderProject.owner)
     cmd = cmd + " --project %s"                             %(renderProject.name)
     cmd = cmd + " --stack %s"                               %(inputStack)

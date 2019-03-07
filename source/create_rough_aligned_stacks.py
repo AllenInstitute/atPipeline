@@ -16,10 +16,10 @@ def run(p, sessionFolder):
     output_json    = os.path.join(dataOutputFolder, "output_roughalignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
 
     #stacks
-    inputStack     = "S%d_Stitched_Dropped_LowRes"%(session)
+    inputStack     = "S%d_LowRes"%(session)
     outputStack    = "S%d_RoughAligned_LowRes"%(session)
 
-    renderProject  = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
+    renderProject  = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName, p.renderHostPort, p.clientScripts)
 
 	#point match collections
     lowresPmCollection = "%s_lowres_round"%renderProject.name
@@ -31,7 +31,7 @@ def run(p, sessionFolder):
     if os.path.isdir(dataOutputFolder) == False:
         os.mkdir(dataOutputFolder)
 
-    u.saveRoughAlignJSON(ra, input_json, p.renderHost, 80, renderProject.owner, renderProject.name, inputStack, outputStack, lowresPmCollection, p.clientScripts, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
+    u.saveRoughAlignJSON(ra, input_json, renderProject, inputStack, outputStack, lowresPmCollection, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
 
     #Run docker command
     cmd = "docker exec " + p.atCoreContainer
@@ -48,7 +48,7 @@ def run(p, sessionFolder):
     proc.wait()
     if proc.returncode:
         print ("PROC_RETURN_CODE:" + str(proc.returncode))
-        raise Exception("Error generating median files")
+        raise Exception("Error creating rough aligned stacks")
 
 
 if __name__ == "__main__":

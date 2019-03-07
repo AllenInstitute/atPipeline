@@ -23,7 +23,7 @@ def run(p, sessionFolder):
 
     # stacks
     input_stack  = "S%d_Stitched_Dropped"   %(session)
-    output_stack = "S%d_Stitched_Dropped_LowRes"%(session)
+    output_stack = "S%d_LowRes"%(session)
 
     renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
 
@@ -35,7 +35,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --render.owner %s"                               %(renderProject.owner)
     cmd = cmd + " --render.client_scripts %s"                      %(p.clientScripts)
     cmd = cmd + " --render.memGB %s"                               %(p.memGB)
-    cmd = cmd + " --render.port %s"                                %(p.port)
+    cmd = cmd + " --render.port %s"                                %(p.renderHostPort)
     cmd = cmd + " --input_stack %s"                                %(input_stack)
     cmd = cmd + " --output_stack %s"                               %(output_stack)
     cmd = cmd + " --image_directory %s"                            %(u.toDockerMountedPath(downsample_dir, p.prefixPath))

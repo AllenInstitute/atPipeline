@@ -10,7 +10,7 @@ def run(p, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    lowresStack             = "S%d_Stitched_Dropped_LowRes"%(session)
+    lowresStack             = "S%d_LowRes"%(session)
 
     inputStack              = "S%d_Stitched_Dropped"%(session)
     outputStack             = "S%d_RoughAligned"%(session)
@@ -35,7 +35,7 @@ def run(p, sessionFolder):
     cmd = cmd + " --render.owner %s "              %renderProject.owner
     cmd = cmd + " --render.project %s"             %renderProject.name
     cmd = cmd + " --render.client_scripts %s"      %p.clientScripts
-    cmd = cmd + " --render.port %d"                %p.port
+    cmd = cmd + " --render.port %d"                %p.renderHostPort
     cmd = cmd + " --render.memGB %s"               %p.memGB
     cmd = cmd + " --pool_size %d"                  %(p.poolSize)
     cmd = cmd + " --tilespec_directory %s"         %(u.toDockerMountedPath(roughalign_ts_dir, p.prefixPath))

@@ -14,7 +14,8 @@ services:
            - JAVA_OPTIONS=-Xms10g -Xmx10g -server -Djava.awt.headless=true
            - WEB_SERVICE_MAX_TILE_SPECS_TO_RENDER=100  
        volumes:
-           - /c/data:/mnt
+           - /nas5/data:/data_input_mount_1
+           - /nas5/processed_data:/data_output_mount_1
        logging:
            options:
                max-size: "5g"

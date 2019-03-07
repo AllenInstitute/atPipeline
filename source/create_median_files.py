@@ -28,7 +28,7 @@ def run(p, sessionFolder):
     with open(p.median_template) as json_data:
          med = json.load(json_data)
 
-    u.savemedianjson(med, median_json, renderProject.host, renderProject.owner, renderProject.name, acq_stack, median_stack, u.toDockerMountedPath(median_dir, p.prefixPath), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
+    u.savemedianjson(med, median_json, renderProject, acq_stack, median_stack, u.toDockerMountedPath(median_dir, p.prefixPath), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
 
     cmd = "docker exec " + p.atCoreContainer
     cmd = cmd + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
@@ -41,7 +41,7 @@ def run(p, sessionFolder):
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in proc.stdout.readlines():
         print (line)
-    
+
     proc.wait()
     if proc.returncode:
         print ("PROC_RETURN_CODE:" + str(proc.returncode))
