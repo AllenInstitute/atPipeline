@@ -6,7 +6,7 @@ import posixpath
 import atutils as u
 import timeit
 
-def run(p, sessionFolder):
+def run(p : u.ATDataIni, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
@@ -21,7 +21,7 @@ def run(p, sessionFolder):
     flatfield_stack  = "S%d_FlatFielded"%(session)
     stitched_stack   = "S%d_Stitched"%(session)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
+    renderProject     = p.renderProject
 
 	#Create json files and start stitching...
     for sectnum in range(p.firstSection, p.lastSection + 1):
@@ -34,7 +34,7 @@ def run(p, sessionFolder):
 
         u.savestitchingjson(stitching_template, stitching_json, renderProject, flatfield_stack, stitched_stack, z)
 
-        cmd = "docker exec " + p.atCoreContainer
+        cmd = "docker exec " + p.sys.atCoreContainer
         cmd = cmd + " java -cp /shared/at_modules/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
         cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(stitching_json, p))
 

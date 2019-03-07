@@ -5,7 +5,7 @@ import atutils as u
 import timeit
 import json
 
-def run(p, sessionFolder):
+def run(p : u.ATDataIni, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
@@ -19,10 +19,10 @@ def run(p, sessionFolder):
     inputStack     = "S%d_LowRes"%(session)
     outputStack    = "S%d_RoughAligned_LowRes"%(session)
 
-    renderProject  = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName, p.renderHostPort, p.clientScripts)
+    rp  = p.renderProject
 
 	#point match collections
-    lowresPmCollection = "%s_lowres_round"%renderProject.name
+    lowresPmCollection = "%s_lowres_round"%rp.projectName
 
     with open(p.systemParameters.alignment_template) as json_data:
        ra = json.load(json_data)
@@ -31,10 +31,10 @@ def run(p, sessionFolder):
     if os.path.isdir(dataOutputFolder) == False:
         os.mkdir(dataOutputFolder)
 
-    u.saveRoughAlignJSON(ra, input_json, renderProject, inputStack, outputStack, lowresPmCollection, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p))
+    u.saveRoughAlignJSON(ra, input_json, rp, inputStack, outputStack, lowresPmCollection, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p))
 
     #Run docker command
-    cmd = "docker exec " + p.atCoreContainer
+    cmd = "docker exec " + p.sys.atCoreContainer
     cmd = cmd + " python -m rendermodules.solver.solve"
     cmd = cmd + " --input_json %s" %(u.toDockerMountedPath(input_json, p))
     cmd = cmd + " --output_json %s"%(u.toDockerMountedPath(output_json, p))

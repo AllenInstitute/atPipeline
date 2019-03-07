@@ -6,7 +6,7 @@ import posixpath
 import atutils as u
 import timeit
 import time
-def run(p, sessionFolder):
+def run(p : u.ATDataIni, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
@@ -16,7 +16,7 @@ def run(p, sessionFolder):
     #RUN python script to calculate scale and background factors for each channel.                     
     cmd = "python deconv_scale_factor_session.py"
     cmd = cmd + "  --drive %s"%(u.toDockerMountedPath(projectroot, p))
-    cmd = cmd + " --project %s"%renderProject.name
+    cmd = cmd + " --project %s"%renderProject.projectName
     cmd = cmd + " --ribbon %s"%ribbon
     cmd = cmd + " --session %s"%session
     cmd = cmd + " --section %s"%p.firstSection

@@ -23,14 +23,14 @@ def run(p : u.ATDataIni, sessionFolder):
     acq_stack        = "S%d_Session%d"%(session, session)
     median_stack     = "S%d_Medians"%(session)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
+    rp               = p.renderProject
 
     with open(p.systemParameters.median_template) as json_data:
          med = json.load(json_data)
 
-    u.savemedianjson(med, median_json, renderProject, acq_stack, median_stack, u.toDockerMountedPath(median_dir, p), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
+    u.savemedianjson(med, median_json, rp, acq_stack, median_stack, u.toDockerMountedPath(median_dir, p), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
 
-    cmd = "docker exec " + p.atCoreContainer
+    cmd = "docker exec " + p.sys.atCoreContainer
     cmd = cmd + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
     cmd = cmd + " --render.port 80"
     cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(median_json,  p))

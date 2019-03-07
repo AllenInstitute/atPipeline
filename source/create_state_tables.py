@@ -2,7 +2,7 @@ import os
 import subprocess
 import atutils as u
 
-def run(p, sessionFolder):
+def run(p : u.ATDataIni, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
@@ -17,7 +17,7 @@ def run(p, sessionFolder):
         if os.path.exists(statetablefile):
            print("The statetable: " + statetablefile + " already exists. Continuing..")
         else:
-            cmd = "docker exec " + p.atCoreContainer
+            cmd = "docker exec " + p.systemParameters.atCoreContainer
             cmd = cmd + " python /pipeline/make_state_table_ext_multi_pseudoz.py"
             cmd = cmd + " --projectDirectory %s"        %(u.toDockerMountedPath(projectroot,    p))
             cmd = cmd + " --outputFile %s"              %(u.toDockerMountedPath(statetablefile, p))

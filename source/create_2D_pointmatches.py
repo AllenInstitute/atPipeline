@@ -8,25 +8,25 @@ import atutils as u
 import timeit
 
 ##Create 2D pointmatches for overlapping tiles
-def run(p, sessionFolder):
+def run(p : u.ATDataIni, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
+    rp = p.renderProject
     outputFolder  = os.path.join(projectRoot, p.dataOutputFolder)
 
-    match_collection_name = "%s_HR_2D"%(renderProject.name)
+    match_collection_name = "%s_HR_2D"%(rp.projectName)
     delta = 250
 
-    cmd = "docker exec " + p.atCoreContainer
+    cmd = "docker exec " + p.sys.atCoreContainer
     cmd = cmd + " python -m renderapps.stitching.create_montage_pointmatches_in_place"
-    cmd = cmd + " --render.host %s"                           %(renderProject.host)
-    cmd = cmd + " --render.project %s"                        %(renderProject.name)
-    cmd = cmd + " --render.owner %s"                          %(renderProject.owner)
-    cmd = cmd + " --render.client_scripts %s"                 %(p.clientScripts)
-    cmd = cmd + " --render.memGB %s"                          %(p.memGB)
-    cmd = cmd + " --render.port %s"                           %(p.renderHostPort)
-    cmd = cmd + " --pool_size %s"                             %(p.poolSize)
+    cmd = cmd + " --render.host %s"                           %(rp.host)
+    cmd = cmd + " --render.project %s"                        %(rp.projectName)
+    cmd = cmd + " --render.owner %s"                          %(rp.owner)
+    cmd = cmd + " --render.client_scripts %s"                 %(rp.clientScripts)
+    cmd = cmd + " --render.memGB %s"                          %(rp.memGB)
+    cmd = cmd + " --render.port %s"                           %(rp.hostPort)
+    cmd = cmd + " --pool_size %s"                             %(p.sys.atCoreThreads)
     cmd = cmd + " --stack S%d_RoughAligned"                   %(session)
     cmd = cmd + " --minZ %d"                                  %(p.firstSection)
     cmd = cmd + " --maxZ %d"                                  %(p.lastSection)

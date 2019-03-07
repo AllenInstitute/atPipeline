@@ -7,7 +7,7 @@ import atutils as u
 import timeit
 
 
-def run(p, sessionFolder):
+def run(p : u.ATDataIni, sessionFolder):
 
 	print ("Processing session folder: " + sessionFolder)
 	[projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
@@ -23,7 +23,7 @@ def run(p, sessionFolder):
 	renderProject = u.RenderProject("ATExplorer", p.renderHost, p.projectName)
 
 	#point match collections
-	lowres_pm_collection = "%s_Lowres_3D"%renderProject.name
+	lowres_pm_collection = "%s_Lowres_3D"%renderProject.projectName
 
 	#get numsections
 	f = open(numsections_file)
@@ -34,12 +34,12 @@ def run(p, sessionFolder):
 	#Extract point matches
 	cmd = "docker exec " + p.rpaContainer
 	cmd = cmd + " sh %s/run_tilepair_and_sift.sh"%pm_script_dir
-	cmd = cmd + " --render.port %s"%p.renderHostPort
+	cmd = cmd + " --render.port %s"%p.hostPort
 	cmd = cmd + " --render.host %s"%renderProject.host
 	cmd = cmd + " --render.client_scripts %s"%p.clientScripts
 	cmd = cmd + " --render.memGB %s"%p.memGB
 	cmd = cmd + " --render.log_level %s"%p.logLevel
-	cmd = cmd + " --render.project %s"%renderProject.name
+	cmd = cmd + " --render.project %s"%renderProject.projectName
 	cmd = cmd + " --render.owner %s"%renderProject.owner
 	cmd = cmd + " --stack %s"%lowres_stack
 	cmd = cmd + " --collection %s"%lowres_pm_collection

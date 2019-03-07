@@ -4,32 +4,32 @@ import posixpath
 import atutils as u
 import timeit
 
-def run(p, sessionFolder):
+def run(p : u.ATDataIni, sessionFolder):
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
+    rp     = p.renderProject
 
     #output directories
     downsample_dir   = os.path.join(projectRoot, p.dataOutputFolder, "low_res")
 
     jsondir  = os.path.join(projectRoot, p.dataOutputFolder, "lowres_tilepairfiles")
-    jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, p.firstSection, p.lastSection))
+    jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.sys.zNeighborDistance, p.firstSection, p.lastSection))
 
     #SIFT Point Match Client
-    cmd = "docker exec " + p.atCoreContainer
+    cmd = "docker exec " + p.sys.atCoreContainer
     cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
     cmd = cmd + " --conf spark.default.parallelism=4750"
-    cmd = cmd + " --driver-memory %s"                       %(p.SPARK['driverMemory'])
-    cmd = cmd + " --executor-memory %s"                     %(p.SPARK['executorMemory'])
-    cmd = cmd + " --executor-cores %s"                      %(p.SPARK['executorCores'])
+    cmd = cmd + " --driver-memory %s"                       %(p.sys.SPARK['driverMemory'])
+    cmd = cmd + " --executor-memory %s"                     %(p.sys.SPARK['executorMemory'])
+    cmd = cmd + " --executor-cores %s"                      %(p.sys.SPARK['executorCores'])
 
     cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
     cmd = cmd + " --name PointMatchFull"
     cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"
-    cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(p.renderHost, p.renderHostPort)
-    cmd = cmd + " --collection %s_lowres_round"             %(p.projectName)
-    cmd = cmd + " --owner %s"                               %(p.renderProjectOwner)
+    cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(rp.host, rp.hostPort)
+    cmd = cmd + " --collection %s_lowres_round"             %(rp.projectName)
+    cmd = cmd + " --owner %s"                               %(rp.owner)
     cmd = cmd + " --pairJson %s"                            %(u.toDockerMountedPath(jsonfile, p))
     cmd = cmd + " --renderWithFilter true"
     cmd = cmd + " --maxFeatureCacheGb 40"

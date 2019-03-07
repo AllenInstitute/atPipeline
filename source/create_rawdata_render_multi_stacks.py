@@ -6,12 +6,12 @@ import posixpath
 import atutils as u
 import timeit
 
-def run(p, sessionFolder):
+def run(p : u.ATDataIni, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
+    rp     = p.renderProject
 
     for sectnum in range(p.firstSection, p.lastSection + 1):
         print("Processing section: " + str(sectnum))
@@ -20,15 +20,15 @@ def run(p, sessionFolder):
         statetablefile = p.getStateTableFileName(ribbon, session, sectnum)
 
         #upload acquisition stacks
-        cmd = "docker exec " + p.atCoreContainer
+        cmd = "docker exec " + p.sys.atCoreContainer
         cmd = cmd + " python -m renderapps.dataimport.create_fast_stacks_multi"
-        cmd = cmd + " --render.host %s"           %renderProject.host
-        cmd = cmd + " --render.owner %s "         %renderProject.owner
-        cmd = cmd + " --render.project %s"        %renderProject.name
-        cmd = cmd + " --render.client_scripts %s" %p.clientScripts
-        cmd = cmd + " --render.port %d"           %p.renderHostPort
-        cmd = cmd + " --render.memGB %s"          %p.memGB
-        cmd = cmd + " --log_level %s"             %p.logLevel
+        cmd = cmd + " --render.host %s"           %rp.host
+        cmd = cmd + " --render.owner %s "         %rp.owner
+        cmd = cmd + " --render.project %s"        %rp.projectName
+        cmd = cmd + " --render.client_scripts %s" %rp.clientScripts
+        cmd = cmd + " --render.port %d"           %rp.hostPort
+        cmd = cmd + " --render.memGB %s"          %rp.memGB
+        cmd = cmd + " --log_level %s"             %rp.logLevel
         cmd = cmd + " --statetableFile %s"        %(u.toDockerMountedPath(statetablefile,  p))
         cmd = cmd + " --projectDirectory %s"      %(u.toDockerMountedPath(projectroot,   p))
         cmd = cmd + " --dataOutputFolder %s"      %(p.dataOutputFolder.replace('\\', '/'))

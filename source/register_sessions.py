@@ -2,14 +2,14 @@ import atutils as u
 import os
 import json
 
-def run(p, sessionFolder):
+def run(p : u.ATDataIni, sessionFolder):
     owner = "multchan"
     registrationtemplate = "template/registration.json"
 
     print ("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.projectName, p.sys.renderHost)
     jsonOutputFolder  = os.path.join(projectRoot, p.dataOutputFolder, "registration")
 
     # Make sure that the output folder exist
@@ -32,7 +32,7 @@ def run(p, sessionFolder):
         t = json.load(json_data)
 
     z = ribbon*100+sectnum
-    u.saveRegistrationJSON(t, inputJSON, p.renderHost, renderProject.owner, renderProject.name, stitched_stack, reference_stack, outputStack, z)
+    u.saveRegistrationJSON(t, inputJSON, p.renderHost, renderProject.owner, renderProject.projectName, stitched_stack, reference_stack, outputStack, z)
 
     #run
     if session > 1:

@@ -6,7 +6,7 @@ import posixpath
 import atutils as u
 import timeit
 import time
-def run(p, sessionFolder):
+def run(p : u.ATDataIni, sessionFolder):
 
     print ("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
@@ -23,7 +23,7 @@ def run(p, sessionFolder):
     median_stack     = "S%d_Medians"%(session)
     flatfield_stack  = "S%d_FlatFielded"%(session)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
+    renderProject     = p.renderProject
 
     #Create json files and apply median.
     for sectnum in range(p.firstSection, p.lastSection + 1):
@@ -31,12 +31,12 @@ def run(p, sessionFolder):
         with open(p.systemParameters.flatfield_template) as json_data:
              ff = json.load(json_data)
 
-        flatfield_json = os.path.join(flatfield_dir, "flatfield_%s_%s_%s_%d.json"%(renderProject.name, ribbon, session, sectnum))
+        flatfield_json = os.path.join(flatfield_dir, "flatfield_%s_%s_%s_%d.json"%(renderProject.projectName, ribbon, session, sectnum))
 
         z = ribbon*100 + sectnum
 
         u.saveflatfieldjson(ff, flatfield_json, renderProject, acq_stack, median_stack, flatfield_stack, u.toDockerMountedPath(flatfield_dir, p), z, True)
-        cmd = "docker exec " + p.atCoreContainer
+        cmd = "docker exec " + p.sys.atCoreContainer
         cmd = cmd + " python -m rendermodules.intensity_correction.apply_multiplicative_correction"
         cmd = cmd + " --render.port 80"
         cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(flatfield_json, p))
