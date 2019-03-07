@@ -27,8 +27,8 @@ class ATDataIni:
 
         self.systemConfigFile                         = general['SYSTEM_CONFIG_FILE']
         #What data to process??
-        self.prefixPath                               = general['PREFIX_PATH']
-        self.dataRootFolder                           = os.path.join(self.prefixPath, general['DATA_FOLDER'])
+        self.dataRootFolder                                 = general['DATA_ROOT']
+        self.projectRootFolder                           = os.path.join(self.dataRootFolder, general['DATA_FOLDER'])
         self.dataOutputFolder                         = os.path.join(general['PROCESSED_DATA_FOLDER'])
 
         #Process parameters
@@ -105,17 +105,17 @@ class ATDataIni:
         self.renderScale                              = float(align['RENDERSCALE'])
 
         for session in self.sessions:
-          self.sessionFolders.append(os.path.join(self.dataRootFolder, "raw", "data", self.ribbons[0], session))
+          self.sessionFolders.append(os.path.join(self.projectRootFolder, "raw", "data", self.ribbons[0], session))
 
         #Read and append SYSTEM Configuration
         self.systemParameters   = at_system_config.ATSystemConfig(self.systemConfigFile)
 
         #Setup System parameters
-        self.systemParameters.setupDockerMountName(self.prefixPath)
+        self.systemParameters.setupDockerMountName(self.dataRootFolder)
 
 
     def getStateTableFileName(self, ribbon, session, sectnum):
-        return os.path.join(self.dataRootFolder, self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
+        return os.path.join(self.projectRootFolder, self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
 
 
 def setupParameters():
@@ -131,7 +131,7 @@ def setupParameters():
     parameters = ATDataIni(parameterFile)
 
     #Copy parameter file to root of processed data output folder
-    outFolder = os.path.join(parameters.dataRootFolder, parameters.dataOutputFolder)
+    outFolder = os.path.join(parameters.projectRootFolder, parameters.dataOutputFolder)
     if os.path.isdir(outFolder) == False:
         pathlib.Path(outFolder).mkdir(parents=True, exist_ok=True)
 
@@ -184,7 +184,7 @@ def getChannelNamesInSessionFolder(directory):
 
 def toDockerMountedPath(path, paras : ATDataIni):
     #Remove prefix
-    p = path.split(paras.prefixPath)[1]
+    p = path.split(paras.dataRootFolder)[1]
     p = posixpath.normpath(p.replace('\\', '/'))
     return posixpath.join(paras.systemParameters.dockerMountName, p[1:])
 

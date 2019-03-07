@@ -31,7 +31,7 @@ class ATSystemConfig:
         self.dockerMountName = ""
 
     def setupDockerMountName(self, localPath):
-        #find the index of localPath in dataRoots variable
+        #find the index of localPath in dataRootFolders variable
         mountIndex = 1
         for mount in self.dataRoots:
             if mount == localPath:

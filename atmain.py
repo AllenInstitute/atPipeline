@@ -13,7 +13,7 @@ def main():
 
     try:
         #Setup and validate parameters
-        parameters          = u.setupParameters()
+        parameters  = u.setupParameters()
 
         dockerClient = docker.from_env()
         atcore = dockerClient.containers.get("atcore")
