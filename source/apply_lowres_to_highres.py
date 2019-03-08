@@ -4,10 +4,12 @@ import posixpath
 import atutils as u
 import timeit
 import json
+import logging
+logger = logging.getLogger('atPipeline')
 
 def run(p : u.ATDataIni, sessionFolder):
 
-    print ("Processing session folder: " + sessionFolder)
+    logger.info("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     lowresStack             = "S%d_LowRes"%(session)
@@ -51,10 +53,7 @@ def run(p : u.ATDataIni, sessionFolder):
     #cmd = cmd + " --minZ %d --maxZ %d "       %(firstribbon*100, (lastribbon+1) * 100)
 
     #Run =============
-    print ("Running: " + cmd.replace('--', '\n--'))
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for line in proc.stdout.readlines():
-        print (line)
+    u.runPipelineStep(cmd, __file__)
 
 if __name__ == "__main__":
 

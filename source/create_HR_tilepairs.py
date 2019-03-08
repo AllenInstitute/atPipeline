@@ -5,10 +5,12 @@ import atutils as u
 import timeit
 import fileinput
 from shutil import copyfile
+import logging
+logger = logging.getLogger('atPipeline')
 
 def run(p : u.ATDataIni, sessionFolder):
 
-    print ("Processing session folder: " + sessionFolder)
+    logger.info("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
     input_stack = "S%d_RoughAligned_Consolidated"%(session)
 
@@ -38,21 +40,13 @@ def run(p : u.ATDataIni, sessionFolder):
     cmd = cmd + " --xyNeighborFactor %s"                    %(p.sys.xyNeighborFactor)
 
     #Run =============
-    print ("Running: " + cmd.replace('--', '\n--'))
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for line in proc.stdout.readlines():
-        print (line)
-
-    proc.wait()
-    if proc.returncode:
-        print ("PROC_RETURN_CODE:" + str(proc.returncode))
-        raise Exception(os.path.basename(__file__) + " threw an Exception")
+    u.runPipelineStep(cmd, __file__)
 
     #Prepare json file for the SIFTPointMatch Client
     jsonfileedit      = os.path.join(jsonOutputFolder, "tilepairs-%d-%d-%d-nostitch-EDIT.json"%(p.sys.zNeighborDistance, p.firstSection, p.lastSection))
     copyfile(jsonfile, jsonfileedit)
     for line in fileinput.input(jsonfileedit, inplace=True):
-      print (line.replace("render-parameters", "render-parameters?removeAllOption=true"), end="")
+        print(line.replace("render-parameters", "render-parameters?removeAllOption=true"), end="")
 
 if __name__ == "__main__":
 

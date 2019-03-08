@@ -6,10 +6,14 @@ import subprocess
 import posixpath
 import atutils as u
 import timeit
+import logging
+import at_logging
+
+logger = logging.getLogger('atPipeline')
 
 ##Create 2D pointmatches for overlapping tiles
-def run(p : u.ATDataIni, sessionFolder):
-    print ("Processing session folder: " + sessionFolder)
+def run(p : u.ATDataIni, sessionFolder, logger = logging.getLogger('atPipeline')):
+    logger.info("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     rp = p.renderProject
@@ -36,20 +40,20 @@ def run(p : u.ATDataIni, sessionFolder):
     cmd = cmd + " --output_json Test"
 
     # Run =============
-    print ("Running: " + cmd.replace('--', '\n--'))
+    logger.info("Running: " + cmd.replace('--', '\n--'))
 
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
     for line in proc.stdout.readlines():
-    	print (line)
+    	logger.info(line.rstrip())
 
     proc.wait()
     if proc.returncode:
-        print ("PROC_RETURN_CODE:" + str(proc.returncode))
+        logger.info("PROC_RETURN_CODE:" + str(proc.returncode))
         raise Exception(os.path.basename(__file__) + " threw an Exception")
 
-
 if __name__ == "__main__":
-
+    logger = at_logging.setup_custom_logger('atPipeline')
+    logger.info("Running one pipeline step")
     #This script need a valid INI file to be passed as an argument
-    u.runAtCoreModule(run)
+    u.runAtCoreModule(run, logger)
 

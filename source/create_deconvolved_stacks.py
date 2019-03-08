@@ -7,6 +7,9 @@ import atutils as u
 import timeit
 import time
 import csv
+import logging
+
+logger = logging.getLogger('atPipeline')
 
 def set_channel_dict(file_dir, channel):
 
@@ -22,7 +25,7 @@ def set_channel_dict(file_dir, channel):
 
 def run(p : u.ATDataIni, sessionFolder):
 
-    print ("Processing session folder: " + sessionFolder)
+    logger.info("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Directories
@@ -63,15 +66,7 @@ def run(p : u.ATDataIni, sessionFolder):
                 cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(deconv_json, p))
 
             #Run =============
-            print ("Running: " + cmd.replace('--', '\n--'))
-            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            for line in proc.stdout.readlines():
-                print (line)
-
-            proc.wait()
-            if proc.returncode:
-		    print ("PROC_RETURN_CODE:" + str(proc.returncode))	
-                raise Exception(os.path.basename(__file__) + " threw an Exception")
+    		u.runPipelineStep(cmd, __file__)
 
 
 if __name__ == "__main__":

@@ -1,19 +1,25 @@
 import os
 import logging
+import at_logging
 import timeit
 import pathlib
 import docker
 from source import *
 import source.atutils as u
+logger = at_logging.setup_custom_logger('atPipeline')
 
 def main():
-    logger = logging.getLogger("atPipeline")
-    logger.setLevel(logging.DEBUG)
+
     timeStart = timeit.default_timer()
 
     try:
         #Setup and validate parameters
         parameters  = u.setupParameters()
+        dataRoot = os.path.join(parameters.projectRootFolder, parameters.dataOutputFolder)
+        at_logging.addLoggingToFile('atPipeline', dataRoot, parameters.projectName + ".log")
+
+        logger.info("Starting the pipeline")
+        logger.setLevel(logging.INFO)
 
         dockerClient = docker.from_env()
         atcore = dockerClient.containers.get("atcore")

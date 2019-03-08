@@ -10,7 +10,9 @@ import shutil
 import timeit
 import at_system_config
 import pathlib
-
+import subprocess
+import logging
+logger = logging.getLogger('atPipeline')
 
 def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")
@@ -97,15 +99,27 @@ def setupParameters():
     shutil.copy2(parameterFile, outFolder)
     return parameters
 
-def runAtCoreModule(method):
+def runAtCoreModule(method, logger):
     timeStart = timeit.default_timer()
     parameters = setupParameters()
 
     for sessionFolder in parameters.sessionFolders:
-        method(parameters, sessionFolder)
+        method(parameters, sessionFolder, logger)
 
     timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
-    print("Elapsed time: " + timeDuration + " minutes")
+    logger.info("Elapsed time: " + timeDuration + " minutes")
+
+
+def runPipelineStep(cmd, stepName):
+    logger.info("===================== Running: " + cmd.replace('--', '\n--') + "\n---------------------------------------")
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+    for line in proc.stdout.readlines():
+        logger.debug(line.rstrip())
+
+    proc.wait()
+    if proc.returncode:
+        logger.error("PROC_RETURN_CODE:" + str(proc.returncode))
+        raise Exception("Error in pipeline step: " + stepName)
 
 class RenderProject:
     def __init__(self, owner, project_name, host_name, host_port, client_scripts, mem_gb, log_level):
@@ -129,10 +143,10 @@ def parse_session_folder(path):
 
 #Input is a sessionfolder path
 def getProjectNameFromSessionFolder(sessionFolder):
-    print ("Session directory: " + sessionFolder)
+    logger.info("Session directory: " + sessionFolder)
     tok = sessionFolder.split(os.sep)
     dataind = tok.index('data')
-    print ("Project data folder: " + tok[dataind+1])
+    logger.info("Project data folder: " + tok[dataind+1])
     return tok[dataind+1]
 
 def getChannelNamesInSessionFolder(directory):

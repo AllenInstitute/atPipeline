@@ -123,12 +123,12 @@ class DockerManager:
 
         cmd = "docker-compose --no-ansi -f " + str(self.composeFile)
         cmd = cmd + " up -d"
-        print ("Running: " + cmd)
+        logger.info("Running: " + cmd)
 
         #Output here looks ugly !!
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='ascii')
         for line in proc.stdout.readlines():
-            print (line.rstrip())
+            logger.info(line.rstrip())
 
         print ("\n ---- running containers follows -----\n")
         cmd = "docker ps"

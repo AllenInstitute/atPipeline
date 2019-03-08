@@ -31,7 +31,6 @@ def main():
     try:
 
         parameters = at_system_config.ATSystemConfig("SystemConfig.ini")
-
         logger.info("============ Managing the atBackend =============")
         args = scriptArguments()
         atCoreCtrName="atcore"

@@ -4,10 +4,12 @@ import posixpath
 import atutils as u
 import timeit
 import json
+import logging
+logger = logging.getLogger('atPipeline')
 
 def run(p : u.ATDataIni, sessionFolder):
 
-    print ("Processing session folder: " + sessionFolder)
+    logger.info("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
@@ -43,16 +45,7 @@ def run(p : u.ATDataIni, sessionFolder):
     cmd = cmd + " --output_json %s"%(u.toDockerMountedPath(output_json, p))
 
     #Run =============
-    print ("Running: " + cmd.replace('--', '\n--'))
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for line in proc.stdout.readlines():
-        print (line)
-
-    proc.wait()
-    if proc.returncode:
-        print ("PROC_RETURN_CODE:" + str(proc.returncode))
-        raise Exception(os.path.basename(__file__) + " threw an Exception")
-
+    u.runPipelineStep(cmd, __file__)
 
 if __name__ == "__main__":
 

@@ -5,10 +5,12 @@ import subprocess
 import posixpath
 import atutils as u
 import timeit
+import logging
+logger = logging.getLogger('atPipeline')
 
 def run(p : u.ATDataIni, sessionFolder):
 
-    print ("Processing session folder: " + sessionFolder)
+    logger.info("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
@@ -36,17 +38,7 @@ def run(p : u.ATDataIni, sessionFolder):
     cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(median_json,  p))
 
     #Run =============
-    print ("Running: " + cmd.replace('--', '\n--'))
-
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for line in proc.stdout.readlines():
-        print (line)
-
-    proc.wait()
-    if proc.returncode:
-        print ("PROC_RETURN_CODE:" + str(proc.returncode))
-        raise Exception("Error generating median files")
-
+    u.runPipelineStep(cmd, __file__)
 
 if __name__ == "__main__":
 
