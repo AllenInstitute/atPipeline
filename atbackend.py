@@ -15,24 +15,25 @@ import at_system_config
 def scriptArguments():
     #Get processing parameters
     parser = argparse.ArgumentParser()
-    parser.add_argument('-startAll',            help='Start the whole AT backend',          action='store_true')
-    parser.add_argument('-startRenderBackend',  help='Start the Render backend',            action='store_true')
-    parser.add_argument('-killAll',             help='Stop the AT backend',                 action='store_true')
-    parser.add_argument('-ra', '--restartAll',  help="Restart all AT backend container",    action='store_true' )
+    parser.add_argument('--startAll',            help='Start the whole AT backend',          action='store_true')
+    parser.add_argument('--startRenderBackend',  help='Start the Render backend',            action='store_true')
+    parser.add_argument('--killAll',             help='Stop the AT backend',                 action='store_true')
+    parser.add_argument('-ra', '--restartAll',   help="Restart all AT backend container",    action='store_true' )
 
-    parser.add_argument('-s', '--start',        help="Start a specific backend container, e.g. atcore",     nargs='?',const='atcore', type=str)
-    parser.add_argument('-k', '--kill',         help='Stop a specific backend cointainer',                  nargs='?',const='atcore', type=str)
-    parser.add_argument('-r', '--restart',      help="Restart a specific backend container, e.g. atcore",   nargs='?',const='atcore', type=str)
+    parser.add_argument('-s', '--start',         help="Start a specific backend container, e.g. atcore",     nargs='?',const='atcore', type=str)
+    parser.add_argument('-k', '--kill',          help='Stop a specific backend cointainer',                  nargs='?',const='atcore', type=str)
+    parser.add_argument('-r', '--restart',       help="Restart a specific backend container, e.g. atcore",   nargs='?',const='atcore', type=str)
 
     return parser.parse_args()
 
 def main():
 
     try:
-
         parameters = at_system_config.ATSystemConfig("SystemConfig.ini")
+        parameters.createReferences()
         logger.info("============ Managing the atBackend =============")
         args = scriptArguments()
+
         atCoreCtrName="atcore"
 
         cwd = pathlib.Path().absolute().resolve()
