@@ -1,38 +1,20 @@
 [GENERAL]
+SYSTEM_CONFIG_FILE=SystemConfig.ini
 
-#SYSTEM_CONFIG_FILE
-SYSTEM_CONFIG_FILE=c:\\pDisk\\ATPipeline\\SYSTEM_CONFIG.ini
-
-#The DATA_INPUT_ROOT_FOLDER is the portion of the data path that prefixes the root folder of the data to process
-#E.g., for the ATIF data named M3434 residing in C:\Documents\Mine\Data\M3434\data...(etc), the data input root folder path would be
+#The DATA_ROOT is the portion of the data path that prefixes the root folder of the data to process
+#E.g., for the ATIF data named M3434 residing in C:\Documents\Mine\Data\M3434\data...(etc), the prefix path would be
 #C:\Documents\Mine\Data
-DATA_INPUT_ROOT_FOLDER=C:\data
+#The DATA_ROOT  MUST correspond to a record in the DATA_ROOTS parameters in the SystemConfig.ini file
+DATA_ROOT=c:\data
+
+#The data folder, relative to the DATA_ROOT, contains the actual data
+PROJECT_DATA_FOLDER=M33
 
 #The 'processed' folder contain intermediate processed data (including this file for reference)
-#This one is an ABSOLUTE path
-DATA_OUTPUT_ROOT_FOLDER=c:\data\data_output
+#This folder is located inside the PROJECT_DATA_FOLDER
+PROCESSED_DATA_FOLDER=processed
 
-#DOCKER mounts
-DOCKER_DATA_INPUT_ROOT_FOLDER=/data_input_mount_1
-DOCKER_DATA_OUTPUT_ROOT_FOLDER=/data_output_mount_1
-
-#JSON Template folder location
-JSON_TEMPLATES_FOLDER=c:\\pDisk\\ATPipeline\\templates
-
-#Render host parameters
-RENDER_HOST=W10DTMJ03EG6Z.corp.alleninstitute.org
-RENDER_HOST_PORT=80
-MEM_GB=5G
-LOG_LEVEL=INFO
-RENDER_PYTHON_APPS_CONTAINER=atcore
-AT_MODULES_CONTAINER=atmodules
-
-#This will not change, probably..
-CLIENT_SCRIPTS=/shared/render/render-ws-java-client/src/main/scripts
-
-#(Render)Project name in renders database, and sub-foldername for processed data
-#PROJECT_NAME is EQUAL to the name of the root folder of the input data
-PROJECT_NAME=M33
+PROJECT_NAME=T1
 
 #Owner for data in renders database
 RENDER_PROJECT_OWNER=Junk

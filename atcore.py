@@ -28,6 +28,7 @@ def scriptArguments():
     optional.add_argument('--firstsection',         help='Specify start section',                                   type=int)
     optional.add_argument('--lastsection',          help='Specify end section',                                     type=int)
     optional.add_argument('--renderprojectowner',   help='Specify  RP owner',                                       type=str)
+    optional.add_argument('--overwritedata',            help='Overwrites any already processed data',               type=bool, nargs='?', const=False, required = True)
 
     return parser.parse_args(), parser
 
@@ -39,6 +40,7 @@ def main():
         logger.info("============ ATCORE ============")
         args,parser = scriptArguments()
 
+        #What project to proces?
         if args.project:
             system_parameters.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = args.project
 
@@ -47,20 +49,26 @@ def main():
             return
 
         #All parameters are now well defined, copy them (and do some parsing) to a file where output data is written
+        #The create references functions appends and overrides various arguments
         system_parameters.createReferences(args)
 
-        #Create outputfolder
+        #Create data outputfolder
         if os.path.isdir(system_parameters.dataOutputFolder) == False:
             os.mkdir(system_parameters.dataOutputFolder)
 
         system_parameters.write(os.path.join(system_parameters.dataOutputFolder, system_parameters.projectName + ".ini"))
 
-        #Create the pipeline
-        aPipeline = atpipeline.ATPipeline(system_parameters)
+        aPipeline = None
+        #Check which pipeline to run
+        if system_parameters.pipeline == "stitch":
+            logger.info("Running stitching pipeline")
+            aPipeline = atpipeline.Stitch(system_parameters)
+        else:
+            logger.error("No such pipeline: " + system_parameters.pipeline)
+            raise Exception("No such pipeline")
 
         #Run the pipeline
         aPipeline.run()
-
 
     except ValueError as e:
         logger.error("ValueError: " + str(e))

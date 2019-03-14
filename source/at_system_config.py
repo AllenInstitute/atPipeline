@@ -3,6 +3,7 @@ import os
 import ast
 import atutils as u
 import posixpath
+import at_render_project as rp
 
 class ATSystemConfig:
     def __init__(self, iniFile):
@@ -99,6 +100,9 @@ class ATSystemConfig:
         self.sessions                                 = ast.literal_eval(self.DATA_INPUT['SESSIONS'])
 
         #When used for input data
+        #Create a "renderProject"
+        self.renderProject = rp.RenderProject(self.renderProjectOwner, self.projectName, self.renderHost, self.renderHostPort, self.clientScripts, self.memGB, self.logLevel)
+
         if args != None:
             if args.firstsection != None:
                 self.firstSection                         = args.firstsection
@@ -113,6 +117,7 @@ class ATSystemConfig:
                 self.lastSection                         = int(self.DATA_INPUT['LAST_SECTION'])
 
             self.pipeline                                = args.pipeline
+            self.overwritedata                           = args.overwritedata
 
     def getStateTableFileName(self, ribbon, session, sectnum):
         return os.path.join(self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
