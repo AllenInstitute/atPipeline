@@ -1,52 +1,57 @@
-# Check http://releases.llvm.org/download.html#7.0.1 for the latest available binaries
-FROM ubuntu:18.04
+FROM atpipeline/clang-base-image:march-15-3
 
-# Make sure the image is updated, install some prerequisites,
-# Download the latest version of Clang (official binary) for Ubuntu
-# Extract the archive and add Clang to the PATH
-RUN apt-get update && apt-get install -y \
-  xz-utils \
-  build-essential \
-  curl \
-  && rm -rf /var/lib/apt/lists/* \
-  && curl -SL http://releases.llvm.org/7.0.1/clang+llvm-7.0.1-x86_64-linux-gnu-ubuntu-18.04.tar.xz \
-  | tar -xJC . && \
-  mv clang+llvm-7.0.1-x86_64-linux-gnu-ubuntu-18.04 clang_7.0.1 && \
-  echo 'export PATH=/clang_7.0.1/bin:$PATH' >> ~/.bashrc && \
-  echo 'export LD_LIBRARY_PATH=/clang_7.0.1/lib:LD_LIBRARY_PATH' >> ~/.bashrc
+##Fetch dsl and atexplorer repositories
+#RUN mkdir /libs && mkdir /libs/dsl \
+#    && git clone https://github.com/TotteKarlsson/dsl.git /libs/dsl \
+#    && git -C /libs/dsl checkout develop \
+#    && git -C /libs/dsl pull \
+#    && git -C libs/dsl submodule init \
+#    && git -C libs/dsl submodule update
+##
+###Fetch dsl and atexplorer repositories (need to be made public)
+##RUN mkdir /libs/atexplorer \
+##    && git clone https://github.com/AllenInstitute/ATExplorer.git /libs/atexplorer \
+##    && git -C /libs/atexplorer checkout develop \
+##    && git -C /libs/atexplorer pull
+#
+#RUN mkdir /libs/atexplorer
+#COPY ./third-party-libs /libs
 
-RUN apt-get update \
-        && apt-get install -y build-essential \
-            cmake \ 
-            git \
-            cmake-gui \
-            ninja-build \
-            vim 
+#
+###Build libs and apps using cmake
+##Build folder is a mount for now...
+#RUN mkdir /builds 
+#
+##Build libraries, dsl-thirdparties, dsl and atexplorer
+##---- DSL Thirdparties ----------------------
+#RUN mkdir /builds/dsl-tp && \
+#cmake -B"/builds/dsl-tp" -H"/libs/dsl/ThirdParties" \
+#-G "Ninja" \
+#-DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
+#-DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
+#
+##---- DSL --------------------------------
+#RUN mkdir /builds/dsl && \
+#cmake -B"/builds/dsl" -H"/libs/dsl" \
+#-G "Ninja" \
+#-DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
+#-DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
+#
+##---- ATEXPLORER --------------------------------
+#RUN mkdir /builds/atexplorer && \
+#cmake -B"/builds/atexplorer" -H"/libs/atexplorer" \
+#-G "Ninja" \
+#-DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
+#-DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
+#
+#
+##Build & install
+#RUN ninja -C /builds/dsl-tp install
+#RUN ninja -C /builds/dsl install
+#RUN ninja -C /builds/atexplorer install
+#
 
-#Fetch dsl and atexplorer repositories
-RUN mkdir /libs && mkdir /libs/dsl \
-    && git clone https://github.com/TotteKarlsson/dsl.git /libs/dsl \
-    && git -C /libs/dsl checkout develop \
-    && git -C /libs/dsl pull \
-    && git -C libs/dsl submodule init \
-    && git -C libs/dsl submodule update
-
-##Fetch dsl and atexplorer repositories (need to be public)
-#RUN mkdir /libs/atexplorer \
-#    && git clone https://github.com/AllenInstitute/ATExplorer.git /libs/atexplorer \
-#    && git -C /libs/atexplorer checkout develop \
-#    && git -C /libs/atexplorer pull
-
-RUN mkdir /libs/atexplorer
-#COPY ./third-party-libs/atExplorer /libs/atexplorer/
-
-
-#Build libs and apps using cmake
-RUN mkdir /builds \
-&& mkdir /builds/dsl \
-&& mkdir /builds/dsl-tp \
-&&  mkdir /builds/atexplorer 
-
+#RUN ldconfig
 
 # Start from a Bash prompt
 CMD [ "/bin/bash" ]
