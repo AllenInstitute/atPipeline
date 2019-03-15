@@ -15,5 +15,38 @@ RUN apt-get update && apt-get install -y \
   echo 'export PATH=/clang_7.0.1/bin:$PATH' >> ~/.bashrc && \
   echo 'export LD_LIBRARY_PATH=/clang_7.0.1/lib:LD_LIBRARY_PATH' >> ~/.bashrc
 
+RUN apt-get update \
+        && apt-get install -y build-essential \
+            cmake \ 
+            git \
+            cmake-gui \
+            ninja-build \
+            vim 
+
+#Fetch dsl and atexplorer repositories
+RUN mkdir /libs && mkdir /libs/dsl \
+    && git clone https://github.com/TotteKarlsson/dsl.git /libs/dsl \
+    && git -C /libs/dsl checkout develop \
+    && git -C /libs/dsl pull \
+    && git -C libs/dsl submodule init \
+    && git -C libs/dsl submodule update
+
+##Fetch dsl and atexplorer repositories (need to be public)
+#RUN mkdir /libs/atexplorer \
+#    && git clone https://github.com/AllenInstitute/ATExplorer.git /libs/atexplorer \
+#    && git -C /libs/atexplorer checkout develop \
+#    && git -C /libs/atexplorer pull
+
+RUN mkdir /libs/atexplorer
+#COPY ./third-party-libs/atExplorer /libs/atexplorer/
+
+
+#Build libs and apps using cmake
+RUN mkdir /builds \
+&& mkdir /builds/dsl \
+&& mkdir /builds/dsl-tp \
+&&  mkdir /builds/atexplorer 
+
+
 # Start from a Bash prompt
 CMD [ "/bin/bash" ]
