@@ -1,0 +1,133 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>at_modules</groupId>
+  <artifactId>allen</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>allen</name>
+  <url>http://maven.apache.org</url>
+
+  <repositories>
+        <!-- NB: for project parent -->
+        <repository>
+            <id>imagej.public</id>
+            <url>http://maven.imagej.net/content/groups/public</url>
+        </repository>
+
+        <repository>
+        <id>saalfeld-lab-maven-repo</id>
+        <url>https://saalfeldlab.github.io/maven</url>
+    </repository>
+
+    </repositories>
+
+
+  <dependencies>
+
+      <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>3.8.1</version>
+          <scope>test</scope>
+      </dependency>
+
+      <dependency>
+           <groupId>com.beust</groupId>
+           <artifactId>jcommander</artifactId>
+           <version>1.48</version>
+      </dependency>
+
+       <dependency>
+                   <groupId>net.imglib2</groupId>
+                   <artifactId>imglib2</artifactId>
+                   <version>2.0.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.imagej</groupId>
+            <artifactId>ij</artifactId>
+             <version>1.49b</version>
+        </dependency>
+
+        <dependency>
+                <groupId>mpicbg</groupId>
+                <artifactId>mpicbg</artifactId>
+                <version>1.0.1</version>
+        </dependency>
+
+
+        <dependency>
+                <groupId>mpicbg</groupId>
+                <artifactId>mpicbg_</artifactId>
+                <version>1.0.1</version>
+        </dependency>
+
+        <dependency>
+                <groupId>sc.fiji</groupId>
+                <artifactId>trakem2_tps</artifactId>
+                <version>1.1.1</version>
+        </dependency>
+
+        <dependency>
+              <groupId>sc.fiji</groupId>
+              <artifactId>Stitching_</artifactId>
+              <version>3.1.2</version>
+        </dependency>
+
+        <dependency>
+              <groupId>sc.fiji</groupId>
+              <artifactId>mpicbg-trakem2</artifactId>
+              <version>1.2.2</version>
+        </dependency>
+
+        <dependency>
+              <groupId>org.janelia.render</groupId>
+              <artifactId>render-app</artifactId>
+              <version>2.0.1</version>
+        </dependency>
+
+        <dependency>
+              <groupId>com.googlecode.json-simple</groupId>
+              <artifactId>json-simple</artifactId>
+              <version>1.1.1</version>
+        </dependency>
+
+        <dependency>
+              <groupId>org.janelia.render</groupId>
+              <artifactId>render-ws-java-client</artifactId>
+              <version>2.0.1</version>
+        </dependency>
+        <dependency>
+              <groupId>com.google.code.gson</groupId>
+              <artifactId>gson</artifactId>
+              <version>2.2.4</version>
+              <scope>compile</scope>
+        </dependency>
+
+  </dependencies>
+
+
+  <build>
+    <plugins>
+      <!-- any other plugins -->
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
