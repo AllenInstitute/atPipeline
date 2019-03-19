@@ -93,6 +93,7 @@ WORKDIR /shared/render-python
 RUN git clone --branch master --single-branch https://github.com/fcollman/render-python.git /shared/render-python
 RUN pip install -e /shared/render-python
 
+
 # Install render-modules
 WORKDIR /shared/render-modules
 RUN git clone --branch at_develop --single-branch https://github.com/AllenInstitute/render-modules.git /shared/render-modules
@@ -106,9 +107,4 @@ RUN pip install -e /shared/render-python-apps
 
 WORKDIR /work
 
-# Clean stuff up
-RUN apt-get remove --purge gcc build-essential libgeos-dev -y && apt-get autoremove -y &&\
-    rm -rf /var/lib/apt/lists/*
-
-ENTRYPOINT [ "/usr/bin/tini", "--" ]
 CMD [ "/bin/bash" ]
