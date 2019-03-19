@@ -3,9 +3,8 @@
 # Based on
 #   https://raw.githubusercontent.com/fcollman/render-deploy/base-image/shared/Dockerfile
 #
-# TODO: Seperate builder for artifacts
-# TODO: Check-out git repos as part of build process
-# TODO: Set up CI
+# TODO: Seperate builders for artifacts
+# TODO: Set up continuous integration
 #
 
 FROM continuumio/miniconda:4.5.12
@@ -60,35 +59,34 @@ ENV RENDER_CLIENT_SCRIPTS=/shared/render/render-ws-java-client/src/main/scripts
 # Work around OpenJDK bug with surefire plugin for both render and at_modules
 ENV _JAVA_OPTIONS -Djdk.net.URLClassPath.disableClassPathURLCheck=true
 
+# Install Render
 WORKDIR /shared/render/
-COPY ./render/ /shared/render
-RUN mvn clean
-# use -T 1C option to multi-thread maven, using 1 thread per available core
-RUN mvn -T 1C -Dproject.build.sourceEncoding=UTF-8 package
-
-# Install EM_Aligner from github
-RUN pip install git+https://github.com/AllenInstitute/EM_aligner_python
-
-# Install render-python
-WORKDIR /shared/render-python
-COPY ./render-python/ /shared/render-python
-RUN pip install -e /shared/render-python
-
-# Install render-modules
-WORKDIR /shared/render-modules
-COPY ./render-modules/ /shared/render-modules
-RUN pip install -e /shared/render-modules
-
-# Install render-python-apps
-RUN apt-get install libspatialindex-dev -y
-WORKDIR /shared/render-python-apps
-COPY ./render-python-apps/ /shared/render-python-apps
-RUN pip install -e /shared/render-python-apps
+RUN git clone --branch at_develop --single-branch https://github.com/perlman/render.git /shared/render
+RUN mvn clean && mvn -T 1C -Dproject.build.sourceEncoding=UTF-8 package
 
 # Install at_modules
 WORKDIR /shared/at_modules
 COPY ./at_modules/ /shared/at_modules
 RUN mvn install
+
+# Install EM_Aligner from github (we need >= 0.3.5 for multiple match collections)
+RUN pip install git+https://github.com/AllenInstitute/EM_aligner_python
+
+# Install render-python
+WORKDIR /shared/render-python
+RUN git clone --branch master --single-branch https://github.com/fcollman/render-python.git /shared/render-python
+RUN pip install -e /shared/render-python
+
+# Install render-modules
+WORKDIR /shared/render-modules
+RUN git clone --branch at_develop --single-branch https://github.com/AllenInstitute/render-modules.git /shared/render-modules
+RUN pip install -e /shared/render-modules
+
+# Install render-python-apps
+RUN apt-get install libspatialindex-dev -y
+WORKDIR /shared/render-python-apps
+RUN git clone --branch at_develop --single-branch https://github.com/AllenInstitute/render-python-apps.git /shared/render-python-apps
+RUN pip install -e /shared/render-python-apps
 
 WORKDIR /work
 
