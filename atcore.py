@@ -57,8 +57,8 @@ def main():
             os.mkdir(system_parameters.dataOutputFolder)
 
         system_parameters.write(os.path.join(system_parameters.dataOutputFolder, system_parameters.projectName + ".ini"))
-
         aPipeline = None
+
         #Check which pipeline to run
         if system_parameters.pipeline == "stitch":
             logger.info("Running stitching pipeline")
