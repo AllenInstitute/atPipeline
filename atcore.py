@@ -28,7 +28,7 @@ def scriptArguments():
     optional.add_argument('--firstsection',         help='Specify start section',                                   type=int)
     optional.add_argument('--lastsection',          help='Specify end section',                                     type=int)
     optional.add_argument('--renderprojectowner',   help='Specify  RP owner',                                       type=str)
-    optional.add_argument('--overwritedata',            help='Overwrites any already processed data',               type=bool, nargs='?', const=False, required = True)
+#    optional.add_argument('--overwritedata',            help='Overwrites any already processed data',               type=bool, nargs='?', const=False, required = True)
 
     return parser.parse_args(), parser
 
@@ -40,7 +40,7 @@ def main():
         logger.info("============ ATCORE ============")
         args,parser = scriptArguments()
 
-        #What project to proces?
+        #What project to process?
         if args.project:
             system_parameters.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = args.project
 
