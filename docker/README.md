@@ -24,7 +24,7 @@ git clone --branch master --single-branch git@github.com:AllenInstitute/at_modul
 
 ```console
 # Build with the context of this entire git repo.
-docker build -t atpipeline/atcore:dev -f Dockerfile ..
+docker build -t atpipeline/atcore:dev .
 ```
 
 ### Build vizrelay
