@@ -1,6 +1,6 @@
 #! /usr/bin/bash
 
-image_tag="clang_image"
+image_tag="clang_image:0.5"
 container_name="clang"
 export DISPLAY=10.128.26.56:0.0
 
