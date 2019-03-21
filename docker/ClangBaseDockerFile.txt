@@ -23,5 +23,7 @@ RUN apt-get update && apt-get install -y \
   | tar -xJC . && \
   mv clang+llvm-7.0.1-x86_64-linux-gnu-ubuntu-18.04 clang_7.0.1 && \
   echo 'export PATH=/clang_7.0.1/bin:$PATH' >> ~/.bashrc && \
-  echo 'export LD_LIBRARY_PATH=/clang_7.0.1/lib:LD_LIBRARY_PATH' >> ~/.bashrc
+  echo 'export LD_LIBRARY_PATH=/clang_7.0.1/lib:LD_LIBRARY_PATH' >> ~/.bashrc && \
+  echo 'export CC=/clang_6.0.1/bin/clang' >> ~/.bashrc && \
+  echo 'export CXX=/clang_7.0.1/bin/clang++' >> ~/.bashrc 
 

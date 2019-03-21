@@ -117,7 +117,7 @@ class ATSystemConfig:
                 self.lastSection                         = int(self.DATA_INPUT['LAST_SECTION'])
 
             self.pipeline                                = args.pipeline
-            #self.overwritedata                           = args.overwritedata
+            self.overwritedata                           = False #args.overwritedata
 
     def getStateTableFileName(self, ribbon, session, sectnum):
         return os.path.join(self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))

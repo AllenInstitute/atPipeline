@@ -15,10 +15,10 @@ import at_system_config
 def scriptArguments():
     #Get processing parameters
     parser = argparse.ArgumentParser()
-    parser.add_argument('--startAll',            help='Start the whole AT backend',          action='store_true')
-    parser.add_argument('--startRenderBackend',  help='Start the Render backend',            action='store_true')
-    parser.add_argument('--killAll',             help='Stop the AT backend',                 action='store_true')
-    parser.add_argument('-ra', '--restartAll',   help="Restart all AT backend container",    action='store_true' )
+    parser.add_argument('--startall',            help='Start the whole AT backend',          action='store_true')
+    parser.add_argument('--startbackend',        help='Start the Render backend',            action='store_true')
+    parser.add_argument('--killall',             help='Stop the AT backend',                 action='store_true')
+    parser.add_argument('-ra', '--restartall',   help="Restart all AT backend container",    action='store_true' )
 
     parser.add_argument('-s', '--start',         help="Start a specific backend container, e.g. atcore",     nargs='?',const='atcore', type=str)
     parser.add_argument('-k', '--kill',          help='Stop a specific backend cointainer',                  nargs='?',const='atcore', type=str)
@@ -52,10 +52,10 @@ def main():
         elif args.kill:
             dManager.stopContainer(args.stop)
 
-        elif args.killAll:
+        elif args.killall:
             dManager.killAllContainers()
 
-        elif args.startAll:
+        elif args.startall:
             #start the render backend first
             if dManager.startRenderBackend() == False:
                 raise Exception("Failed starting the RenderBackend")
@@ -63,12 +63,12 @@ def main():
             #Start the atcore container
             dManager.startContainer("atcore")
 
-        elif args.startRenderBackend:
+        elif args.startrenderbackend:
             #start the render backend first
             if dManager.startRenderBackend() == False:
                 raise Exception("Failed starting the RenderBackend")
 
-        elif args.restartAll:
+        elif args.restartall:
             dManager.reStartAll()
 
 
