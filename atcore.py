@@ -36,7 +36,7 @@ def main():
 
     try:
         cwd = pathlib.Path().absolute().resolve()
-        system_parameters = at_system_config.ATSystemConfig("SystemConfig.ini")
+        system_parameters = at_system_config.ATSystemConfig(os.path.join("config", "SystemConfig.ini"))
         logger.info("============ ATCORE ============")
         args,parser = scriptArguments()
 
@@ -45,6 +45,8 @@ def main():
             system_parameters.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = args.project
 
         if args.project and not args.pipeline:
+            cmd = "docker exec -t clang atcli --json --dataroot " + system_parameters.toDockerMountedPath(args.project)
+            u.runShellCMD(cmd)
             logger.info("Return information about input data, e.g. number of sessions, sections and ribbons")
             return
 

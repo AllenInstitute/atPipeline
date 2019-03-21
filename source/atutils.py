@@ -110,6 +110,17 @@ def runAtCoreModule(method, logger):
     logger.info("Elapsed time: " + timeDuration + " minutes")
 
 
+def runShellCMD(cmd):
+    logger.info("===================== Running: " + cmd.replace('--', '\n--') + "\n---------------------------------------")
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+    for line in proc.stdout.readlines():
+        logger.debug(line.rstrip())
+
+    proc.wait()
+    if proc.returncode:
+        logger.error("PROC_RETURN_CODE:" + str(proc.returncode))
+        raise Exception("Error Running Command: " + cmd)
+
 def runPipelineStep(cmd, stepName):
     logger.info("===================== Running: " + cmd.replace('--', '\n--') + "\n---------------------------------------")
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')

@@ -1,4 +1,4 @@
-FROM atpipeline/clang-base-image:march-20
+FROM atpipeline/clang-base-image:0.1
 
 ##Fetch dsl and atExplorer repositories
 #RUN mkdir /libs && mkdir /libs/dsl \
@@ -15,40 +15,39 @@ FROM atpipeline/clang-base-image:march-20
 ##    && git -C /libs/atExplorer pull
 
 RUN mkdir /libs && mkdir /libs/atExplorer
-#COPY ./third-party-libs /libs
-
-#Build libs and apps using cmake
-RUN mkdir /builds 
-#
-#--#Build libraries, dsl-thirdparties, dsl and atExplorer
-#--#---- DSL Thirdparties ----------------------
-#--RUN mkdir /builds/dsl-tp && \
-#--cmake -B"/builds/dsl-tp" -H"/libs/dsl/ThirdParties" \
-#---G "Ninja" \
-#---DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
-#---DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
-#--
-#--#---- DSL --------------------------------
-#--RUN mkdir /builds/dsl && \
-#--cmake -B"/builds/dsl" -H"/libs/dsl" \
-#---G "Ninja" \
-#---DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
-#---DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
-#--
-#--##---- ATEXPLORER --------------------------------
-#--
-#--RUN mkdir /builds/atExplorer && \
-#--cmake -B"/builds/atExplorer" -H"/libs/atExplorer" \
-#---G "Ninja" \
-#---DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
-#---DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
-#--
-#--#Build & install
-#--RUN ninja -C /builds/dsl-tp install
-#--RUN ninja -C /builds/dsl install
-#--RUN ninja -C /builds/atExplorer install
-#--
-#--RUN ldconfig
-
+#  COPY ./third-party-libs /libs
+  
+  #Build libs and apps using cmake
+  RUN mkdir /builds 
+#  #
+#  #Build libraries, dsl-thirdparties, dsl and atExplorer
+#  #---- DSL Thirdparties ----------------------
+#  RUN mkdir /builds/dsl-tp && \
+#  cmake -B"/builds/dsl-tp" -H"/libs/dsl/ThirdParties" \
+#  -G "Ninja" \
+#  -DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
+#  -DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
+#  
+#  #---- DSL --------------------------------
+#  RUN mkdir /builds/dsl && \
+#  cmake -B"/builds/dsl" -H"/libs/dsl" \
+#  -G "Ninja" \
+#  -DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
+#  -DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
+#  
+#  ##---- ATEXPLORER --------------------------------
+#  RUN mkdir /builds/atExplorer && \
+#  cmake -B"/builds/atExplorer" -H"/libs/atExplorer" \
+#  -G "Ninja" \
+#  -DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
+#  -DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
+#  
+#  #Build & install
+#  RUN ninja -C /builds/dsl-tp install
+#  RUN ninja -C /builds/dsl install
+#  RUN ninja -C /builds/atExplorer install
+#  
+#  RUN ldconfig
+#  
 # Start from a Bash prompt
 CMD [ "/bin/bash" ]

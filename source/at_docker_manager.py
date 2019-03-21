@@ -25,8 +25,8 @@ class DockerManager:
         cwd = pathlib.Path().absolute().resolve()
         mountCount = 1
         for mount in mounts:
-            mountValue  = {'bind' : '/data_mount_' + str(mountCount) , 'mode' : 'rw'}
-            self.atCoreMounts[mount] = mountValue
+            mountValue  = {'bind' : mount[1] , 'mode' : 'rw'}
+            self.atCoreMounts[mount[0]] = mountValue
             mountCount = mountCount + 1
 
         if mountRenderPythonApps == True:

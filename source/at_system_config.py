@@ -20,11 +20,14 @@ class ATSystemConfig:
         self.tp_client                                     = self.config['TILE_PAIR_CLIENT']
         self.SPARK_SEC                                     = self.config['SPARK']
         self.DATA_INPUT                                    = self.config['DATA_INPUT']
+        self.mounts                                        = ast.literal_eval(self.general['DATA_ROOTS'])
+
+        print (self.mounts)
 
     #The arguments passed here are captured from the commandline and will over ride any option
     #present in the system config file
     def createReferences(self, args = None):
-        self.dataRoots                                = ast.literal_eval(self.general['DATA_ROOTS'])
+
         self.mountRenderPythonApps                    = u.toBool(self.general['MOUNT_RENDER_PYTHON_APPS'])
         self.mountRenderModules                       = u.toBool(self.general['MOUNT_RENDER_MODULES'])
         self.atCoreContainer                          = self.general['AT_CORE_DOCKER_CONTAINER']
@@ -129,7 +132,7 @@ class ATSystemConfig:
     def setupDockerMountName(self, localPath):
         #find the index of localPath in dataRootFolders variable
         mountIndex = 1
-        for mount in self.dataRoots:
+        for mount in self.mounts:
             if mount == localPath:
                 self.dockerMountName = "/data_mount_" + str(mountIndex)
                 break
@@ -139,19 +142,20 @@ class ATSystemConfig:
             raise Exception("The data path: " + localPath + " is not valid")
 
 
-def toDockerMountedPath2(aPath, paras : ATSystemConfig):
-    #Find out index of path in DATA_ROOTS
-    index = paras.dataRoots.index(paras.dataRootFolder) + 1
+    def toDockerMountedPath(self, aPath):
+        #Find out index of path in DATA_ROOTS
+        index = 0 #self.mounts.index(paras.dataRootFolder) + 1
 
-    #Remove rootfolder from aPath
-    if aPath.startswith(paras.dataRootFolder):
-        aPath = aPath[len(paras.dataRootFolder):]
-    else:
-        raise ValueError("Bad path in " + __file__)
+        theMount = self.mounts[index][0]
 
-    aPath = posixpath.normpath(aPath.replace('\\', '/'))
-    if aPath[0] == '/':
-        aPath = aPath[1:]
+        #Remove root part from aPath
+        if aPath.startswith(theMount):
+            aPath = aPath[len(theMount):]
+        else:
+            raise ValueError("Bad path in " + __file__)
 
-    dockerMountName = "/data_mount_" + str(index)
-    return posixpath.join(dockerMountName, aPath)
+        aPath = posixpath.normpath(aPath.replace('\\', '/'))
+        if aPath[0] == '/':
+            aPath = aPath[1:]
+
+        return posixpath.join(self.mounts[index][1], aPath)

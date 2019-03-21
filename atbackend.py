@@ -30,7 +30,7 @@ def scriptArguments():
 def main():
 
     try:
-        parameters = at_system_config.ATSystemConfig("SystemConfig.ini")
+        parameters = at_system_config.ATSystemConfig(os.path.join("config", "SystemConfig.ini"))
         parameters.createReferences()
         logger.info("============ Managing the atBackend =============")
         args = scriptArguments()
@@ -40,8 +40,8 @@ def main():
         cwd = pathlib.Path().absolute().resolve()
 
         dManager = at_docker_manager.DockerManager()
-        dManager.setupMounts(parameters.dataRoots, parameters.mountRenderPythonApps, parameters.mountRenderModules)
-        dManager.setComposeFile(os.path.join(cwd, "docker-compose.yml"))
+        dManager.setupMounts(parameters.mounts, parameters.mountRenderPythonApps, parameters.mountRenderModules)
+        dManager.setComposeFile(os.path.join(cwd, "config", "docker-compose.yml"))
 
         if args.restart:
             dManager.reStartContainer(args.restart)
