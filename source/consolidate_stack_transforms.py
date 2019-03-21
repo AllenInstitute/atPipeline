@@ -6,38 +6,41 @@ import subprocess
 import posixpath
 import atutils as u
 import timeit
+import logging
+
+logger = logging.getLogger('atPipeline')
 
 ##Create a new stack with "consolidated" transforms
-def run(p, sessionFolder):
-    print ("Processing session folder: " + sessionFolder)
+def run(p : u.ATDataIni, sessionFolder):
+    logger.info("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    renderProject = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
+    rp = p.renderProject
 
-    cmd = "docker exec "+ p.atCoreContainer
+    cmd = "docker exec "+ p.sys.atCoreContainer
     cmd = cmd + " python -m rendermodules.stack.consolidate_transforms"
-    cmd = cmd + " --render.host %s"                           %(renderProject.host)
-    cmd = cmd + " --render.project %s"                        %(renderProject.name)
-    cmd = cmd + " --render.owner %s"                          %(renderProject.owner)
-    cmd = cmd + " --render.client_scripts %s"                 %(p.clientScripts)
-    cmd = cmd + " --render.memGB %s"                          %(p.memGB)
-    cmd = cmd + " --render.port %s"                           %(p.renderHostPort)
-    cmd = cmd + " --pool_size %s"                             %(p.poolSize)
-    cmd = cmd + " --stack S%d_RoughAligned"                        %(session)
-    cmd = cmd + " --output_stack S%d_RoughAligned_Consolidated"    %(session)
-    cmd = cmd + " --close_stack %d"%(True)
+    cmd = cmd + " --render.host %s"                             %(rp.host)
+    cmd = cmd + " --render.project %s"                          %(rp.projectName)
+    cmd = cmd + " --render.owner %s"                            %(rp.owner)
+    cmd = cmd + " --render.client_scripts %s"                   %(rp.clientScripts)
+    cmd = cmd + " --render.memGB %s"                            %(rp.memGB)
+    cmd = cmd + " --render.port %s"                             %(rp.hostPort)
+    cmd = cmd + " --pool_size %s"                               %(p.sys.atCoreThreads)
+    cmd = cmd + " --stack S%d_RoughAligned"                     %(session)
+    cmd = cmd + " --output_stack S%d_RoughAligned_Consolidated" %(session)
+    cmd = cmd + " --close_stack %d"                             %(True)
     cmd = cmd + " --output_json Test"
 
     # Run =============
-    print ("Running: " + cmd.replace('--', '\n--'))
+    logger.info("Running: " + cmd.replace('--', '\n--'))
 
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
     for line in proc.stdout.readlines():
-    	print (line)
+    	logger.info(line.rstrip())
 
     proc.wait()
     if proc.returncode:
-        print ("PROC_RETURN_CODE:" + str(proc.returncode))
+        logger.info("PROC_RETURN_CODE:" + str(proc.returncode))
         raise Exception("consolidate_stack_transforms threw an Exception")
 
 

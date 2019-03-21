@@ -4,52 +4,45 @@ import posixpath
 import atutils as u
 import timeit
 import json
+import logging
+logger = logging.getLogger('atPipeline')
 
-def run(p, sessionFolder):
+def run(p : u.ATDataIni, sessionFolder):
 
-    print ("Processing session folder: " + sessionFolder)
+    logger.info("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
-    dataOutputFolder       = os.path.join(p.dataOutputFolder, "rough_aligned")
-    input_json     = os.path.join(dataOutputFolder, "roughalignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
-    output_json    = os.path.join(dataOutputFolder, "output_roughalignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
+    dataOutputFolder    = os.path.join(projectRoot, p.dataOutputFolder, "rough_aligned")
+    input_json          = os.path.join(dataOutputFolder, "roughalignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
+    output_json         = os.path.join(dataOutputFolder, "output_roughalignment_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
 
     #stacks
-    inputStack     = "S%d_Stitched_Dropped_LowRes"%(session)
+    inputStack     = "S%d_LowRes"%(session)
     outputStack    = "S%d_RoughAligned_LowRes"%(session)
 
-    renderProject  = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
+    rp  = p.renderProject
 
 	#point match collections
-    lowresPmCollection = "%s_lowres_round"%renderProject.name
+    lowresPmCollection = "%s_lowres_round"%rp.projectName
 
-    with open(p.alignment_template) as json_data:
+    with open(p.systemParameters.alignment_template) as json_data:
        ra = json.load(json_data)
 
     #Create folder if not exists
     if os.path.isdir(dataOutputFolder) == False:
         os.mkdir(dataOutputFolder)
 
-    u.saveRoughAlignJSON(ra, input_json, p.renderHost, 80, renderProject.owner, renderProject.name, inputStack, outputStack, lowresPmCollection, p.clientScripts, p.logLevel, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p.prefixPath))
+    u.saveRoughAlignJSON(ra, input_json, rp, inputStack, outputStack, lowresPmCollection, p.firstSection, p.lastSection, u.toDockerMountedPath(dataOutputFolder, p))
 
     #Run docker command
-    cmd = "docker exec " + p.atCoreContainer
+    cmd = "docker exec " + p.sys.atCoreContainer
     cmd = cmd + " python -m rendermodules.solver.solve"
-    cmd = cmd + " --input_json %s" %(u.toDockerMountedPath(input_json, p.prefixPath))
-    cmd = cmd + " --output_json %s"%(u.toDockerMountedPath(output_json, p.prefixPath))
+    cmd = cmd + " --input_json %s" %(u.toDockerMountedPath(input_json, p))
+    cmd = cmd + " --output_json %s"%(u.toDockerMountedPath(output_json, p))
 
     #Run =============
-    print ("Running: " + cmd.replace('--', '\n--'))
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for line in proc.stdout.readlines():
-        print (line)
-
-    proc.wait()
-    if proc.returncode:
-        print ("PROC_RETURN_CODE:" + str(proc.returncode))
-        raise Exception("Error generating median files")
-
+    u.runPipelineStep(cmd, __file__)
 
 if __name__ == "__main__":
 

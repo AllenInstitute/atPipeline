@@ -5,17 +5,17 @@ import subprocess
 import posixpath
 import atutils as u
 import timeit
+import logging
+logger = logging.getLogger('atPipeline')
 
-def run(p, sessionFolder):
+def run(p : u.ATDataIni, sessionFolder):
 
-    print ("Processing session folder: " + sessionFolder)
+    logger.info("Processing session folder: " + sessionFolder)
     [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
     #Output directories
-    median_dir         = os.path.join(p.dataOutputFolder, "medians")
-    docker_median_dir  = posixpath.join(p.dockerDataOutputFolder, "medians")
-
-    median_json_file   = "median_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection)
+    median_dir       = os.path.join("%s"%projectroot, p.dataOutputFolder, "medians")
+    median_json      = os.path.join(median_dir, "median_%s_%s_%d_%d.json"%(ribbon, session, p.firstSection, p.lastSection))
 
     #Make sure output folder exist
     if os.path.isdir(median_dir) == False:
@@ -25,30 +25,20 @@ def run(p, sessionFolder):
     acq_stack        = "S%d_Session%d"%(session, session)
     median_stack     = "S%d_Medians"%(session)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.renderHost, p.projectName)
+    rp               = p.renderProject
 
-    with open(p.median_template) as json_data:
+    with open(p.systemParameters.median_template) as json_data:
          med = json.load(json_data)
 
-    u.savemedianjson(med, os.path.join(median_dir, median_json_file), renderProject, acq_stack, median_stack, docker_median_dir, ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
+    u.savemedianjson(med, median_json, rp, acq_stack, median_stack, u.toDockerMountedPath(median_dir, p), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
 
-    cmd = "docker exec " + p.atCoreContainer
+    cmd = "docker exec " + p.sys.atCoreContainer
     cmd = cmd + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
     cmd = cmd + " --render.port 80"
-    cmd = cmd + " --input_json %s"%(posixpath.join(docker_median_dir, median_json_file))
+    cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(median_json,  p))
 
     #Run =============
-    print ("Running: " + cmd.replace('--', '\n--'))
-
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for line in proc.stdout.readlines():
-        print (line)
-
-    proc.wait()
-    if proc.returncode:
-        print ("PROC_RETURN_CODE:" + str(proc.returncode))
-        raise Exception("Error generating median files")
-
+    u.runPipelineStep(cmd, __file__)
 
 if __name__ == "__main__":
 

@@ -19,6 +19,8 @@ create_2D_pointmatches
 create_HR_tilepairs
 create_HR_pointmatches
 create_fine_aligned_stacks
+at_system_config
+at_render_project
 '''
 
 __all__ = scripts.split()
