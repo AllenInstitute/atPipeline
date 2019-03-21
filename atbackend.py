@@ -16,7 +16,8 @@ def scriptArguments():
     #Get processing parameters
     parser = argparse.ArgumentParser()
     parser.add_argument('--startall',            help='Start the whole AT backend',          action='store_true')
-    parser.add_argument('--startbackend',        help='Start the Render backend',            action='store_true')
+    parser.add_argument('--startbackend',        help='Start the whole backend',             action='store_true')
+    parser.add_argument('--startrenderbackend',  help='Start the Render backend',            action='store_true')
     parser.add_argument('--killall',             help='Stop the AT backend',                 action='store_true')
     parser.add_argument('-ra', '--restartall',   help="Restart all AT backend container",    action='store_true' )
 

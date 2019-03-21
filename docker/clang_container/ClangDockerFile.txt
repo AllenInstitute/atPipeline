@@ -1,4 +1,4 @@
-FROM atpipeline/clang-base-image:march-15-3
+FROM atpipeline/clang-base-image:march-20
 
 ##Fetch dsl and atExplorer repositories
 #RUN mkdir /libs && mkdir /libs/dsl \

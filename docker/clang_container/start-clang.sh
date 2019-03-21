@@ -1,6 +1,6 @@
 #! /usr/bin/bash
 
-image_tag="clang_image:0.5"
+image_tag="clang_image:0.1"
 container_name="clang"
 export DISPLAY=10.128.26.56:0.0
 
@@ -15,6 +15,6 @@ docker run -e DISPLAY=$DISPLAY -d --name $container_name \
 -v c:\\pDisk\\ATPipeline\\docker\\third-party-libs:/libs \
 -v c:\\pDisk\\ATPipeline\\docker\\third-party-libs\\builds:/builds \
 -v c:\\data:/data_mount_1 \
--it $image_tag /bin/bash
+-it $image_tag bash
 
 echo "Done.."
