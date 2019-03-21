@@ -17,6 +17,6 @@ docker run -e DISPLAY=$DISPLAY -d --name $container_name \
 -v c:\\data:/data \
 -it $image_tag 
 
-docker exec -t clang /build/build.bash
+#docker exec -t clang /build/build.bash
 
 echo "========= Done ========"
