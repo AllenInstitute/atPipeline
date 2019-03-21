@@ -6,10 +6,10 @@ import subprocess
 import posixpath
 
 def parseprojectroot(projectdirectory):
-    print ("Project directory: " + projectdirectory)
+    logger.info("Project directory: " + projectdirectory)
     tok = projectdirectory.split(os.sep)
     dataind = tok.index('data')
-    print ("Project data folder: " + tok[dataind+1])
+    logger.info("Project data folder: " + tok[dataind+1])
     return tok[dataind+1]
 
 def parse_project_directory(line):
@@ -40,7 +40,7 @@ def parsefile(fname):
         content = f.readlines()
 
     if len(content)>1:
-        print ("The File: "  + fname + " is corrupted!")
+        logger.info("The File: "  + fname + " is corrupted!")
     else:
         #parse line
         fullline = content[0]
@@ -69,11 +69,11 @@ if __name__ == "__main__":
     alldirnames = ["f:\\data\\M33\\raw\\data\\Ribbon0004\\session02"]
 
     for dirname in alldirnames:
-        print ("Processing folder: " + dirname)
+        logger.info("Processing folder: " + dirname)
 
         for sectnum in range(firstsection,lastsection+1):
 
-            print("Processing section: " + str(sectnum))
+            logger.info("Processing section: " + str(sectnum))
             projectdirectory = dirname.strip()
             project = parseprojectroot(projectdirectory)
             channels = get_channel_names(projectdirectory)
@@ -115,7 +115,7 @@ if __name__ == "__main__":
             cmd = cmd + " --section %d"%sectnum
             print (cmd)
 
-            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
             for line in p.stdout.readlines():
                 print (line)
 
@@ -147,7 +147,7 @@ if __name__ == "__main__":
 ##
 ##            print (cmd)
 ##
-##            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+##            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
 ##            for line in p.stdout.readlines():
 ##                print (line)
 ##

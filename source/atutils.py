@@ -8,10 +8,11 @@ import ast
 import argparse
 import shutil
 import timeit
+import at_system_config
 import pathlib
-
-#Some hardcoded paths..
-dockerMountName = "/data_mount_1"
+import subprocess
+import logging
+logger = logging.getLogger('atPipeline')
 
 def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")
@@ -21,30 +22,20 @@ class ATDataIni:
         config = configparser.ConfigParser()
         config.read(iniFile)
         general                                       = config['GENERAL']
-        deconv                                        = config['DECONV']
-        align                                         = config['ALIGN']
-        tp_client                                     = config['TILE_PAIR_CLIENT']
-        SPARK_SEC                                     = config['SPARK']
+
+        self.systemConfigFile                         = general['SYSTEM_CONFIG_FILE']
 
         #What data to process??
-        self.prefixPath                               = general['PREFIX_PATH']
-        self.dataRootFolder                           = os.path.join(self.prefixPath, general['DATA_FOLDER'])
+        self.dataRootFolder                           = general['DATA_ROOT']
+        self.projectRootFolder                        = os.path.join(self.dataRootFolder, general['PROJECT_DATA_FOLDER'])
         self.dataOutputFolder                         = os.path.join(general['PROCESSED_DATA_FOLDER'])
 
         #Process parameters
-        self.atCoreContainer                          = general['RENDER_PYTHON_APPS_CONTAINER']
-        self.atmContainer                             = general['AT_MODULES_CONTAINER']
-        self.renderHost                               = general['RENDER_HOST']
         self.renderProjectOwner                       = general['RENDER_PROJECT_OWNER']
-        self.renderHostPort                           = int(general['RENDER_HOST_PORT'])
         self.projectName                              = general['PROJECT_NAME']
-
-        self.dataOutputFolder                         = os.path.join(  self.dataOutputFolder, self.projectName)
-        self.clientScripts                            = general['CLIENT_SCRIPTS']
-
-        self.memGB                                    = general['MEM_GB']
-        self.logLevel                                 = general['LOG_LEVEL']
+        self.dataOutputFolder                         = os.path.join(self.dataOutputFolder, self.projectName)
         self.referenceChannel                         = general['REFERENCE_CHANNEL']
+
         self.ribbons                                  = ast.literal_eval(general['RIBBONS'])
         self.sessions                                 = ast.literal_eval(general['SESSIONS'])
         self.sessionFolders                           = []
@@ -52,6 +43,7 @@ class ATDataIni:
         self.lastSection                              = int(general['END_SECTION'])
         self.firstRibbon                              = int(general['FIRST_RIBBON'])
         self.lastRibbon                               = int(general['LAST_RIBBON'])
+
         self.createStateTables                        = toBool(general['CREATE_STATE_TABLES'])
         self.createRawDataRenderMultiStacks           = toBool(general['CREATE_RAWDATA_RENDER_MULTI_STACKS'])
         self.createMedianFiles                        = toBool(general['CREATE_MEDIAN_FILES'])
@@ -69,61 +61,25 @@ class ATDataIni:
         self.createHRPointMatches                     = toBool(general['CREATE_HR_POINTMATCHES'])
         self.createFineAlignedStacks                  = toBool(general['CREATE_FINE_ALIGNED_STACKS'])
 
-
-        #SPARK stuff
-        self.SPARK = {}
-        self.SPARK['driverMemory']                    = SPARK_SEC['DRIVER_MEMORY']
-        self.SPARK['executorMemory']                  = SPARK_SEC['EXECUTOR_MEMORY']
-        self.SPARK['executorCores']                   = SPARK_SEC['EXECUTOR_CORES']
-        self.SPARK['maxFeatureCacheGb']               = SPARK_SEC['MAX_FEATURE_CACHE_GB']
-
-
-        self.JSONTemplatesFolder                      = general['JSON_TEMPLATES_FOLDER']
-
-        self.ch405                                    = config['DECONV_405']
-        self.ch488                                    = config['DECONV_488']
-        self.ch594                                    = config['DECONV_594']
-        self.ch647                                    = config['DECONV_647']
-
-        #Tilepair client
-        self.excludeCornerNeighbors                   = toBool(tp_client['EXCLUDE_CORNER_NEIGHBOURS'])
-        self.excludeSameSectionNeighbors              = toBool(tp_client['EXCLUDE_SAME_SECTION_NEIGHBOR'])
-        self.zNeighborDistance                        = int(tp_client['Z_NEIGHBOR_DISTANCE'])
-        self.xyNeighborFactor                         = float(tp_client['XY_NEIGHBOR_FACTOR'])
-
-        #Deconvolution parameters
-        self.channels                                 = ast.literal_eval(deconv['CHANNELS'])
-        self.bgrdSize                                 = ast.literal_eval(deconv['BGRD_SIZE'])
-        self.scaleFactor                              = ast.literal_eval(deconv['SCALE_FACTOR'])
-        self.numIter                                  = int(deconv['NUM_ITER'])
-
-        #Alignment parameters
-        self.poolSize                                 = int(align['POOL_SIZE'])
-        self.edgeThreshold                            = int(align['EDGE_THRESHOLD'])
-        self.scale                                    = float(align['SCALE'])
-        self.distance                                 = int(align['DISTANCE'])
-        self.siftMin                                  = float(align['SIFTMIN'])
-        self.siftMax                                  = float(align['SIFTMAX'])
-        self.siftSteps                                = int(align['SIFTSTEPS'])
-        self.renderScale                              = float(align['RENDERSCALE'])
-
-        #JSON Templates
-        self.median_template                          = os.path.join(self.JSONTemplatesFolder, "median.json")
-        self.stitching_template                       = os.path.join(self.JSONTemplatesFolder, "stitching.json")
-        self.flatfield_template                       = os.path.join(self.JSONTemplatesFolder, "flatfield.json")
-        self.deconvolution_template                   = os.path.join(self.JSONTemplatesFolder, "deconvolution.json")
-        self.alignment_template                       = os.path.join(self.JSONTemplatesFolder, "roughalign.json")
-        self.fine_alignment_template                  = os.path.join(self.JSONTemplatesFolder, "fine_align.json")
-        self.registrationTemplate                     = os.path.join(self.JSONTemplatesFolder, "registration.json")
-
         for session in self.sessions:
-          self.sessionFolders.append(os.path.join(self.dataRootFolder, "raw", "data", self.ribbons[0], session))
+          self.sessionFolders.append(os.path.join(self.projectRootFolder, "raw", "data", self.ribbons[0], session))
+
+        iniFilePath = os.path.split(iniFile)[0]
+        #Read and append SYSTEM Configuration
+        self.systemParameters   = at_system_config.ATSystemConfig(os.path.join(iniFilePath, self.systemConfigFile))
+        self.sys = self.systemParameters
+
+        #Setup System parameters
+        self.systemParameters.setupDockerMountName(self.dataRootFolder)
+
+        #Create a "renderProject"
+        self.renderProject = RenderProject(self.renderProjectOwner, self.projectName, self.sys.renderHost, self.sys.renderHostPort, self.sys.clientScripts, self.sys.memGB, self.sys.logLevel)
 
     def getStateTableFileName(self, ribbon, session, sectnum):
-        return os.path.join(self.dataRootFolder, self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
+        return os.path.join(self.projectRootFolder, self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
 
 
-def validateATCoreInputAndOutput():
+def setupParameters():
     parser = argparse.ArgumentParser()
     parser.add_argument('parameter_file', help='Input file')
     args = parser.parse_args()
@@ -136,31 +92,55 @@ def validateATCoreInputAndOutput():
     parameters = ATDataIni(parameterFile)
 
     #Copy parameter file to root of processed data output folder
-    outFolder = os.path.join(parameters.dataRootFolder, parameters.dataOutputFolder)
+    outFolder = os.path.join(parameters.projectRootFolder, parameters.dataOutputFolder)
     if os.path.isdir(outFolder) == False:
         pathlib.Path(outFolder).mkdir(parents=True, exist_ok=True)
 
     shutil.copy2(parameterFile, outFolder)
     return parameters
 
-
-def runAtCoreModule(method):
+def runAtCoreModule(method, logger):
     timeStart = timeit.default_timer()
-    parameters =validateATCoreInputAndOutput()
+    parameters = setupParameters()
 
     for sessionFolder in parameters.sessionFolders:
-        method(parameters, sessionFolder)
+        method(parameters, sessionFolder, logger)
 
     timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
-    print("Elapsed time: " + timeDuration + " minutes")
+    logger.info("Elapsed time: " + timeDuration + " minutes")
+
+
+def runShellCMD(cmd):
+    logger.info("===================== Running: " + cmd.replace('--', '\n--') + "\n---------------------------------------")
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+    for line in proc.stdout.readlines():
+        logger.debug(line.rstrip())
+
+    proc.wait()
+    if proc.returncode:
+        logger.error("PROC_RETURN_CODE:" + str(proc.returncode))
+        raise Exception("Error Running Command: " + cmd)
+
+def runPipelineStep(cmd, stepName):
+    logger.info("===================== Running: " + cmd.replace('--', '\n--') + "\n---------------------------------------")
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+    for line in proc.stdout.readlines():
+        logger.debug(line.rstrip())
+
+    proc.wait()
+    if proc.returncode:
+        logger.error("PROC_RETURN_CODE:" + str(proc.returncode))
+        raise Exception("Error in pipeline step: " + stepName)
 
 class RenderProject:
-    def __init__(self, owner, host, name, host_port="80", client_scripts="/shared/render/render-ws-java-client/src/main/scripts"):
-        self.name           = name
-        self.host           = host
+    def __init__(self, owner, project_name, host_name, host_port, client_scripts, mem_gb, log_level):
         self.owner          = owner
+        self.projectName    = project_name
+        self.host           = host_name
         self.hostPort       = host_port
         self.clientScripts  = client_scripts
+        self.memGB          = mem_gb
+        self.logLevel       = log_level
 
 def parse_session_folder(path):
     proj = path.split("raw")
@@ -174,10 +154,10 @@ def parse_session_folder(path):
 
 #Input is a sessionfolder path
 def getProjectNameFromSessionFolder(sessionFolder):
-    print ("Session directory: " + sessionFolder)
+    logger.info("Session directory: " + sessionFolder)
     tok = sessionFolder.split(os.sep)
     dataind = tok.index('data')
-    print ("Project data folder: " + tok[dataind+1])
+    logger.info("Project data folder: " + tok[dataind+1])
     return tok[dataind+1]
 
 def getChannelNamesInSessionFolder(directory):
@@ -187,11 +167,11 @@ def getChannelNamesInSessionFolder(directory):
             directory_list.append(os.path.join(root, name))
     return dirs
 
-def toDockerMountedPath(path, prefix):
+def toDockerMountedPath(path, paras : ATDataIni):
     #Remove prefix
-    p = path.split(prefix)[1]
+    p = path.split(paras.dataRootFolder)[1]
     p = posixpath.normpath(p.replace('\\', '/'))
-    return posixpath.join(dockerMountName, p[1:])
+    return posixpath.join(paras.systemParameters.dockerMountName, p[1:])
 
 def dump_json(data, fileName):
     with open(fileName, 'w') as outfile:
@@ -200,7 +180,7 @@ def dump_json(data, fileName):
 def savemedianjson(template, outFile, render_project, acq_stack, median_stack, median_dir, minz, maxz, close_stack):
     template['render']['host']    = render_project.host
     template['render']['owner']   = render_project.owner
-    template['render']['project'] = render_project.name
+    template['render']['project'] = render_project.projectName
     template['input_stack']       = acq_stack
     template['output_stack']      = median_stack
     template['minZ']              = minz
@@ -212,7 +192,7 @@ def savemedianjson(template, outFile, render_project, acq_stack, median_stack, m
 def saveflatfieldjson(template, outFile, render_project, acq_stack, median_stack, flatfield_stack, flatfield_dir, sectnum, close_stack):
     template['render']['host']    = render_project.host
     template['render']['owner']   = render_project.owner
-    template['render']['project'] = render_project.name
+    template['render']['project'] = render_project.projectName
     template['input_stack']       = acq_stack
     template['correction_stack']  = median_stack
     template['output_stack']      = flatfield_stack
@@ -238,41 +218,41 @@ def savedeconvjson(template,outFile, owner, project, flatfield_stack,deconv_stac
 def savestitchingjson(template, outfile, render_project, flatfield_stack, stitched_stack, sectnum):
     template['baseDataUrl']            = "http://%s/render-ws/v1"%(render_project.host)
     template['owner']                  = render_project.owner
-    template['project']                = render_project.name
+    template['project']                = render_project.projectName
     template['stack']                  = flatfield_stack
     template['outputStack']            = stitched_stack
     template['section']                = sectnum
     dump_json(template, outfile)
 
-def saveRoughAlignJSON(template, outFile, renderProject, input_stack, output_stack, lowresPmCollection, logLevel, nFirst, nLast, dataOutputFolder):
-    template['regularization']['log_level']                  = logLevel
-    template['matrix_assembly']['log_level']                 = logLevel
+def saveRoughAlignJSON(template, outFile, renderProject, input_stack, output_stack, lowresPmCollection, nFirst, nLast, dataOutputFolder):
+    template['regularization']['log_level']                  = renderProject.logLevel
+    template['matrix_assembly']['log_level']                 = renderProject.logLevel
 
     template['output_stack']['client_scripts']               = renderProject.clientScripts
     template['output_stack']['owner']                        = renderProject.owner
-    template['output_stack']['log_level']                    = logLevel
-    template['output_stack']['project']                      = renderProject.name
+    template['output_stack']['log_level']                    = renderProject.logLevel
+    template['output_stack']['project']                      = renderProject.projectName
     template['output_stack']['port']                         = renderProject.hostPort
     template['output_stack']['host']                         = renderProject.host
     template['output_stack']['name']                         = output_stack
 
     template['input_stack']['client_scripts']                = renderProject.clientScripts
     template['input_stack']['owner']                         = renderProject.owner
-    template['input_stack']['log_level']                     = logLevel
-    template['input_stack']['project']                       = renderProject.name
+    template['input_stack']['log_level']                     = renderProject.logLevel
+    template['input_stack']['project']                       = renderProject.projectName
     template['input_stack']['port']                          = renderProject.hostPort
     template['input_stack']['host']                          = renderProject.host
     template['input_stack']['name']                          = input_stack
 
     template['pointmatch']['client_scripts']                 = renderProject.clientScripts
     template['pointmatch']['owner']                          = renderProject.owner
-    template['pointmatch']['log_level']                      = logLevel
-    template['pointmatch']['project']                        = renderProject.name
+    template['pointmatch']['log_level']                      = renderProject.logLevel
+    template['pointmatch']['project']                        = renderProject.projectName
     template['pointmatch']['name']                           = lowresPmCollection
     template['pointmatch']['port']                           = renderProject.hostPort
     template['pointmatch']['host']                           = renderProject.host
 
-    template['hdf5_options']['log_level']                    = logLevel
+    template['hdf5_options']['log_level']                    = renderProject.logLevel
     template['hdf5_options']['output_dir']                   = dataOutputFolder
 
     template['first_section']                                = nFirst

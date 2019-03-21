@@ -1,9 +1,0 @@
-[submodule "docker/at_modules"]
-	path = docker/at_modules
-	url = ../../AllenInstitute/at_modules
-[submodule "docker/render-modules"]
-	path = docker/render-modules
-	url = ../../AllenInstitute/render-modules.git
-[submodule "docker/render-python-apps"]
-	path = docker/render-python-apps
-	url = ../../AllenInstitute/render-python-apps.git

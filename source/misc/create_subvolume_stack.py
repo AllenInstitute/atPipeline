@@ -57,15 +57,15 @@ def run():
     cmd = cmd + " --pool_size %d"%pool_size
 
     #Run =============
-    print ("Running: " + cmd.replace('--', '\n--'))
+    logger.info("Running: " + cmd.replace('--', '\n--'))
 
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
     for line in proc.stdout.readlines():
-        print (line)
+        logger.info(line.rstrip())
 
 if __name__ == '__main__':
     timeStart = timeit.default_timer()
     run()
 
     timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
-    print("Elapsed time: " + timeDuration + " minutes")
+    logger.info("Elapsed time: " + timeDuration + " minutes")
