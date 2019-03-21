@@ -12,9 +12,9 @@ docker rm $container_name
 
 echo "Starting container with name: $container_name"
 docker run -e DISPLAY=$DISPLAY -d --name $container_name \
--v c:\\pDisk\\ATPipeline\\docker\\third-party-libs:/libs \
--v c:\\pDisk\\ATPipeline\\docker\\third-party-libs\\builds:/builds \
+-v c:\\pDisk\\ATPipeline\\docker\\clang_container\\third-party-libs:/libs \
+-v c:\\pDisk\\ATPipeline\\docker\\clang_container\\third-party-libs\\builds:/builds \
 -v c:\\data:/data_mount_1 \
--it $image_tag bash
+-it $image_tag 
 
-echo "Done.."
+echo "========= Done ========"
