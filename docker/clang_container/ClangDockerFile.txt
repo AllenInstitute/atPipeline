@@ -1,4 +1,4 @@
-FROM atpipeline/clang-base-image:0.1
+FROM atpipeline/clang-base-image:0.2
 
 ##Fetch dsl and atExplorer repositories
 #RUN mkdir /libs && mkdir /libs/dsl \
