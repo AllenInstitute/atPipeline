@@ -19,9 +19,10 @@ COPY ./third-party-libs /libs
   
 #Build libs and apps using cmake
 RUN mkdir /build 
-COPY build.bash /build
+COPY build-thirdparty-libs.bash /build
 WORKDIR /build
-RUN bash build.bash
+
+RUN bash build-thirdparty-libs.bash
 
 # # ---- Build libraries, dsl-thirdparties, dsl and atExplorer
 # # ---- DSL Thirdparties ----------------------

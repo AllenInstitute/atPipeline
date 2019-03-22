@@ -2,37 +2,31 @@
 
 echo "Building.."
 
-export PATH=/clang_7.0.1/bin:$PATH
-export LD_LIBRARY_PATH=/clang_7.0.1/lib:LD_LIBRARY_PATH
-export CC=/clang_7.0.1/bin/clang
-export CXX=/clang_7.0.1/bin/clang++
 
+
+CC=$CC
+CXX=$CXX
+
+#Build build files
 lib=dsl/ThirdParties
-cmake -B"/build/$lib" \
--H"/libs/$lib" \
--G "Ninja" \
--DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
--DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
-
-ninja -C /build/$lib install
+cmake -B"/build/$lib" -H"/libs/$lib" -G "Ninja" \
+-DCMAKE_C_COMPILER=$CC \
+-DCMAKE_CXX_COMPILER=$CXX   
 
 lib=dsl
-cmake -B"/build/$lib" \
--H"/libs/$lib" \
--G "Ninja" \
--DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
--DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
-
-ninja -C /build/$lib install
+cmake -B"/build/$lib" -H"/libs/$lib" -G "Ninja" \
+-DCMAKE_C_COMPILER=$CC \
+-DCMAKE_CXX_COMPILER=$CXX  
 
 lib=atExplorer
-cmake -B"/build/$lib" \
--H"/libs/$lib" \
--G "Ninja" \
--DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
--DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
+cmake -B"/build/$lib" -H"/libs/$lib" -G "Ninja" \
+-DCMAKE_C_COMPILER=$CC \
+-DCMAKE_CXX_COMPILER=$CXX  
 
-ninja -C /build/$lib install
+#Build binaries
+ninja -C /build/dsl/ThirdParties install
+ninja -C /build/dsl install
+ninja -C /build/atExplorer install
 
 ldconfig 
 echo "Done"

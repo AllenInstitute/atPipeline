@@ -1,3 +1,10 @@
 #! /bin/bash
+if [ "$1" == "" ]; then
+    echo "Supply the tag for the image to build"
+    exit 1
+fi
 
-docker build -t clang_image -f ClangDockerFile.txt .
+imagetag=$1
+
+
+docker build -t atpipeline/clang-image:$imagetag -t clang-image:latest -f ClangDockerFile.txt .

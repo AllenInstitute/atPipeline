@@ -17,14 +17,7 @@ RUN apt-get update && apt-get install -y \
   vim-gnome \
   libboost-all-dev \
   clang
-#   && rm -rf /var/lib/apt/lists/* \
-#   && curl -SL http://releases.llvm.org/7.0.1/clang+llvm-7.0.1-x86_64-linux-gnu-ubuntu-18.04.tar.xz \
-#   | tar -xJC . && \
-#   mv clang+llvm-7.0.1-x86_64-linux-gnu-ubuntu-18.04 clang_7.0.1  
 
-
-# ENV PATH=/clang_7.0.1/bin:$PATH
-# ENV LD_LIBRARY_PATH=/clang_7.0.1/lib:LD_LIBRARY_PATH
-# ENV CC=/clang_7.0.1/bin/clang
-# ENV CXX=/clang_7.0.1/bin/clang++
+ENV CC=/usr/bin/clang
+ENV CXX=/usr/bin/clang++
 

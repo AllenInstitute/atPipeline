@@ -1,8 +1,8 @@
 #! /usr/bin/bash
 
-image_tag="clang_image:latest"
+image_tag="clang-image:latest"
 container_name="clang"
-export DISPLAY=10.128.26.56:0.0
+export DISPLAY=$(HOSTNAME):0.0
 
 echo " ======== Starting Docker container with name: $container_name =============="
 
