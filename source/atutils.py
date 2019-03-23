@@ -110,9 +110,26 @@ def runAtCoreModule(method, logger):
     logger.info("Elapsed time: " + timeDuration + " minutes")
 
 
-def runShellCMD(cmd):
+def getJSON(cmd):
     logger.info("===================== Running: " + cmd.replace('--', '\n--') + "\n---------------------------------------")
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+    proc = None
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
+    result = proc.communicate()[0]
+
+    if proc.returncode:
+        logger.error("PROC_RETURN_CODE:" + str(proc.returncode))
+        raise Exception("Error Running Command: " + cmd)
+
+    return result
+
+def runShellCMD(cmd, logs = True):
+    logger.info("===================== Running: " + cmd.replace('--', '\n--') + "\n---------------------------------------")
+    proc = None
+    if logs:
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+    else:
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
+
     for line in proc.stdout.readlines():
         logger.debug(line.rstrip())
 

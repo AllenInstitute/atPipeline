@@ -22,8 +22,6 @@ class ATSystemConfig:
         self.DATA_INPUT                                    = self.config['DATA_INPUT']
         self.mounts                                        = ast.literal_eval(self.general['DATA_ROOTS'])
 
-        print (self.mounts)
-
     #The arguments passed here are captured from the commandline and will over ride any option
     #present in the system config file
     def createReferences(self, args = None):
@@ -33,10 +31,7 @@ class ATSystemConfig:
         self.atCoreContainer                          = self.general['AT_CORE_DOCKER_CONTAINER']
         self.atCoreThreads                            = int(self.general['AT_CORE_THREADS'])
         self.downSampleScale                          = self.general['DOWN_SAMPLE_SCALE']
-
-        #
         self.dataOutputFolder                         = self.general['PROCESSED_DATA_FOLDER']
-
         self.renderHost                               = self.general['RENDER_HOST']
         self.renderHostPort                           = int(self.general['RENDER_HOST_PORT'])
         self.logLevel                                 = self.general['LOG_LEVEL']
@@ -120,7 +115,7 @@ class ATSystemConfig:
                 self.lastSection                         = int(self.DATA_INPUT['LAST_SECTION'])
 
             self.pipeline                                = args.pipeline
-            self.overwritedata                           = False #args.overwritedata
+            self.overwritedata                           = args.overwritedata
 
     def getStateTableFileName(self, ribbon, session, sectnum):
         return os.path.join(self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
@@ -141,11 +136,9 @@ class ATSystemConfig:
         if len(self.dockerMountName) == 0:
             raise Exception("The data path: " + localPath + " is not valid")
 
-
     def toDockerMountedPath(self, aPath):
         #Find out index of path in DATA_ROOTS
-        index = 0 #self.mounts.index(paras.dataRootFolder) + 1
-
+        index = 0
         theMount = self.mounts[index][0]
 
         #Remove root part from aPath
@@ -155,6 +148,8 @@ class ATSystemConfig:
             raise ValueError("Bad path in " + __file__)
 
         aPath = posixpath.normpath(aPath.replace('\\', '/'))
+
+        #prepare for join
         if aPath[0] == '/':
             aPath = aPath[1:]
 

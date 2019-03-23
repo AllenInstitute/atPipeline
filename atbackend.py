@@ -72,7 +72,6 @@ def main():
         elif args.restartall:
             dManager.reStartAll()
 
-
     except ValueError as e:
         logger.error("ValueError: " + str(e))
 

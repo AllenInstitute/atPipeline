@@ -20,15 +20,16 @@ def scriptArguments():
     required = parser.add_argument_group('required arguments')
     optional = parser.add_argument_group('optional arguments')
 
-    required.add_argument('--project',              help='Full path to data folder for project data to process',                nargs='?',  type=str, required=True)
-    required.add_argument('--pipeline',             help='Specify the pipeline to use, e.g. stitch, finealign or register',     nargs='?',  const='stitch',    type=str)
+    required.add_argument('--datainput',            help='Full path to data folder for project data to process',                type=str,   nargs='?',                          required=True)
+    required.add_argument('--pipeline',             help='Specify the pipeline to use, e.g. stitch, finealign or register. \
+                                                                                                     Default = \'stitch\'',     type=str,   nargs='?',      const='stitch'    )
 
-    optional.add_argument('--sessions',             help='Specify sessions to process',                             type=str)
-    optional.add_argument('--ribbons',              help='Specify ribbons  to process',                             type=str)
-    optional.add_argument('--firstsection',         help='Specify start section',                                   type=int)
-    optional.add_argument('--lastsection',          help='Specify end section',                                     type=int)
-    optional.add_argument('--renderprojectowner',   help='Specify  RP owner',                                       type=str)
-#    optional.add_argument('--overwritedata',            help='Overwrites any already processed data',               type=bool, nargs='?', const=False, required = True)
+    optional.add_argument('--sessions',             help='Specify sessions to process',                                         type=str)
+    optional.add_argument('--ribbons',              help='Specify ribbons  to process',                                         type=str)
+    optional.add_argument('--firstsection',         help='Specify start section',                                               type=int)
+    optional.add_argument('--lastsection',          help='Specify end section',                                                 type=int)
+    optional.add_argument('--renderprojectowner',   help='Specify  RP owner',                                                   type=str)
+    optional.add_argument('--overwritedata',        help='Overwrite any already processed data',                                type=bool,  nargs='?', const=False,             required = False)
 
     return parser.parse_args(), parser
 
@@ -41,13 +42,14 @@ def main():
         args,parser = scriptArguments()
 
         #What project to process?
-        if args.project:
-            system_parameters.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = args.project
+        if args.datainput:
+            system_parameters.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = args.datainput
 
-        if args.project and not args.pipeline:
-            cmd = "docker exec -t clang atcli --json --dataroot " + system_parameters.toDockerMountedPath(args.project)
-            u.runShellCMD(cmd)
-            logger.info("Return information about input data, e.g. number of sessions, sections and ribbons")
+        if args.datainput and not args.pipeline:
+            cmd = "docker exec clang atcli --json --dataroot " + system_parameters.toDockerMountedPath(args.datainput)
+            result = u.getJSON(cmd)
+            print (result)
+
             return
 
         #All parameters are now well defined, copy them (and do some parsing) to a file where output data is written
