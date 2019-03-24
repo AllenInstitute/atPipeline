@@ -11,7 +11,8 @@ FROM ubuntu:18.04
 
 # Updating Ubuntu packages
 RUN apt-get update && apt-get -y upgrade && \
-  apt-get -y install --no-install-recommends wget curl git openjdk-8-jdk ca-certificates-java gcc build-essential libgeos-dev imagemagick xvfb vim maven
+  apt-get -y install --no-install-recommends wget curl git openjdk-8-jdk ca-certificates-java gcc build-essential vim maven && \
+  apt-get -y install --no-install-recommends cmake ninja-build libboost-all-dev clang
 
 # Install conda
 # Based on https://github.com/ContinuumIO/docker-images/blob/master/miniconda/Dockerfile
