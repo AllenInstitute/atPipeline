@@ -12,30 +12,32 @@ import source.atutils as u
 import ast
 import at_system_config
 
-def scriptArguments():
+def scriptArguments(caller = None):
     #Get processing parameters
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog = caller)
     parser.add_argument('--startall',            help='Start the whole AT backend',          action='store_true')
     parser.add_argument('--startbackend',        help='Start the whole backend',             action='store_true')
     parser.add_argument('--startrenderbackend',  help='Start the Render backend',            action='store_true')
     parser.add_argument('--killall',             help='Stop the AT backend',                 action='store_true')
+    parser.add_argument('--prune_all',           help='Prune the AT backend',                action='store_true')
+    parser.add_argument('--prune_containers',    help='Prune the AT backend',                action='store_true')
+    parser.add_argument('--prune_images',        help='Prune the AT backend',                action='store_true')
     parser.add_argument('-ra', '--restartall',   help="Restart all AT backend container",    action='store_true' )
 
     parser.add_argument('-s', '--start',         help="Start a specific backend container, e.g. atcore",     nargs='?',const='atcore', type=str)
     parser.add_argument('-k', '--kill',          help='Stop a specific backend cointainer',                  nargs='?',const='atcore', type=str)
     parser.add_argument('-r', '--restart',       help="Restart a specific backend container, e.g. atcore",   nargs='?',const='atcore', type=str)
-
-    return parser.parse_args()
+    return parser
 
 def main():
 
     try:
-        parameters = at_system_config.ATSystemConfig(os.path.join("config", "SystemConfig.ini"))
-        parameters.createReferences()
         logger.info("============ Managing the atBackend =============")
-        args = scriptArguments()
+        parser = scriptArguments("backend_management")
+        args = parser.parse_args()
 
-        atCoreCtrName="atcore"
+        parameters = at_system_config.ATSystemConfig(os.path.join("config", "SystemConfig.ini"))
+        parameters.createReferences(parser)
 
         cwd = pathlib.Path().absolute().resolve()
 
@@ -72,12 +74,20 @@ def main():
         elif args.restartall:
             dManager.reStartAll()
 
+        elif args.prune_images:
+            dManager.prune_images()
+
+        elif args.prune_containers:
+            dManager.prune_containers()
+
+        elif args.prune_all:
+            dManager.prune_all()
+
     except ValueError as e:
         logger.error("ValueError: " + str(e))
 
     except Exception as e:
         logger.error("Exception: " + str(e))
-
 
 if __name__ == '__main__':
     main()

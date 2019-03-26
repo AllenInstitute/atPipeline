@@ -7,7 +7,7 @@ FROM atpipeline/clang-base-image:0.2
 #    && git -C /libs/dsl pull \
 #    && git -C libs/dsl submodule init \
 #    && git -C libs/dsl submodule update
-##
+
 ###Fetch dsl and atExplorer repositories (need to be made public)
 ##RUN mkdir /libs/atExplorer \
 ##    && git clone https://github.com/AllenInstitute/ATExplorer.git /libs/atExplorer \
@@ -15,13 +15,12 @@ FROM atpipeline/clang-base-image:0.2
 ##    && git -C /libs/atExplorer pull
 
 #For development, mount the /libs and /build folders to see whats going on
-# RUN mkdir /libs
-# COPY ./third-party-libs /libs
-#   
-# #Build libs and apps using cmake
-# RUN mkdir /build 
-# COPY build-thirdparty-libs.bash /build
-# WORKDIR /build
-# 
-# RUN bash build-thirdparty-libs.bash
-# 
+RUN mkdir /libs
+COPY ./third-party-libs /libs
+   
+#Build libs and apps
+RUN mkdir /build 
+COPY build-thirdparty-libs.bash /build
+WORKDIR /build
+RUN bash build-thirdparty-libs.bash
+ 

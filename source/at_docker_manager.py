@@ -14,6 +14,18 @@ class DockerManager:
         self.atCoreMounts = {}
         self.composeFile = ""
 
+    def prune_containers(self):
+        val = self.dClient.containers.prune()
+        logger.info(val)
+
+    def prune_images(self):
+        val = self.dClient.images.prune()
+        logger.info(val)
+
+    def prune_all(self):
+        self.prune_containers()
+        self.prune_images()
+
     def setComposeFile(self, fName):
         #Check that file exists, otherwise raise an error
         if os.path.isfile(fName) == False:

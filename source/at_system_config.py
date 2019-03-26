@@ -24,10 +24,8 @@ class ATSystemConfig:
 
     #The arguments passed here are captured from the commandline and will over ride any option
     #present in the system config file
-    def createReferences(self, args = None, dataInfo = None):
+    def createReferences(self, parser = None, dataInfo = None):
 
-        self.mountRenderPythonApps                    = u.toBool(self.general['MOUNT_RENDER_PYTHON_APPS'])
-        self.mountRenderModules                       = u.toBool(self.general['MOUNT_RENDER_MODULES'])
         self.atCoreContainer                          = self.general['AT_CORE_DOCKER_CONTAINER']
         self.atCoreThreads                            = int(self.general['AT_CORE_THREADS'])
         self.downSampleScale                          = self.general['DOWN_SAMPLE_SCALE']
@@ -86,7 +84,18 @@ class ATSystemConfig:
         self.zNeighborDistance                        = int(self.tp_client['Z_NEIGHBOR_DISTANCE'])
         self.xyNeighborFactor                         = float(self.tp_client['XY_NEIGHBOR_FACTOR'])
 
-        ##Data input
+        args = parser.parse_args()
+
+        if parser.prog == "data_processing":
+            self.createReferencesForPipeline(args, dataInfo)
+        else:
+            self.createReferencesForBackend(args)
+
+    def createReferencesForBackend(self, args = None):
+        self.mountRenderPythonApps                    = u.toBool(self.general['MOUNT_RENDER_PYTHON_APPS'])
+        self.mountRenderModules                       = u.toBool(self.general['MOUNT_RENDER_MODULES'])
+
+    def createReferencesForPipeline(self, args = None, dataInfo = None):
         self.dataRootFolder                           = self.DATA_INPUT['DATA_ROOT_FOLDER']
         self.projectDataFolder                        = self.DATA_INPUT['PROJECT_DATA_FOLDER']
 
@@ -140,6 +149,7 @@ class ATSystemConfig:
         #When used for input data
         #Create a "renderProject" to make things easier
         self.renderProject = rp.RenderProject(self.renderProjectOwner, self.projectName, self.renderHost, self.renderHostPort, self.clientScripts, self.memGB, self.logLevel)
+
 
     def getStateTableFileName(self, ribbon, session, sectnum):
         return os.path.join(self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))

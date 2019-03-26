@@ -6,5 +6,4 @@ fi
 
 imagetag=$1
 
-
-docker build -t atpipeline/clang-image:$imagetag -t clang-image:latest -f ClangDockerFile.txt .
+docker build --no-cache -t atpipeline/clang:$imagetag -t atpipeline/clang:latest -f ClangDockerFile.txt .
