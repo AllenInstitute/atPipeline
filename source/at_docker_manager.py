@@ -26,6 +26,11 @@ class DockerManager:
         self.prune_containers()
         self.prune_images()
 
+    def status(self):
+        containers = self.dClient.containers.list(all=True)
+        for ctr in containers:
+            logger.info("Container: " + ctr.name + " : " + ctr.status)
+
     def setComposeFile(self, fName):
         #Check that file exists, otherwise raise an error
         if os.path.isfile(fName) == False:

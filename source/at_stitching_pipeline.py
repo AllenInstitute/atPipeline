@@ -1,33 +1,13 @@
-#The ATPipeline class
-import atutils as u
-import logging
 import os
-import at_system_config as c
-import docker
-import subprocess
+import logging
 import json
+import at_pipeline
+import at_pipeline_process
+import at_utils as u
 
 logger = logging.getLogger('atPipeline')
 
-class ATPipeline:
-    def __init__(self, parameters : c.ATSystemConfig):
-        self.parameters = parameters
-
-        dockerClient = docker.from_env()
-        atcore = dockerClient.containers.get("atcore")
-        render = dockerClient.containers.get("tk_render")
-
-        if render.status != "running":
-            raise ValueError("The Render docker container is not running!")
-
-        if atcore.status != "running":
-            raise ValueError("The atcore docker container is not running!")
-
-    def run(self):
-        logger.info("ATPipeline run")
-        pass
-
-class Stitch(ATPipeline):
+class Stitch(at_pipeline.ATPipeline):
     def __init__(self, _paras):
         super().__init__(_paras)
 
@@ -38,7 +18,7 @@ class Stitch(ATPipeline):
         self.createMedianFiles              = CreateMedianFiles(p)
 
     def run(self):
-        ATPipeline.run(self)
+        at_pipeline.ATPipeline.run(self)
         #Check what pipeline to run
         for ribbon in self.parameters.ribbons:
             sessionFolders = []
@@ -53,36 +33,13 @@ class Stitch(ATPipeline):
 
         return True
 
-class PipelineProcess():
-    def __init__(self, _paras, _name):
-        self.paras = _paras
-        self.name = _name
-
-    def run(self, sessionFolder):
-        [self.projectroot, self.ribbon, self.session] = u.parse_session_folder(sessionFolder)
-
-
-    def submit(self, cmd):
-        logger.info("===================== Running command: " + cmd.replace('--', '\n--') + "\n---------------------------------------")
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
-        for line in proc.stdout.readlines():
-            logger.debug(line.rstrip())
-
-        proc.wait()
-        if proc.returncode:
-            logger.error("PROC_RETURN_CODE:" + str(proc.returncode))
-            raise Exception("Error in pipeline step: " + self.name)
-
-    def validate():
-        pass
-
-class CreateStateTables(PipelineProcess):
+class CreateStateTables(at_pipeline_process.PipelineProcess):
 
     def __init__(self, _paras):
         super().__init__(_paras, "CreateStateTables")
 
     def run(self, sessionFolder):
-        PipelineProcess.run(self, sessionFolder)
+        at_pipeline_process.PipelineProcess.run(self, sessionFolder)
         logger.info("=========== Creating state tables for session: " + sessionFolder + " ===============")
 
         for sectnum in range(self.paras.firstSection, self.paras.lastSection + 1):
@@ -107,8 +64,7 @@ class CreateStateTables(PipelineProcess):
     		  #Run ====================
                 self.submit(cmd)
 
-
-class CreateRawDataRenderStacks(PipelineProcess):
+class CreateRawDataRenderStacks(at_pipeline_process.PipelineProcess):
 
     def __init__(self, _paras):
         super().__init__(_paras, "CreateRawDataRenderStacks")
@@ -146,7 +102,7 @@ class CreateRawDataRenderStacks(PipelineProcess):
     	  #Run =============
             u.runPipelineStep(cmd, __file__)
 
-class CreateMedianFiles(PipelineProcess):
+class CreateMedianFiles(at_pipeline_process.PipelineProcess):
 
     def __init__(self, _paras):
         super().__init__(_paras, "CreateMedianFiles")
@@ -182,4 +138,3 @@ class CreateMedianFiles(PipelineProcess):
 
         #Run =============
         u.runPipelineStep(cmd, __file__)
-

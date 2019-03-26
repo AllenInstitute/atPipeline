@@ -1,7 +1,7 @@
 import configparser
 import os
 import ast
-import atutils as u
+import at_utils as u
 import posixpath
 import at_render_project as rp
 
@@ -86,9 +86,9 @@ class ATSystemConfig:
 
         args = parser.parse_args()
 
-        if parser.prog == "data_processing":
+        if parser.prog == "pipeline":
             self.createReferencesForPipeline(args, dataInfo)
-        else:
+        elif parser.prog == "backend_management":
             self.createReferencesForBackend(args)
 
     def createReferencesForBackend(self, args = None):
