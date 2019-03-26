@@ -1,2 +1,24 @@
-The ATPipeline software package make use of the following ThirdParty software libraries:
+The ATExplorer software package make use of the following ThirdParty software libraries:
+
+DSL++ C++ API
+   Copyright 1995-2019 Dune Scientific, LLC
+   DSL is distributed under the Apache 2.0 License
+
+The DSL software package make use of the following ThirdParty software libraries:
+
+POCO
+    Distributed under the Boost License
+    http://pocoproject.org/license.html
+
+SQLite
+    The source code for SQLite is in the public domain. 
+    See http://www.sqlite.org
+
+libcURL
+    libcurl is probably the most portable, most powerful and most often used 
+    C-based multi-platform file transfer library on this planet � be it open source or 
+    commercial. libcurl are true Open Source/Free Software and meet all definitions as 
+    such. It means that you are free to modify and redistribute all contents of the 
+    curl distributed archives. You may also freely use curl and libcurl in your commercial 
+    projects. libcurl are licensed under a MIT/X derivate license.
 

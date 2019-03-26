@@ -5,6 +5,7 @@ import os
 import at_system_config as c
 import docker
 import subprocess
+import json
 
 logger = logging.getLogger('atPipeline')
 
@@ -47,8 +48,8 @@ class Stitch(ATPipeline):
 
             for sessionFolder in sessionFolders:
                 self.createStateTables.run(sessionFolder)
-                #self.createRawDataRenderStacks.run(sessionFolder)
-                #self.createMedianFiles,run(sessionFolder)
+                self.createRawDataRenderStacks.run(sessionFolder)
+                self.createMedianFiles.run(sessionFolder)
 
         return True
 
@@ -96,8 +97,8 @@ class CreateStateTables(PipelineProcess):
             else:
                 cmd = "docker exec " + self.paras.atCoreContainer
                 cmd = cmd + " python /pipeline/make_state_table_ext_multi_pseudoz.py"
-                cmd = cmd + " --projectDirectory %s"        %(c.toDockerMountedPath2(self.projectroot,    self.paras))
-                cmd = cmd + " --outputFile %s"              %(c.toDockerMountedPath2(statetablefile, self.paras))
+                cmd = cmd + " --projectDirectory %s"        %(self.paras.toMount(self.projectroot))
+                cmd = cmd + " --outputFile %s"              %(self.paras.toMount(statetablefile))
                 cmd = cmd + " --ribbon %d"                  %(self.ribbon)
                 cmd = cmd + " --session %d"                 %(self.session)
                 cmd = cmd + " --section %d"                 %(sectnum)
@@ -136,8 +137,8 @@ class CreateRawDataRenderStacks(PipelineProcess):
             cmd = cmd + " --render.port %d"           %rp.hostPort
             cmd = cmd + " --render.memGB %s"          %rp.memGB
             cmd = cmd + " --log_level %s"             %rp.logLevel
-            cmd = cmd + " --statetableFile %s"        %(c.toDockerMountedPath2(statetablefile,  p))
-            cmd = cmd + " --projectDirectory %s"      %(c.toDockerMountedPath2(projectroot,   p))
+            cmd = cmd + " --statetableFile %s"        %(self.paras.toMount(statetablefile))
+            cmd = cmd + " --projectDirectory %s"      %(self.paras.toMount(projectroot))
             cmd = cmd + " --dataOutputFolder %s"      %(p.dataOutputFolder.replace('\\', '/'))
             cmd = cmd + " --outputStackPrefix S%d_"   %(session)
             cmd = cmd + " --reference_channel %s"      %(p.referenceChannelRegistration)
@@ -145,20 +146,14 @@ class CreateRawDataRenderStacks(PipelineProcess):
     	  #Run =============
             u.runPipelineStep(cmd, __file__)
 
-##class CreateR(PipelineProcess):
-##
-##    def __init__(self, _paras):
-##        super().__init__(_paras)
-##
-##    def run(self, sessionFolder):
-
 class CreateMedianFiles(PipelineProcess):
 
     def __init__(self, _paras):
         super().__init__(_paras, "CreateMedianFiles")
 
     def run(self, sessionFolder):
-        logger.info("Processing session folder: " + sessionFolder)
+        p = self.paras
+        logger.info("Creating median files for session folder: " + sessionFolder)
         [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
         #Output directories
@@ -175,15 +170,15 @@ class CreateMedianFiles(PipelineProcess):
 
         rp               = p.renderProject
 
-        with open(p.systemParameters.median_template) as json_data:
+        with open(p.median_template) as json_data:
             med = json.load(json_data)
 
-        u.savemedianjson(med, median_json, rp, acq_stack, median_stack, u.toDockerMountedPath(median_dir, p), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
+        u.savemedianjson(med, median_json, rp, acq_stack, median_stack, self.paras.toMount(median_dir), ribbon*100 + p.firstSection, ribbon*100 + p.lastSection, True)
 
-        cmd = "docker exec " + p.sys.atCoreContainer
+        cmd = "docker exec " + p.atCoreContainer
         cmd = cmd + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
         cmd = cmd + " --render.port 80"
-        cmd = cmd + " --input_json %s"%(u.toDockerMountedPath(median_json,  p))
+        cmd = cmd + " --input_json %s"%(self.paras.toMount(median_json))
 
         #Run =============
         u.runPipelineStep(cmd, __file__)

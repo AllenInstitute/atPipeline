@@ -14,44 +14,14 @@ FROM atpipeline/clang-base-image:0.2
 ##    && git -C /libs/atExplorer checkout develop \
 ##    && git -C /libs/atExplorer pull
 
-RUN mkdir /libs
-COPY ./third-party-libs /libs
-  
-#Build libs and apps using cmake
-RUN mkdir /build 
-COPY build-thirdparty-libs.bash /build
-WORKDIR /build
-
-RUN bash build-thirdparty-libs.bash
-
-# # ---- Build libraries, dsl-thirdparties, dsl and atExplorer
-# # ---- DSL Thirdparties ----------------------
-# RUN mkdir /builds/dsl-tp && \
-# cmake -B"/builds/dsl-tp" -H"/libs/dsl/ThirdParties" \
-# -G "Ninja" \
-# -DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
-# -DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
+#For development, mount the /libs and /build folders to see whats going on
+# RUN mkdir /libs
+# COPY ./third-party-libs /libs
+#   
+# #Build libs and apps using cmake
+# RUN mkdir /build 
+# COPY build-thirdparty-libs.bash /build
+# WORKDIR /build
 # 
-# #---- DSL --------------------------------
-# RUN mkdir /builds/dsl && \
-# cmake -B"/builds/dsl" -H"/libs/dsl" \
-# -G "Ninja" \
-# -DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
-# -DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
+# RUN bash build-thirdparty-libs.bash
 # 
-# ##---- ATEXPLORER --------------------------------
-# RUN mkdir /builds/atExplorer && \
-# cmake -B"/builds/atExplorer" -H"/libs/atExplorer" \
-# -G "Ninja" \
-# -DCMAKE_C_COMPILER="/clang_7.0.1/bin/clang" \
-# -DCMAKE_CXX_COMPILER="/clang_7.0.1/bin/clang++"   
-# 
-# #Build & install
-# RUN ninja -C /builds/dsl-tp install
-# RUN ninja -C /builds/dsl install
-# RUN ninja -C /builds/atExplorer install
-# 
-# RUN ldconfig
- 
-#---- Start from a Bash prompt
-#CMD [ "/bin/bash" ]
