@@ -39,21 +39,23 @@ class DockerManager:
         self.composeFile = fName
 
     def setupMounts(self, mounts, mountRenderPythonApps = False, mountRenderModules = False):
-        cwd = pathlib.Path().absolute().resolve()
+        logger.info("Setting up cointainer mounts")
+
+        #cwd = pathlib.Path().absolute().resolve()
         mountCount = 1
         for mount in mounts:
             mountValue  = {'bind' : mount[1] , 'mode' : 'rw'}
             self.atCoreMounts[mount[0]] = mountValue
             mountCount = mountCount + 1
 
-        if mountRenderPythonApps == True:
-            self.atCoreMounts[os.path.join(cwd, 'docker', 'render-python-apps')] = {'bind': '/shared/render-python-apps'}
+        #if mountRenderPythonApps == True:
+        #    self.atCoreMounts[os.path.join(cwd, 'docker', 'render-python-apps')] = {'bind': '/shared/render-python-apps'}
 
-        if mountRenderModules == True:
-            self.atCoreMounts[os.path.join(cwd, 'docker', 'render-modules')] = {'bind': '/shared/render-modules'}
+        #if mountRenderModules == True:
+        #    self.atCoreMounts[os.path.join(cwd, 'docker', 'render-modules')] = {'bind': '/shared/render-modules'}
 
         #Mount pipeline
-        self.atCoreMounts[os.path.join(cwd, 'pipeline')] = {'bind' : '/pipeline', 'mode' : 'ro'}
+        self.atCoreMounts['/local2/atpipeline/pipeline'] = {'bind' : '/pipeline', 'mode' : 'ro'}
 
     def reStartContainer(self, ctrName):
         logger.info("Restarting the container: " + ctrName)
@@ -138,18 +140,24 @@ class DockerManager:
 
     def startRenderBackend(self):
 
-        cmd = "docker-compose --no-ansi -f " + str(self.composeFile)
-        cmd = cmd + " up -d"
+        cmd = "docker-compose -p default -f " + str(self.composeFile)
+        cmd = cmd + " up -d " 
         logger.info("Running: " + cmd)
+        logger.info("Using compose file: " + self.composeFile)
 
         #Output here looks ugly !!
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='ascii')
+        if os.name =='posix':
+            useShell = True
+        else:
+            useShell = False
+	
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=useShell, stderr=subprocess.STDOUT, encoding='ascii')
         for line in proc.stdout.readlines():
             logger.info(line.rstrip())
 
         print ("\n ---- running containers follows -----\n")
         cmd = "docker ps"
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=useShell, stderr=subprocess.STDOUT, encoding='utf-8')
         for line in p.stdout.readlines():
             print (line.rstrip())
 

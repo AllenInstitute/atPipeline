@@ -15,7 +15,7 @@ class ATPipeline:
 
         dockerClient = docker.from_env()
         atcore = dockerClient.containers.get("atcore")
-        render = dockerClient.containers.get("tk_render")
+        render = dockerClient.containers.get("default_render_1")
 
         if render.status != "running":
             raise ValueError("The Render docker container is not running!")

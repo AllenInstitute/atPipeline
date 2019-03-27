@@ -172,6 +172,8 @@ class ATSystemConfig:
             raise Exception("The data path: " + localPath + " is not valid")
 
     def toMount(self, aPath):
+        if os.name == 'posix':
+            return aPath #If on linux, the moounts looks the same inside and outside the container!
         #Find out index of path in DATA_ROOTS
         index = 0
         theMount = self.mounts[index][0]
@@ -180,7 +182,7 @@ class ATSystemConfig:
         if aPath.startswith(theMount):
             aPath = aPath[len(theMount):]
         else:
-            raise ValueError("Bad path in " + __file__)
+            raise ValueError("The Path: " + aPath + " is not valid using the mount: " + theMOunt)
 
         aPath = posixpath.normpath(aPath.replace('\\', '/'))
 

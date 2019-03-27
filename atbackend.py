@@ -6,10 +6,10 @@ import timeit
 import pathlib
 import docker
 import argparse
+import ast
 import at_docker_manager
 from source import *
-import source.atutils as u
-import ast
+import source.at_utils as u
 import at_system_config
 
 def scriptArguments(caller = None):
@@ -22,27 +22,27 @@ def scriptArguments(caller = None):
     parser.add_argument('--prune_all',           help='Prune the AT backend',                action='store_true')
     parser.add_argument('--prune_containers',    help='Prune the AT backend',                action='store_true')
     parser.add_argument('--prune_images',        help='Prune the AT backend',                action='store_true')
-    parser.add_argument('--restartall',          help="Restart all AT backend container",    action='store_true' )
-    parser.add_argument('--status',              help="Get backend status",                  action='store_true' )
+    parser.add_argument('--restartall',          help='Restart all AT backend container',    action='store_true' )
+    parser.add_argument('--status',              help='Get backend status',                  action='store_true' )
 
-    parser.add_argument('-s', '--start',         help="Start a specific backend container, e.g. atcore",     nargs='?',const='atcore', type=str)
+    parser.add_argument('-s', '--start',         help='Start a specific backend container, e.g. atcore',     nargs='?',const='atcore', type=str)
     parser.add_argument('-k', '--kill',          help='Stop a specific backend cointainer',                  nargs='?',const='atcore', type=str)
-    parser.add_argument('-r', '--restart',       help="Restart a specific backend container, e.g. atcore",   nargs='?',const='atcore', type=str)
+    parser.add_argument('-r', '--restart',       help='Restart a specific backend container, e.g. atcore',   nargs='?',const='atcore', type=str)
     return parser
 
 def main():
 
     try:
-        logger.info("============ Managing the atBackend =============")
-        parser = scriptArguments("backend_management")
+        logger.info('============ Managing the atBackend =============')
+        parser = scriptArguments('backend_management')
         args = parser.parse_args()
 
-        parameters = at_system_config.ATSystemConfig(os.path.join("config", "SystemConfig.ini"))
+        parameters = at_system_config.ATSystemConfig('/usr/local/etc/at-system-config.ini')
         parameters.createReferences(parser)
 
         dManager = at_docker_manager.DockerManager()
         dManager.setupMounts(parameters.mounts, parameters.mountRenderPythonApps, parameters.mountRenderModules)
-        dManager.setComposeFile(os.path.join("config", "docker-compose.yml"))
+        dManager.setComposeFile('/usr/local/etc/at-docker-compose.yml')
 
         if args.restart:
             dManager.reStartContainer(args.restart)
@@ -60,15 +60,15 @@ def main():
         elif args.startall:
             #start the render backend first
             if dManager.startRenderBackend() == False:
-                raise Exception("Failed starting the RenderBackend")
+                raise Exception('Failed starting the RenderBackend')
 
             #Start the atcore container
-            dManager.startContainer("atcore")
+            dManager.startContainer('atcore')
 
         elif args.startrenderbackend:
             #start the render backend first
             if dManager.startRenderBackend() == False:
-                raise Exception("Failed starting the RenderBackend")
+                raise Exception('Failed starting the RenderBackend')
 
         elif args.restartall:
             dManager.reStartAll()
@@ -86,10 +86,10 @@ def main():
             dManager.status()
 
     except ValueError as e:
-        logger.error("ValueError: " + str(e))
+        logger.error('ValueError: ' + str(e))
 
     except Exception as e:
-        logger.error("Exception: " + str(e))
+        logger.error('Exception: ' + str(e))
 
 if __name__ == '__main__':
     main()

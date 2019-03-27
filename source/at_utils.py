@@ -112,7 +112,7 @@ def runAtCoreModule(method, logger):
 def getJSON(cmd):
     logger.info("===================== Running: " + cmd.replace('--', '\n--') + "\n---------------------------------------")
     proc = None
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, encoding='utf-8')
     result = proc.communicate()[0]
 
     if proc.returncode:
@@ -125,9 +125,9 @@ def runShellCMD(cmd, logs = True):
     logger.debug("===================== Running: " + cmd.replace('--', '\n--') + "\n---------------------------------------")
     #proc = None
     if logs:
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, stderr=subprocess.STDOUT, encoding='utf-8')
     else:
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, encoding='utf-8')
 
     lines = []
     for line in proc.stdout.readlines():
@@ -142,7 +142,7 @@ def runShellCMD(cmd, logs = True):
 
 def runPipelineStep(cmd, stepName):
     logger.info("===================== Running Pipeline Step: " + stepName + cmd.replace('--', '\n--') + "\n---------------------------------------")
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, stderr=subprocess.STDOUT, encoding='utf-8')
     for line in proc.stdout.readlines():
         logger.debug(line.rstrip())
 
