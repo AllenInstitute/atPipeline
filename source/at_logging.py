@@ -2,13 +2,12 @@ import logging
 import os
 
 def setup_custom_logger(name):
-    logFormatter = logging.Formatter('%(asctime)s - %(levelname)s - %(module)s :: %(message)s', "%H:%M:%S")
-    rootLogger = logging.getLogger(name)
-    consoleHandler = logging.StreamHandler()
+    logFormatter    = logging.Formatter('%(asctime)s - %(levelname)s - %(module)s :: %(message)s', "%H:%M:%S")
+    rootLogger      = logging.getLogger(name)
+    consoleHandler  = logging.StreamHandler()
     consoleHandler.setFormatter(logFormatter)
     rootLogger.addHandler(consoleHandler)
-
-    rootLogger.setLevel(logging.DEBUG)
+    rootLogger.setLevel(logging.INFO)
     return rootLogger
 
 def addLoggingToFile(loggerName, logPath, logFileName):
