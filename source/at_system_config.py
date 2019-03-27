@@ -135,7 +135,7 @@ class ATSystemConfig:
         #Populate ini file sections so values passed on the command line are written
         #to the ini file in the data output folder
         self.DATA_INPUT['first_section']             = str(self.firstSection)
-        self.DATA_INPUT['last_section']              = str(self.firstSection)
+        self.DATA_INPUT['last_section']              = str(self.lastSection)
         self.DATA_INPUT['ribbons']                   = str(self.ribbons)
         self.DATA_INPUT['sessions']                  = str(self.sessions)
         self.DATA_INPUT['pipeline']                  = self.pipeline
