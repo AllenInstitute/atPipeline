@@ -1,5 +1,6 @@
 import at_utils as u
 import logging
+import subprocess
 
 logger = logging.getLogger('atPipeline')
 
@@ -11,9 +12,8 @@ class PipelineProcess():
     def run(self, sessionFolder):
         [self.projectroot, self.ribbon, self.session] = u.parse_session_folder(sessionFolder)
 
-
     def submit(self, cmd):
-        logger.info("===================== Running command: " + cmd.replace('--', '\n--') + "\n---------------------------------------")
+        logger.info("\n===================== Running Pipeline Process: " + self.name + ". \n\nCMD: " + cmd.replace('--', '\n--') + "\n---------------------------------------")
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
         for line in proc.stdout.readlines():
             logger.debug(line.rstrip())
@@ -25,4 +25,3 @@ class PipelineProcess():
 
     def validate():
         pass
-

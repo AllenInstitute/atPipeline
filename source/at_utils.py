@@ -141,7 +141,7 @@ def runShellCMD(cmd, logs = True):
     return lines
 
 def runPipelineStep(cmd, stepName):
-    logger.info("===================== Running: " + cmd.replace('--', '\n--') + "\n---------------------------------------")
+    logger.info("===================== Running Pipeline Step: " + stepName + cmd.replace('--', '\n--') + "\n---------------------------------------")
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
     for line in proc.stdout.readlines():
         logger.debug(line.rstrip())

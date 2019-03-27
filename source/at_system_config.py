@@ -102,7 +102,8 @@ class ATSystemConfig:
         #Process parameters
         self.projectName                              = os.path.basename(self.projectDataFolder)
         self.DATA_INPUT['PROJECT_NAME']               = self.projectName
-        self.dataOutputFolder                         = os.path.join(self.projectDataFolder, self.dataOutputFolder, self.projectName)
+        self.dataOutputFolder                         = os.path.join(self.dataOutputFolder, self.projectName)
+        self.absoluteDataOutputFolder                 = os.path.join(self.projectDataFolder, self.dataOutputFolder)
 
         self.ribbons                                  = "" #ast.literal_eval(self.DATA_INPUT['RIBBONS'])
         self.sessions                                 = "" #ast.literal_eval(self.DATA_INPUT['SESSIONS'])
@@ -152,7 +153,7 @@ class ATSystemConfig:
 
 
     def getStateTableFileName(self, ribbon, session, sectnum):
-        return os.path.join(self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
+        return os.path.join(self.absoluteDataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
 
     def write(self, fName):
         with open(fName, 'w') as configfile:

@@ -22,7 +22,8 @@ def scriptArguments(caller = None):
     parser.add_argument('--prune_all',           help='Prune the AT backend',                action='store_true')
     parser.add_argument('--prune_containers',    help='Prune the AT backend',                action='store_true')
     parser.add_argument('--prune_images',        help='Prune the AT backend',                action='store_true')
-    parser.add_argument('-ra', '--restartall',   help="Restart all AT backend container",    action='store_true' )
+    parser.add_argument('--restartall',          help="Restart all AT backend container",    action='store_true' )
+    parser.add_argument('--status',              help="Get backend status",                  action='store_true' )
 
     parser.add_argument('-s', '--start',         help="Start a specific backend container, e.g. atcore",     nargs='?',const='atcore', type=str)
     parser.add_argument('-k', '--kill',          help='Stop a specific backend cointainer',                  nargs='?',const='atcore', type=str)
@@ -39,11 +40,9 @@ def main():
         parameters = at_system_config.ATSystemConfig(os.path.join("config", "SystemConfig.ini"))
         parameters.createReferences(parser)
 
-        cwd = pathlib.Path().absolute().resolve()
-
         dManager = at_docker_manager.DockerManager()
         dManager.setupMounts(parameters.mounts, parameters.mountRenderPythonApps, parameters.mountRenderModules)
-        dManager.setComposeFile(os.path.join(cwd, "config", "docker-compose.yml"))
+        dManager.setComposeFile(os.path.join("config", "docker-compose.yml"))
 
         if args.restart:
             dManager.reStartContainer(args.restart)
@@ -82,6 +81,9 @@ def main():
 
         elif args.prune_all:
             dManager.prune_all()
+
+        elif args.status:
+            dManager.status()
 
     except ValueError as e:
         logger.error("ValueError: " + str(e))
