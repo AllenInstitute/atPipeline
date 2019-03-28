@@ -3,16 +3,35 @@ import logging
 import os
 import subprocess
 import pathlib
-
+import at_system_config
+import argparse
 logger = logging.getLogger('atPipeline')
 #A simple docker manager, wrapping some of the DockerSDK
 
 class DockerManager:
-    def __init__(self):
-        self.dClient = docker.from_env()
+    def __init__(self,):
+
         logger = logging.getLogger('atPipeline')
+        self.argparser = argparse.ArgumentParser('backend_management')
+        self.dClient = docker.from_env()
+
         self.atCoreMounts = {}
         self.composeFile = ""
+
+        if os.name == 'posix':
+            self.configFolder = '/usr/local/etc/'
+        elif os.name == 'nt':
+            #Read from environment
+            self.configFolder = os.environ['AT_SYSTEM_CONFIG_FOLDER']
+
+        self.paras = at_system_config.ATSystemConfig(os.path.join(self.configFolder, 'at_system_config.ini'))
+        self.setComposeFile(os.path.join(self.configFolder, 'at-docker-compose.yml'))
+        self.setupMounts()
+
+    def parseCommandLineArguments(self):
+        args = self.argparser.parse_args()
+        self.paras.createReferences(args, self.argparser.prog)
+        return args
 
     def prune_containers(self):
         val = self.dClient.containers.prune()
@@ -38,12 +57,11 @@ class DockerManager:
 
         self.composeFile = fName
 
-    def setupMounts(self, mounts, mountRenderPythonApps = False, mountRenderModules = False):
+    def setupMounts(self, mountRenderPythonApps = False, mountRenderModules = False):
         logger.info("Setting up cointainer mounts")
 
-        #cwd = pathlib.Path().absolute().resolve()
         mountCount = 1
-        for mount in mounts:
+        for mount in self.paras.mounts:
             mountValue  = {'bind' : mount[1] , 'mode' : 'rw'}
             self.atCoreMounts[mount[0]] = mountValue
             mountCount = mountCount + 1
@@ -55,7 +73,7 @@ class DockerManager:
         #    self.atCoreMounts[os.path.join(cwd, 'docker', 'render-modules')] = {'bind': '/shared/render-modules'}
 
         #Mount pipeline
-        self.atCoreMounts['/local2/atpipeline/pipeline'] = {'bind' : '/pipeline', 'mode' : 'ro'}
+        #self.atCoreMounts['/local2/atpipeline/pipeline'] = {'bind' : '/pipeline', 'mode' : 'ro'}
 
     def reStartContainer(self, ctrName):
         logger.info("Restarting the container: " + ctrName)
@@ -141,7 +159,7 @@ class DockerManager:
     def startRenderBackend(self):
 
         cmd = "docker-compose -p default -f " + str(self.composeFile)
-        cmd = cmd + " up -d " 
+        cmd = cmd + " up -d "
         logger.info("Running: " + cmd)
         logger.info("Using compose file: " + self.composeFile)
 
@@ -150,7 +168,7 @@ class DockerManager:
             useShell = True
         else:
             useShell = False
-	
+
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=useShell, stderr=subprocess.STDOUT, encoding='ascii')
         for line in proc.stdout.readlines():
             logger.info(line.rstrip())

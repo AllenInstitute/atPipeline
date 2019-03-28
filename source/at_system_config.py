@@ -24,7 +24,7 @@ class ATSystemConfig:
 
     #The arguments passed here are captured from the commandline and will over ride any option
     #present in the system config file
-    def createReferences(self, parser = None, dataInfo = None):
+    def createReferences(self, args = None, caller = None, dataInfo = None):
 
         self.atCoreContainer                          = self.general['AT_CORE_DOCKER_CONTAINER']
         self.atCoreThreads                            = int(self.general['AT_CORE_THREADS'])
@@ -84,11 +84,9 @@ class ATSystemConfig:
         self.zNeighborDistance                        = int(self.tp_client['Z_NEIGHBOR_DISTANCE'])
         self.xyNeighborFactor                         = float(self.tp_client['XY_NEIGHBOR_FACTOR'])
 
-        args = parser.parse_args()
-
-        if parser.prog == "pipeline":
+        if caller == "pipeline":
             self.createReferencesForPipeline(args, dataInfo)
-        elif parser.prog == "backend_management":
+        elif caller == "backend_management":
             self.createReferencesForBackend(args)
 
     def createReferencesForBackend(self, args = None):
