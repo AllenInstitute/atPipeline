@@ -6,8 +6,8 @@ import pathlib
 import at_system_config
 import argparse
 logger = logging.getLogger('atPipeline')
-#A simple docker manager, wrapping some of the DockerSDK
 
+#A simple docker manager, wrapping some of the DockerSDK
 class DockerManager:
     def __init__(self,):
 
@@ -95,7 +95,7 @@ class DockerManager:
         if ctrName == "atcore":
             #This will do nothing, forever
             cmd = "tail -f /dev/null"
-            ctr = self.dClient.containers.run('atpipeline/atcore:dev', volumes=self.atCoreMounts, command=cmd, cap_add=["SYS_ADMIN"], privileged=True, name=ctrName, detach=True)
+            ctr = self.dClient.containers.run('atpipeline/atcore:dev-190320', volumes=self.atCoreMounts, command=cmd, cap_add=["SYS_ADMIN"], privileged=True, name=ctrName, detach=True)
 
             if ctr == None:
                return False

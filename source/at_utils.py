@@ -124,10 +124,11 @@ def getJSON(cmd):
 def runShellCMD(cmd, logs = True):
     logger.debug("===================== Running: " + cmd.replace('--', '\n--') + "\n---------------------------------------")
     #proc = None
+    useShell = True
     if logs:
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, stderr=subprocess.STDOUT, encoding='utf-8')
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=useShell, stderr=subprocess.STDOUT, encoding='utf-8')
     else:
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, encoding='utf-8')
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=useShell, encoding='utf-8')
 
     lines = []
     for line in proc.stdout.readlines():

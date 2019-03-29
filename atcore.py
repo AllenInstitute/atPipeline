@@ -1,18 +1,20 @@
-import at_logging
-import logging
-logger = at_logging.setup_custom_logger('atPipeline')
+import json
+import traceback
 import os
 import pathlib
 import docker
 import argparse
+import logging
+import at_logging
+
+logger = at_logging.setup_custom_logger('atPipeline')
 import at_docker_manager
 from source import *
 import source.at_utils as u
 import at_system_config
 import at_pipeline
 import at_stitching_pipeline
-import json
-import traceback
+
 
 def scriptArguments(caller = None):
     #Get processing parameters
@@ -28,7 +30,6 @@ def scriptArguments(caller = None):
                                                                                                      Default = \'stitch\'',     type=str,   nargs='?',      const='stitch'    )
 
     #Optional arguments
-    optional.add_argument('--datainfo',             help='Print information about data in the folder supplied by --datainput',  action = 'store_true')
     optional.add_argument('--renderprojectowner',   help='Specify a RenderProject owner',                                       type=str,   nargs='?')
     optional.add_argument('--sessions',             help='Specify sessions to process',                                         type=str)
     optional.add_argument('--ribbons',              help='Specify ribbons  to process',                                         type=str)
@@ -40,7 +41,13 @@ def scriptArguments(caller = None):
 def main():
 
     try:
-        system_parameters = at_system_config.ATSystemConfig('/usr/local/etc/at-system-config.ini')
+        if os.name == 'posix':
+            configFolder = '/usr/local/etc/'
+        elif os.name == 'nt':
+            #Read from environment
+            configFolder = os.environ['AT_SYSTEM_CONFIG_FOLDER']
+
+        system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, 'at_system_config.ini'))
 
         parser = scriptArguments('pipeline')
         args = parser.parse_args()
@@ -49,17 +56,16 @@ def main():
         if args.dataroot:
             system_parameters.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = args.dataroot
 
-        if args.dataroot and args.datainfo:
+        if args.dataroot and not args.pipeline:
             lvl = logger.getEffectiveLevel()
             lvlName = logging.getLevelName(lvl)
             cmd = 'docker exec clang atcore --dataroot ' + system_parameters.toMount(args.dataroot) + ' --datainfo --loglevel ' + lvlName
-            lines = u.runShellCMD(cmd, False)
+            lines = u.runShellCMD(cmd, True)
             for line in lines:
                 print (line.rstrip())
-            return
 
-        if args.dataroot and not args.pipeline:
-            print ('Supply a valid pipeline name to --pipeline. Valid pipelines are stitch, align and register')
+
+            print ('To process this data, supply a valid pipeline name to --pipeline. Valid pipelines are stitch, align and register')
             return
 
         #Query atcore for any data processing information we may need to setup, such as Ribbon, session and section information
@@ -68,7 +74,7 @@ def main():
 
         #All parameters are now well defined, copy them (and do some parsing) to a file where output data is written
         #The create references functions appends and overrides various arguments
-        system_parameters.createReferences(parser, dataInfo)
+        system_parameters.createReferences(args, parser.prog, dataInfo)
 
         #Create data outputfolder and write processing parametrs to output folder
         if os.path.isdir(system_parameters.absoluteDataOutputFolder) == False:

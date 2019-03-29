@@ -172,15 +172,21 @@ class ATSystemConfig:
     def toMount(self, aPath):
         if os.name == 'posix':
             return aPath #If on linux, the moounts looks the same inside and outside the container!
-        #Find out index of path in DATA_ROOTS
-        index = 0
-        theMount = self.mounts[index][0]
 
-        #Remove root part from aPath
-        if aPath.startswith(theMount):
-            aPath = aPath[len(theMount):]
-        else:
-            raise ValueError("The Path: " + aPath + " is not valid using the mount: " + theMOunt)
+        #Find out index of path in DATA_ROOTS
+        nrOfMounts = len(self.mounts);
+        found = False
+        for index in range(nrOfMounts):
+            theMount = self.mounts[index][0]
+
+            #Remove root part from aPath
+            if aPath.startswith(theMount):
+                aPath = aPath[len(theMount):]
+                found = True
+                break
+
+        if not found:
+            raise Exception('Failed finding mount for path: ' + aPath)
 
         aPath = posixpath.normpath(aPath.replace('\\', '/'))
 

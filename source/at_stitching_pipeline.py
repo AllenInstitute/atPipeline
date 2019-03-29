@@ -23,23 +23,33 @@ class Stitch(atp.ATPipeline):
         self.drop_stitching_mistakes          = DropStitchingMistakes(p)
 
 
-
     def run(self):
         atp.ATPipeline.run(self)
-        #Check what pipeline to run
+
+        #Create "sessionfolders"
+        sessionFolders = []
         for ribbon in self.parameters.ribbons:
-            sessionFolders = []
             #Create session folders
             for session in self.parameters.sessions:
               sessionFolders.append(os.path.join(self.parameters.projectDataFolder, self.parameters.projectDataFolder, "raw", "data", ribbon, session))
 
-            for sessionFolder in sessionFolders:
-                self.create_state_tables.run(sessionFolder)
-                self.create_raw_data_render_stacks.run(sessionFolder)
-                self.create_median_files.run(sessionFolder)
-                self.create_flatfield_corrected_data.run(sessionFolder)
-                self.create_stitched_sections.run(sessionFolder)
-                self.drop_stitching_mistakes.run(sessionFolder)
+        for sessionFolder in sessionFolders:
+            self.create_state_tables.run(sessionFolder)
+
+        for sessionFolder in sessionFolders:
+            self.create_raw_data_render_stacks.run(sessionFolder)
+
+        for sessionFolder in sessionFolders:
+            self.create_median_files.run(sessionFolder)
+
+        for sessionFolder in sessionFolders:
+            self.create_flatfield_corrected_data.run(sessionFolder)
+
+        for sessionFolder in sessionFolders:
+            self.create_stitched_sections.run(sessionFolder)
+
+        for sessionFolder in sessionFolders:
+            self.drop_stitching_mistakes.run(sessionFolder)
 
         return True
 
@@ -55,6 +65,10 @@ class CreateStateTables(atpp.PipelineProcess):
         atpp.PipelineProcess.run(self, sessionFolder)
         logger.info("=========== Creating state tables for session: " + sessionFolder + " ===============")
 
+        #Check which ribbon we are processing, and adjust section numbers accordingly
+
+        startSection
+        endSection
         for sectnum in range(self.paras.firstSection, self.paras.lastSection + 1):
             logger.debug("Processing section: " + str(sectnum))
 
