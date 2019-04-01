@@ -17,66 +17,6 @@ logger = logging.getLogger('atPipeline')
 def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")
 
-class ATDataIni:
-    def __init__(self, iniFile):
-        config = configparser.ConfigParser()
-        config.read(iniFile)
-        general                                       = config['GENERAL']
-
-        self.systemConfigFile                         = general['SYSTEM_CONFIG_FILE']
-
-        #What data to process??
-        self.dataRootFolder                           = general['DATA_ROOT']
-        self.projectRootFolder                        = os.path.join(self.dataRootFolder, general['PROJECT_DATA_FOLDER'])
-        self.dataOutputFolder                         = os.path.join(general['PROCESSED_DATA_FOLDER'])
-
-        #Process parameters
-        self.renderProjectOwner                       = general['RENDER_PROJECT_OWNER']
-        self.projectName                              = general['PROJECT_NAME']
-        self.dataOutputFolder                         = os.path.join(self.dataOutputFolder, self.projectName)
-        self.referenceChannel                         = general['REFERENCE_CHANNEL']
-
-        self.ribbons                                  = ast.literal_eval(general['RIBBONS'])
-        self.sessions                                 = ast.literal_eval(general['SESSIONS'])
-        self.sessionFolders                           = []
-        self.firstSection                             = int(general['START_SECTION'])
-        self.lastSection                              = int(general['END_SECTION'])
-        self.firstRibbon                              = int(general['FIRST_RIBBON'])
-        self.lastRibbon                               = int(general['LAST_RIBBON'])
-
-        self.createStateTables                        = toBool(general['CREATE_STATE_TABLES'])
-        self.createRawDataRenderMultiStacks           = toBool(general['CREATE_RAWDATA_RENDER_MULTI_STACKS'])
-        self.createMedianFiles                        = toBool(general['CREATE_MEDIAN_FILES'])
-        self.createFlatFieldCorrectedData             = toBool(general['CREATE_FLATFIELD_CORRECTED_DATA'])
-        self.createStitchedSections                   = toBool(general['CREATE_STITCHED_SECTIONS'])
-        self.dropStitchingMistakes                    = toBool(general['DROP_STITCHING_MISTAKES'])
-        self.createLowResStacks                       = toBool(general['CREATE_LOWRES_STACKS'])
-        self.createLRTilePairs                        = toBool(general['CREATE_LOWRES_TILEPAIRS'])
-        self.createLRPointMatches                     = toBool(general['CREATE_LOWRES_POINTMATCHES'])
-        self.createRoughAlignedStacks                 = toBool(general['CREATE_ROUGH_ALIGNED_STACKS'])
-        self.applyLowResToHighRes                     = toBool(general['APPLY_LOWRES_TO_HIGHRES'])
-        self.consolidateRoughAlignedStackTransforms   = toBool(general['CONSOLIDATE_ROUGH_ALIGNED_STACK_TRANSFORMS'])
-        self.create2DPointMatches                     = toBool(general['CREATE_2D_POINTMATCHES'])
-        self.createHRTilePairs                        = toBool(general['CREATE_HR_TILEPAIRS'])
-        self.createHRPointMatches                     = toBool(general['CREATE_HR_POINTMATCHES'])
-        self.createFineAlignedStacks                  = toBool(general['CREATE_FINE_ALIGNED_STACKS'])
-
-        for session in self.sessions:
-          self.sessionFolders.append(os.path.join(self.projectRootFolder, "raw", "data", self.ribbons[0], session))
-
-        iniFilePath = os.path.split(iniFile)[0]
-        #Read and append SYSTEM Configuration
-        self.systemParameters   = at_system_config.ATSystemConfig(os.path.join(iniFilePath, self.systemConfigFile))
-        self.sys = self.systemParameters
-
-        #Setup System parameters
-        self.systemParameters.setupDockerMountName(self.dataRootFolder)
-
-        #Create a "renderProject"
-        self.renderProject = RenderProject(self.renderProjectOwner, self.projectName, self.sys.renderHost, self.sys.renderHostPort, self.sys.clientScripts, self.sys.memGB, self.sys.logLevel)
-
-    def getStateTableFileName(self, ribbon, session, sectnum):
-        return os.path.join(self.projectRootFolder, self.dataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
 
 
 def setupParameters():
@@ -172,6 +112,12 @@ def parse_session_folder(path):
     session = int(sessiondir[7:])
     return [projectdirectory, ribbon, session]
 
+def getRibbonLabelFromSessionFolder(path):
+    proj = path.split("raw")
+    tok = path.split(os.sep)
+    ribbondir = tok[len(tok)-2]
+    return ribbondir
+
 #Input is a sessionfolder path
 def getProjectNameFromSessionFolder(sessionFolder):
     logger.info("Session directory: " + sessionFolder)
@@ -187,11 +133,6 @@ def getChannelNamesInSessionFolder(directory):
             directory_list.append(os.path.join(root, name))
     return dirs
 
-def toDockerMountedPath(path, paras : ATDataIni):
-    #Remove prefix
-    p = path.split(paras.dataRootFolder)[1]
-    p = posixpath.normpath(p.replace('\\', '/'))
-    return posixpath.join(paras.systemParameters.dockerMountName, p[1:])
 
 def dump_json(data, fileName):
     with open(fileName, 'w') as outfile:

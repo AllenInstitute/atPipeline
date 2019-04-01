@@ -24,10 +24,10 @@ def scriptArguments(caller = None):
     optional = parser.add_argument_group('optional arguments')
 
     #Required arguments
-    required.add_argument('--dataroot',             help='Full path to data folder for project data to process',                type=str,   nargs='?',                          required=True)
+    required.add_argument('--dataroot',             help='Full path to data folder for project data to process',                type=str,   nargs='?',    required=True)
 
     required.add_argument('--pipeline',             help='Specify the pipeline to use, e.g. stitch, finealign or register. \
-                                                                                                     Default = \'stitch\'',     type=str,   nargs='?',      const='stitch'    )
+                                                                                                     Default = \'stitch\'',     type=str,   nargs='?',    const='stitch'    )
 
     #Optional arguments
     optional.add_argument('--renderprojectowner',   help='Specify a RenderProject owner',                                       type=str,   nargs='?')
@@ -35,7 +35,8 @@ def scriptArguments(caller = None):
     optional.add_argument('--ribbons',              help='Specify ribbons  to process',                                         type=str)
     optional.add_argument('--firstsection',         help='Specify start section',                                               type=int)
     optional.add_argument('--lastsection',          help='Specify end section',                                                 type=int)
-    optional.add_argument('--overwritedata',        help='Overwrite any already processed data',                                action='store_true')
+    optional.add_argument('--overwritedata',        help='Overwrite any already processed data',                                            action='store_true')
+    optional.add_argument('--loglevel',             help='Set program loglevel',                                                type=str,   default='INFO' )
     return parser
 
 def main():
@@ -51,6 +52,11 @@ def main():
 
         parser = scriptArguments('pipeline')
         args = parser.parse_args()
+
+        if args.loglevel == 'INFO':
+            logger.setLevel(logging.INFO)
+        elif args.loglevel == 'DEBUG':
+            logger.setLevel(logging.DEBUG)
 
         #What project to process?
         if args.dataroot:
