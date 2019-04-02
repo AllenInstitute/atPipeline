@@ -7,7 +7,7 @@ def setup_custom_logger(name):
     consoleHandler  = logging.StreamHandler()
     consoleHandler.setFormatter(logFormatter)
     rootLogger.addHandler(consoleHandler)
-    rootLogger.setLevel(logging.INFO)
+    rootLogger.setLevel(logging.DEBUG)
     return rootLogger
 
 def addLoggingToFile(loggerName, logPath, logFileName):

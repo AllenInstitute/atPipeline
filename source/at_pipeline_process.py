@@ -1,11 +1,12 @@
 import at_utils as u
 import logging
 import subprocess
+import at_system_config
 
 logger = logging.getLogger('atPipeline')
 
 class PipelineProcess():
-    def __init__(self, _paras, _name):
+    def __init__(self, _paras : at_system_config.ATSystemConfig, _name):
         self.paras = _paras
         self.name = _name
 

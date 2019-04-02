@@ -23,4 +23,5 @@ RUN mkdir /build
 COPY build-thirdparty-libs.bash /build
 WORKDIR /build
 RUN bash build-thirdparty-libs.bash
- 
+
+CMD [ "/bin/bash" ]

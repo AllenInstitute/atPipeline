@@ -22,10 +22,55 @@ class ATSystemConfig:
         self.DATA_INPUT                                    = self.config['DATA_INPUT']
         self.mounts                                        = ast.literal_eval(self.general['DATA_ROOTS'])
 
+    def getNrOfSectionsInRibbon(self, ribbon):
+        #Get ribbon index
+        ribbonIndex = self.ribbons.index(ribbon)
+
+        #get number in dataInfo structure for index
+        secsInRibbons = self.dataInfo['SectionsInRibbons']
+        return secsInRibbons[ribbonIndex]
+
+    def convertGlobalSectionIndexesToCurrentRibbon(self, _ribbon):
+        #The ribbons are consecutive, with various number of sections
+        #The user will supply a start, end section to process. This range may span
+        #multiple ribbons.
+        sectionIndices = []
+        sectionIndicesArray = []
+
+        #Create a "ribbon indices" arrays, holding global and local indices
+        for i in range(self.dataInfo['NumberOfSections']):
+            sectionIndices = {'global' : i, 'local' : -1}
+            sectionIndicesArray.append(sectionIndices)
+
+        #Populate 'local' indices
+        globalIndex = 0
+        for ribbon in self.ribbons:
+            nrOfSectionsInRibbon = self.getNrOfSectionsInRibbon(ribbon)
+            for i in range(nrOfSectionsInRibbon):
+                indices = sectionIndicesArray[globalIndex]
+                indices['local'] = i
+                globalIndex = globalIndex + 1
+
+        #Get the values for input ribbon
+        globalIndex = 0
+        wantedIndices = []
+        for ribbon in self.ribbons:
+            nrOfSectionsInRibbon = self.getNrOfSectionsInRibbon(ribbon)
+            for i in range(nrOfSectionsInRibbon):
+                if ribbon == _ribbon:
+                    indices = sectionIndicesArray[globalIndex]
+                    indices['local'] = i
+                    wantedIndices.append(indices)
+                    globalIndex = globalIndex + 1
+
+        length = len (wantedIndices)
+        return wantedIndices[0]['local'], wantedIndices[length -1]['local']
+
     #The arguments passed here are captured from the commandline and will over ride any option
     #present in the system config file
-    def createReferences(self, parser = None, dataInfo = None):
+    def createReferences(self, args = None, caller = None, dataInfo = None):
 
+        self.dataInfo                                 = dataInfo
         self.atCoreContainer                          = self.general['AT_CORE_DOCKER_CONTAINER']
         self.atCoreThreads                            = int(self.general['AT_CORE_THREADS'])
         self.downSampleScale                          = self.general['DOWN_SAMPLE_SCALE']
@@ -84,11 +129,9 @@ class ATSystemConfig:
         self.zNeighborDistance                        = int(self.tp_client['Z_NEIGHBOR_DISTANCE'])
         self.xyNeighborFactor                         = float(self.tp_client['XY_NEIGHBOR_FACTOR'])
 
-        args = parser.parse_args()
-
-        if parser.prog == "pipeline":
+        if caller == "pipeline":
             self.createReferencesForPipeline(args, dataInfo)
-        elif parser.prog == "backend_management":
+        elif caller == "backend_management":
             self.createReferencesForBackend(args)
 
     def createReferencesForBackend(self, args = None):
@@ -174,15 +217,21 @@ class ATSystemConfig:
     def toMount(self, aPath):
         if os.name == 'posix':
             return aPath #If on linux, the moounts looks the same inside and outside the container!
-        #Find out index of path in DATA_ROOTS
-        index = 0
-        theMount = self.mounts[index][0]
 
-        #Remove root part from aPath
-        if aPath.startswith(theMount):
-            aPath = aPath[len(theMount):]
-        else:
-            raise ValueError("The Path: " + aPath + " is not valid using the mount: " + theMOunt)
+        #Find out index of path in DATA_ROOTS
+        nrOfMounts = len(self.mounts);
+        found = False
+        for index in range(nrOfMounts):
+            theMount = self.mounts[index][0]
+
+            #Remove root part from aPath
+            if aPath.startswith(theMount):
+                aPath = aPath[len(theMount):]
+                found = True
+                break
+
+        if not found:
+            raise Exception('Failed finding mount for path: ' + aPath)
 
         aPath = posixpath.normpath(aPath.replace('\\', '/'))
 
