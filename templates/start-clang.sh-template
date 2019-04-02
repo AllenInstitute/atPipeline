@@ -25,7 +25,6 @@ docker run -e DISPLAY=$DISPLAY -d --name $container_name \
 
 #cp ./build-thirdparty-libs.bash ./build
 #docker exec -t clang /build/build-thirdparty-libs.bash
-#-v c:\\pDisk\\atPipeline\\docker\\clang_container\\third-party-libs:/libs \
-#-v c:\\pDisk\\atPipeline\\docker\\clang_container\\build:/build \
+
 
 echo "========= Done ========"

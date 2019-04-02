@@ -43,7 +43,7 @@ def main():
             dManager.startContainer(args.start)
 
         elif args.kill:
-            dManager.stopContainer(args.stop)
+            dManager.stopContainer(args.kill)
 
         elif args.killall:
             dManager.killAllContainers()
