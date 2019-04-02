@@ -14,6 +14,7 @@ import source.at_utils as u
 import at_system_config
 import at_pipeline
 import at_stitching_pipeline
+import at_rough_align_pipeline
 
 
 def scriptArguments(caller = None):
@@ -92,6 +93,9 @@ def main():
         if system_parameters.pipeline == 'stitch':
             logger.info('Running stitching pipeline')
             aPipeline = at_stitching_pipeline.Stitch(system_parameters)
+        elif system_parameters.pipeline == 'rough-align':
+            aPipeline = at_rough_align_pipeline.RoughAlign(system_parameters)
+
         else:
             logger.error('No such pipeline: ' + system_parameters.pipeline)
             raise Exception('No such pipeline')
