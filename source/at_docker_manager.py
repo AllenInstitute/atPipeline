@@ -24,7 +24,7 @@ class DockerManager:
             #Read from environment
             self.configFolder = os.environ['AT_SYSTEM_CONFIG_FOLDER']
 
-        self.paras = at_system_config.ATSystemConfig(os.path.join(self.configFolder, 'at_system_config.ini'))
+        self.paras = at_system_config.ATSystemConfig(os.path.join(self.configFolder, 'at-system-config.ini'))
         self.setComposeFile(os.path.join(self.configFolder, 'at-docker-compose.yml'))
         self.setupMounts()
 
