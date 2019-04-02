@@ -33,7 +33,7 @@ def scriptArguments(caller = None):
     optional.add_argument('--renderprojectowner',   help='Specify a RenderProject owner',                                       type=str,   nargs='?')
     optional.add_argument('--sessions',             help='Specify sessions to process',                                         type=str)
     optional.add_argument('--ribbons',              help='Specify ribbons  to process',                                         type=str)
-    optional.add_argument('--firstsection',         help='Specify start section',                                               type=int)
+    optional.add_argument('--firstsection',         help='Specify start section (e.g. \'1\' to start with a datasets first section)',                                             type=int)
     optional.add_argument('--lastsection',          help='Specify end section',                                                 type=int)
     optional.add_argument('--overwritedata',        help='Overwrite any already processed data',                                            action='store_true')
     optional.add_argument('--loglevel',             help='Set program loglevel',                                                type=str,   default='INFO' )
@@ -48,7 +48,7 @@ def main():
             #Read from environment
             configFolder = os.environ['AT_SYSTEM_CONFIG_FOLDER']
 
-        system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, 'at_system_config.ini'))
+        system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, 'at-system-config.ini'))
 
         parser = scriptArguments('pipeline')
         args = parser.parse_args()

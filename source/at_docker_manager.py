@@ -58,7 +58,7 @@ class DockerManager:
         self.composeFile = fName
 
     def setupMounts(self, mountRenderPythonApps = False, mountRenderModules = False):
-        logger.info("Setting up cointainer mounts")
+        logger.debug("Setting up container mounts.")
 
         mountCount = 1
         for mount in self.paras.mounts:
