@@ -60,6 +60,8 @@ class ATSystemConfig:
                 wantedIndices.append(indices)
 
         length = len (wantedIndices)
+        if length == 0:
+            return -1, -1
         return wantedIndices[0]['local'], wantedIndices[length - 1]['local']
 
     #The arguments passed here are captured from the commandline and will over ride any option
