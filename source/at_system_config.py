@@ -32,39 +32,35 @@ class ATSystemConfig:
 
     def convertGlobalSectionIndexesToCurrentRibbon(self, _ribbon):
         #The ribbons are consecutive, with various number of sections
-        #The user will supply a start, end section to process. This range may span
-        #multiple ribbons.
+        #The user will supply a start, end section to process. That range may span
+        #multiple ribbons and are numbered 1-N ("global" indexes).
         sectionIndices = []
         sectionIndicesArray = []
 
-        #Create a "ribbon indices" arrays, holding global and local indices
+        #First create a "ribbon indices" arrays, holding global and local indices
         for i in range(self.dataInfo['NumberOfSections']):
-            sectionIndices = {'global' : i, 'local' : -1}
+            sectionIndices = {'global' : i + 1, 'local' : -1, 'ribbon' : ''} #Simple dict helping with book keeping
             sectionIndicesArray.append(sectionIndices)
 
-        #Populate 'local' indices
+        #Populate 'local' indices, i.e. section index per ribbon. These starts at 0
         globalIndex = 0
         for ribbon in self.ribbons:
             nrOfSectionsInRibbon = self.getNrOfSectionsInRibbon(ribbon)
             for i in range(nrOfSectionsInRibbon):
                 indices = sectionIndicesArray[globalIndex]
                 indices['local'] = i
+                indices['ribbon'] = ribbon
                 globalIndex = globalIndex + 1
 
-        #Get the values for input ribbon
-        globalIndex = 0
+        #Now loop over first to last, and capture 'indices' falling on current input ribbon
         wantedIndices = []
-        for ribbon in self.ribbons:
-            nrOfSectionsInRibbon = self.getNrOfSectionsInRibbon(ribbon)
-            for i in range(nrOfSectionsInRibbon):
-                if ribbon == _ribbon:
-                    indices = sectionIndicesArray[globalIndex]
-                    indices['local'] = i
-                    wantedIndices.append(indices)
-                    globalIndex = globalIndex + 1
+        for i in range(self.firstSection, self.lastSection + 1):
+            indices = sectionIndicesArray[i-1]
+            if indices['ribbon'] == _ribbon:
+                wantedIndices.append(indices)
 
         length = len (wantedIndices)
-        return wantedIndices[0]['local'], wantedIndices[length -1]['local']
+        return wantedIndices[0]['local'], wantedIndices[length - 1]['local']
 
     #The arguments passed here are captured from the commandline and will over ride any option
     #present in the system config file
