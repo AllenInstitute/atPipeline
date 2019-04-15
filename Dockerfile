@@ -73,9 +73,6 @@ ENV JAVA_HOME /docker-java-home
 ENV RENDER_JAVA_HOME /docker-java-home
 ENV RENDER_CLIENT_SCRIPTS=/shared/render/render-ws-java-client/src/main/scripts
 
-# Work around OpenJDK bug with surefire plugin for both render and at_modules
-ENV _JAVA_OPTIONS -Djdk.net.URLClassPath.disableClassPathURLCheck=true
-
 # Install Render
 WORKDIR /shared/render/
 RUN git clone --branch at_develop --single-branch https://github.com/perlman/render.git /shared/render
@@ -83,7 +80,7 @@ RUN mvn clean && mvn -T 1C -Dproject.build.sourceEncoding=UTF-8 package
 
 # Install at_modules
 WORKDIR /shared/at_modules
-COPY ./at_modules/ /shared/at_modules
+COPY ./at-modules/ /shared/at_modules
 RUN mvn install
 
 # Install EM_Aligner from github (we need >= 0.3.5 for multiple match collections)
