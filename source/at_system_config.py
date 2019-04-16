@@ -34,6 +34,8 @@ class ATSystemConfig:
         #The ribbons are consecutive, with various number of sections
         #The user will supply a start, end section to process. That range may span
         #multiple ribbons and are numbered 1-N ("global" indexes).
+        #When a ribbon is being processed, a "local" section index is used, starting at 0 for each
+        #ribbon
         sectionIndices = []
         sectionIndicesArray = []
 
@@ -53,9 +55,10 @@ class ATSystemConfig:
                 globalIndex = globalIndex + 1
 
         #Now loop over first to last, and capture 'indices' falling on current input ribbon
+        #First section starts at '1' (not zero)
         wantedIndices = []
         for i in range(self.firstSection, self.lastSection + 1):
-            indices = sectionIndicesArray[i-1]
+            indices = sectionIndicesArray[i]
             if indices['ribbon'] == _ribbon:
                 wantedIndices.append(indices)
 

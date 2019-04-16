@@ -18,7 +18,6 @@ def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")
 
 
-
 def setupParameters():
     parser = argparse.ArgumentParser()
     parser.add_argument('parameter_file', help='Input file')
