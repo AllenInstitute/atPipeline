@@ -1,13 +1,13 @@
 import os
 import logging
 import json
-import at_pipeline as atp
-import at_pipeline_process as atpp
-import at_stitching_pipeline
-import at_utils as u
 import fileinput
 from shutil import copyfile
-import posixpath
+import at_pipeline as atp
+import at_pipeline_process as atpp
+from . import at_rough_align_pipeline
+import at_utils as u
+
 
 logger = logging.getLogger('atPipeline')
 
@@ -16,31 +16,34 @@ class FineAlign(atp.ATPipeline):
     def __init__(self, _paras):
         super().__init__(_paras)
 
-        p = self.parameters
-
         #Define the pipeline
-        #self.stitchingPipeline                  at_stitching_pipeline.Stitch
-        self.consolidateRoughAlignedStackTransforms = ConsolidateRoughAlignedStackTransforms
-        self.create_2D_pointmatches                 = Create_2D_pointmatches
-        self.create_HR_tilepairs                    = Create_HR_tilepairs
-        self.create_HR_pointmatches                 = Create_HR_pointmatches
-        self.create_fine_aligned_stacks             = Create_fine_aligned_stacks
+        self.roughAlignPipeline                     =  at_rough_align_pipeline.RoughAlign(_paras)
+        self.consolidateRoughAlignedStackTransforms = ConsolidateRoughAlignedStackTransforms(_paras)
+        self.create_2D_pointmatches                 = Create_2D_pointmatches(_paras)
+        self.create_HR_tilepairs                    = Create_HR_tilepairs(_paras)
+        self.create_HR_pointmatches                 = Create_HR_pointmatches(_paras)
+        self.create_fine_aligned_stacks             = Create_fine_aligned_stacks(_paras)
 
     def run(self):
         atp.ATPipeline.run(self)
 
-        #Create "sessionfolders"
-        sessionFolders = []
-        for ribbon in self.parameters.ribbons:
-            #Create session folders
-            for session in self.parameters.sessions:
-              sessionFolders.append(os.path.join(self.parameters.projectDataFolder, self.parameters.projectDataFolder, "raw", "data", ribbon, session))
+        #Run any pre pipeline(s)
+        self.roughAlignPipeline.run()
 
-        self.consolidateRoughAlignedStackTransforms.run(sessionFolders)
-        self.create_2D_pointmatches.run(sessionFolders)
-        self.create_HR_tilepairs.run(sessionFolders)
-        self.create_HR_pointmatches.run(sessionFolders)
-        self.create_fine_aligned_stacks.run(sessionFolders)
+        self.consolidateRoughAlignedStackTransforms.run()
+        logger.newline()
+
+        self.create_2D_pointmatches.run()
+        logger.newline()
+
+        self.create_HR_tilepairs.run()
+        logger.newline()
+
+        self.create_HR_pointmatches.run()
+        logger.newline()
+
+        self.create_fine_aligned_stacks.run()
+        logger.newline()
 
         return True
 
@@ -49,11 +52,16 @@ class ConsolidateRoughAlignedStackTransforms(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "ConsolidateRoughAlignedStackTransforms")
 
-    def run(self, sessionFolders):
+##    def validate(self):
+##        super().validate()
+##        pass
+
+    def run(self):
+        super().run()
         p = self.paras
         rp = p.renderProject
 
-        for sessionFolder in sessionFolders:
+        for sessionFolder in self.sessionFolders:
             logger.info("Processing session folder: " + sessionFolder)
             [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
@@ -72,7 +80,8 @@ class ConsolidateRoughAlignedStackTransforms(atpp.PipelineProcess):
             cmd = cmd + " --output_json Test"
 
             # Run =============
-            #self.submit(cmd)
+            self.submit(cmd)
+        self.validate()
 
 
 class Create_2D_pointmatches(atpp.PipelineProcess):
@@ -80,9 +89,10 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "Create_2D_pointmatches")
 
-    def run(self, sessionFolders):
+    def run(self):
+        super().run()
         p = self.paras
-        for sessionFolder in sessionFolders:
+        for sessionFolder in self.sessionFolders:
             logger.info("Processing session folder: " + sessionFolder)
 
             ribbonLabel = u.getRibbonLabelFromSessionFolder(sessionFolder)
@@ -96,7 +106,7 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
             match_collection_name = "%s_HR_2D"%(rp.projectName)
             delta = 250
 
-            cmd = "docker exec " + p.sys.atCoreContainer
+            cmd = "docker exec " + p.atCoreContainer
             cmd = cmd + " python -m renderapps.stitching.create_montage_pointmatches_in_place"
             cmd = cmd + " --render.host %s"                           %(rp.host)
             cmd = cmd + " --render.project %s"                        %(rp.projectName)
@@ -114,20 +124,20 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
             cmd = cmd + " --output_json Test"
 
             # Run =============
-            logger.info("Running: " + cmd.replace('--', '\n--'))
             #self.submit(cmd)
-
+        self.validate()
 
 class Create_HR_tilepairs(atpp.PipelineProcess):
 
     def __init__(self, _paras):
         super().__init__(_paras, "Create_HR_tilepairs")
 
-    def run(self, sessionFolders):
+    def run(self):
+        super().run()
         p = self.paras
         rp     = p.renderProject
 
-        for sessionFolder in sessionFolders:
+        for sessionFolder in self.sessionFolders:
             logger.info("Processing session folder: " + sessionFolder)
             ribbonLabel = u.getRibbonLabelFromSessionFolder(sessionFolder)
             firstSection, lastSection = p.convertGlobalSectionIndexesToCurrentRibbon(ribbonLabel)
@@ -164,9 +174,14 @@ class Create_HR_tilepairs(atpp.PipelineProcess):
 
             #Prepare json file for the SIFTPointMatch Client
             jsonfileedit      = os.path.join(jsonOutputFolder, "tilepairs-%d-%d-%d-nostitch-EDIT.json"%(p.zNeighborDistance, firstSection, lastSection))
-            copyfile(jsonfile, jsonfileedit)
-            for line in fileinput.input(jsonfileedit, inplace=True):
-                print(line.replace("render-parameters", "render-parameters?removeAllOption=true"), end="")
+
+##            if os.path.isfile(jsonfileedit) == False:
+##                raise ValueError("The file: " + jsonfileedit + " don't exist. Bailing..")
+##
+##            copyfile(jsonfile, jsonfileedit)
+##            for line in fileinput.input(jsonfileedit, inplace=True):
+##                print(line.replace("render-parameters", "render-parameters?removeAllOption=true"), end="")
+        self.validate()
 
 
 class Create_HR_pointmatches(atpp.PipelineProcess):
@@ -174,11 +189,12 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "Create_HR_pointmatches")
 
-    def run(self, sessionFolders):
+    def run(self):
+        super().run()
         p = self.paras
         rp     = p.renderProject
 
-        for sessionFolder in sessionFolders:
+        for sessionFolder in self.sessionFolders:
             logger.info("Processing session folder: " + sessionFolder)
             ribbonLabel = u.getRibbonLabelFromSessionFolder(sessionFolder)
             firstSection, lastSection = p.convertGlobalSectionIndexesToCurrentRibbon(ribbonLabel)
@@ -223,7 +239,59 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
             cmd = cmd + " --renderScale 1.0"
             cmd = cmd + " --matchRod 0.5"
             #cmd = cmd + " --matchFilter CONSENSUS_SETS"
+        self.validate()
 
+class Create_fine_aligned_stacks(atpp.PipelineProcess):
 
+    def __init__(self, _paras):
+        super().__init__(_paras, "Create_fine_aligned_stacks")
 
+    def run(self):
+        super().run()
+        p = self.paras
+        rp = p.renderProject
+
+        for sessionFolder in self.sessionFolders:
+            logger.info("Processing session folder: " + sessionFolder)
+
+            ribbonLabel = u.getRibbonLabelFromSessionFolder(sessionFolder)
+            firstSection, lastSection = p.convertGlobalSectionIndexesToCurrentRibbon(ribbonLabel)
+
+            [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
+
+            #Output directories
+            dataOutputFolder    = os.path.join(projectRoot, p.dataOutputFolder, "fine_aligned")
+            input_json     	    = os.path.join(dataOutputFolder, "input_fine_alignment_%s_%s_%d_%d.json"%(ribbon, session, firstSection, lastSection))
+            output_json    	    = os.path.join(dataOutputFolder, "output_fine_alignment_%s_%s_%d_%d.json"%(ribbon, session, firstSection, lastSection))
+
+            #stacks
+            input_stack       = "S%d_RoughAligned_Consolidated" %(session)
+            output_stack      = "S%d_FineAligned"               %(session)
+
+            rp     = p.renderProject
+
+        	#point match collections
+            pm_collection2D     = "%s_HR_2D"%(rp.projectName)
+            pm_collection3D     = "%s_HR_3D"%(rp.projectName)
+
+            with open(p.fine_alignment_template) as json_data:
+               ra = json.load(json_data)
+
+            #Create folder if not exists
+            if os.path.isdir(dataOutputFolder) == False:
+                os.mkdir(dataOutputFolder)
+
+            u.saveFineAlignJSON(ra, input_json, rp.host, rp.hostPort, rp.owner, rp.projectName,
+                                    input_stack, output_stack, pm_collection2D, pm_collection3D,
+                                    rp.clientScripts, rp.logLevel, firstSection, lastSection, p.toMount(dataOutputFolder))
+
+            #Run docker command
+            cmd = "docker exec " + p.atCoreContainer
+            cmd = cmd + " python -m rendermodules.solver.solve"
+            cmd = cmd + " --input_json %s" %(p.toMount(input_json))
+            cmd = cmd + " --output_json %s"%(p.toMount(output_json))
+
+            # Run =============
+            #self.submit(cmd)
+        self.validate()
 

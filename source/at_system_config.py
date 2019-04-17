@@ -41,7 +41,7 @@ class ATSystemConfig:
 
         #First create a "ribbon indices" arrays, holding global and local indices
         for i in range(self.dataInfo['NumberOfSections']):
-            sectionIndices = {'global' : i + 1, 'local' : -1, 'ribbon' : ''} #Simple dict helping with book keeping
+            sectionIndices = {'global' : i, 'local' : -1, 'ribbon' : ''} #Simple dict helping with book keeping
             sectionIndicesArray.append(sectionIndices)
 
         #Populate 'local' indices, i.e. section index per ribbon. These starts at 0
@@ -149,9 +149,6 @@ class ATSystemConfig:
         self.dataOutputFolder                         = os.path.join(self.dataOutputFolder, self.projectName)
         self.absoluteDataOutputFolder                 = os.path.join(self.projectDataFolder, self.dataOutputFolder)
 
-        self.ribbons                                  = "" #ast.literal_eval(self.DATA_INPUT['RIBBONS'])
-        self.sessions                                 = "" #ast.literal_eval(self.DATA_INPUT['SESSIONS'])
-
         #Over write any default values with any argument/values from the command line
         if args.firstsection != None:
             self.firstSection                         = args.firstsection
@@ -194,7 +191,6 @@ class ATSystemConfig:
         #When used for input data
         #Create a "renderProject" to make things easier
         self.renderProject = rp.RenderProject(self.renderProjectOwner, self.projectName, self.renderHost, self.renderHostPort, self.clientScripts, self.memGB, self.logLevel)
-
 
     def getStateTableFileName(self, ribbon, session, sectnum):
         return os.path.join(self.absoluteDataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))

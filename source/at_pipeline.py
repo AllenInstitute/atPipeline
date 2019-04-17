@@ -24,7 +24,6 @@ class ATPipeline:
             raise ValueError("The atcore docker container is not running!")
 
     def run(self):
-        logger.info("ATPipeline run")
         pass
 
 

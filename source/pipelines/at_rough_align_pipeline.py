@@ -3,7 +3,7 @@ import logging
 import json
 import at_pipeline as atp
 import at_pipeline_process as atpp
-import at_stitching_pipeline
+from . import at_stitching_pipeline
 import at_utils as u
 import fileinput
 from shutil import copyfile
@@ -16,34 +16,27 @@ class RoughAlign(atp.ATPipeline):
     def __init__(self, _paras):
         super().__init__(_paras)
 
-        p = self.parameters
-
         #Define the pipeline
-        #self.stitchingPipeline                  at_stitching_pipeline.Stitch
+        self.stitchingPipeline                   =  at_stitching_pipeline.Stitch(_paras)
 
-        self.create_lowres_stacks                = CreateLowResStacks(p)
-        self.create_lowres_tilepairs             = CreateLowResTilePairs(p)
-        self.create_lowres_pointmatches          = CreateLowResPointMatches(p)
-        self.create_rough_aligned_stacks         = CreateRoughAlignedStacks(p)
-        self.apply_lowres_to_highres             = ApplyLowResToHighRes(p)
+        self.create_lowres_stacks                = CreateLowResStacks(_paras)
+        self.create_lowres_tilepairs             = CreateLowResTilePairs(_paras)
+        self.create_lowres_pointmatches          = CreateLowResPointMatches(_paras)
+        self.create_rough_aligned_stacks         = CreateRoughAlignedStacks(_paras)
+        self.apply_lowres_to_highres             = ApplyLowResToHighRes(_paras)
 
         #We could store these in an array and pop them off one by one
 
     def run(self):
         atp.ATPipeline.run(self)
+        #Run any pre pipeline(s)
+        self.stitchingPipeline.run()
 
-        #Create "sessionfolders"
-        sessionFolders = []
-        for ribbon in self.parameters.ribbons:
-            #Create session folders
-            for session in self.parameters.sessions:
-              sessionFolders.append(os.path.join(self.parameters.projectDataFolder, self.parameters.projectDataFolder, "raw", "data", ribbon, session))
-
-        self.create_lowres_stacks.run(sessionFolders)
-        self.create_lowres_tilepairs.run(sessionFolders)
-        self.create_lowres_pointmatches.run(sessionFolders)
-        self.create_rough_aligned_stacks.run(sessionFolders)
-        self.apply_lowres_to_highres.run(sessionFolders)
+        self.create_lowres_stacks.run()
+        self.create_lowres_tilepairs.run()
+        self.create_lowres_pointmatches.run()
+        self.create_rough_aligned_stacks.run()
+        self.apply_lowres_to_highres.run()
         return True
 
 class CreateLowResStacks(atpp.PipelineProcess):
@@ -51,10 +44,11 @@ class CreateLowResStacks(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateLowResStacks")
 
-    def run(self, sessionFolders):
+    def run(self):
+        super().run()
         p = self.paras
 
-        for sessionFolder in sessionFolders:
+        for sessionFolder in self.sessionFolders:
             logger.info("Processing session folder: " + sessionFolder)
             [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
             firstRibbon = ribbon
@@ -103,10 +97,11 @@ class CreateLowResTilePairs(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateLowResTilePairs")
 
-    def run(self, sessionFolders):
+    def run(self):
+        super().run()
         p = self.paras
 
-        for sessionFolder in sessionFolders:
+        for sessionFolder in self.sessionFolders:
             #Check which ribbon we are processing, and adjust section numbers accordingly
             ribbon = u.getRibbonLabelFromSessionFolder(sessionFolder)
             firstSection, lastSection = p.convertGlobalSectionIndexesToCurrentRibbon(ribbon)
@@ -156,9 +151,11 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateLowResPointMatches")
 
-    def run(self, sessionFolders):
+    def run(self):
+        super().run()
         p = self.paras
-        for sessionFolder in sessionFolders:
+
+        for sessionFolder in self.sessionFolders:
             #Check which ribbon we are processing, and adjust section numbers accordingly
             ribbonLabel = u.getRibbonLabelFromSessionFolder(sessionFolder)
             firstSection, lastSection = p.convertGlobalSectionIndexesToCurrentRibbon(ribbonLabel)
@@ -215,11 +212,12 @@ class CreateRoughAlignedStacks(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateRoughAlignedStacks")
 
-    def run(self, sessionFolders):
+    def run(self):
+        super().run()
         p = self.paras
         rp  = p.renderProject
 
-        for sessionFolder in sessionFolders:
+        for sessionFolder in self.sessionFolders:
 
             logger.info("Processing session folder: " + sessionFolder)
             [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
@@ -260,10 +258,11 @@ class ApplyLowResToHighRes(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "ApplyLowResToHighRes")
 
-    def run(self, sessionFolders):
+    def run(self):
+        super().run()
         p = self.paras
 
-        for sessionFolder in sessionFolders:
+        for sessionFolder in self.sessionFolders:
             logger.info("Processing session folder: " + sessionFolder)
             [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 

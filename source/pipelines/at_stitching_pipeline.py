@@ -12,34 +12,36 @@ class Stitch(atp.ATPipeline):
     def __init__(self, _paras):
         super().__init__(_paras)
 
-        p = self.parameters
-
         #Define the pipeline
-        self.create_state_tables              = CreateStateTables(p)
-        self.create_raw_data_render_stacks    = CreateRawDataRenderStacks(p)
-        self.create_median_files              = CreateMedianFiles(p)
-        self.create_flatfield_corrected_data  = CreateFlatFieldCorrectedData(p)
-        self.create_stitched_sections         = CreateStitchedSections(p)
-        self.drop_stitching_mistakes          = DropStitchingMistakes(p)
+        self.create_state_tables              = CreateStateTables(_paras)
+        self.create_raw_data_render_stacks    = CreateRawDataRenderStacks(_paras)
+        self.create_median_files              = CreateMedianFiles(_paras)
+        self.create_flatfield_corrected_data  = CreateFlatFieldCorrectedData(_paras)
+        self.create_stitched_sections         = CreateStitchedSections(_paras)
+        self.drop_stitching_mistakes          = DropStitchingMistakes(_paras)
 
         #We could store these in an array and pop them off one by one
 
     def run(self):
         atp.ATPipeline.run(self)
 
-        #Create "sessionfolders"
-        sessionFolders = []
-        for ribbon in self.parameters.ribbons:
-            #Create session folders
-            for session in self.parameters.sessions:
-              sessionFolders.append(os.path.join(self.parameters.projectDataFolder, self.parameters.projectDataFolder, "raw", "data", ribbon, session))
+        self.create_state_tables.run()
+        logger.newline()
 
-        self.create_state_tables.run(sessionFolders)
-        self.create_raw_data_render_stacks.run(sessionFolders)
-        self.create_median_files.run(sessionFolders)
-        self.create_flatfield_corrected_data.run(sessionFolders)
-        self.create_stitched_sections.run(sessionFolders)
-        self.drop_stitching_mistakes.run(sessionFolders)
+        self.create_raw_data_render_stacks.run()
+        logger.newline()
+
+        self.create_median_files.run()
+        logger.newline()
+
+        self.create_flatfield_corrected_data.run()
+        logger.newline()
+
+        self.create_stitched_sections.run()
+        logger.newline()
+
+        self.drop_stitching_mistakes.run()
+        logger.newline()
 
         return True
 
@@ -52,22 +54,22 @@ class CreateStateTables(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateStateTables")
 
-    def run(self, sessionFolders):
+    def run(self):
         p = self.paras
 
-        for sessionFolder in sessionFolders:
-            atpp.PipelineProcess.run(self, sessionFolder)
+        for sessionFolder in self.sessionFolders:
             logger.info("=========== Creating state tables for session: " + sessionFolder + " ===============")
 
             #Check which ribbon we are processing, and adjust section numbers accordingly
             ribbon = u.getRibbonLabelFromSessionFolder(sessionFolder)
             firstSection, lastSection = p.convertGlobalSectionIndexesToCurrentRibbon(ribbon)
+            [project_root, ribbon, session] = u.parse_session_folder(sessionFolder)
 
             for sectnum in range(firstSection, lastSection + 1):
                 logger.debug("Processing section: " + str(sectnum))
 
                 #State table file
-                statetablefile = self.paras.getStateTableFileName(self.ribbon, self.session, sectnum)
+                statetablefile = self.paras.getStateTableFileName(ribbon, session, sectnum)
                 logger.info("Creating statetable file: " + statetablefile)
 
                 if os.path.exists(statetablefile) and self.paras.overwritedata == False:
@@ -75,10 +77,10 @@ class CreateStateTables(atpp.PipelineProcess):
                 else:
                     cmd = "docker exec " + self.paras.atCoreContainer
                     cmd = cmd + " python /pipeline/make_state_table_ext_multi_pseudoz.py"
-                    cmd = cmd + " --projectDirectory %s"        %(self.paras.toMount(self.projectroot))
-                    cmd = cmd + " --outputFile %s"              %(self.paras.toMount(statetablefile))
-                    cmd = cmd + " --ribbon %d"                  %(self.ribbon)
-                    cmd = cmd + " --session %d"                 %(self.session)
+                    cmd = cmd + " --projectDirectory %s"        %(p.toMount(project_root))
+                    cmd = cmd + " --outputFile %s"              %(p.toMount(statetablefile))
+                    cmd = cmd + " --ribbon %d"                  %(ribbon)
+                    cmd = cmd + " --session %d"                 %(session)
                     cmd = cmd + " --section %d"                 %(sectnum)
                     cmd = cmd + " --oneribbononly True"
 
@@ -90,10 +92,10 @@ class CreateRawDataRenderStacks(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateRawDataRenderStacks")
 
-    def run(self, sessionFolders):
+    def run(self):
 
         p = self.paras
-        for sessionFolder in sessionFolders:
+        for sessionFolder in self.sessionFolders:
 
             logger.info("Processing session folder: " + sessionFolder)
             [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
@@ -120,8 +122,8 @@ class CreateRawDataRenderStacks(atpp.PipelineProcess):
                 cmd = cmd + " --render.port %d"           %rp.hostPort
                 cmd = cmd + " --render.memGB %s"          %rp.memGB
                 cmd = cmd + " --log_level %s"             %rp.logLevel
-                cmd = cmd + " --statetableFile %s"        %(self.paras.toMount(statetablefile))
-                cmd = cmd + " --projectDirectory %s"      %(self.paras.toMount(projectroot))
+                cmd = cmd + " --statetableFile %s"        %(p.toMount(statetablefile))
+                cmd = cmd + " --projectDirectory %s"      %(p.toMount(projectroot))
                 cmd = cmd + " --dataOutputFolder %s"      %(posixpath.join("." , p.dataOutputFolder.replace('\\', '/')))
                 cmd = cmd + " --outputStackPrefix S%d_"   %(session)
                 cmd = cmd + " --reference_channel %s"     %(p.referenceChannelRegistration)
@@ -135,10 +137,10 @@ class CreateMedianFiles(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateMedianFiles")
 
-    def run(self, sessionFolders):
+    def run(self):
         p = self.paras
 
-        for sessionFolder in sessionFolders:
+        for sessionFolder in self.sessionFolders:
 
             logger.info("Creating median files for session folder: " + sessionFolder)
             [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
@@ -179,10 +181,10 @@ class CreateFlatFieldCorrectedData(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateFlatFieldCorrectedData")
 
-    def run(self, sessionFolders):
+    def run(self):
         p = self.paras
 
-        for sessionFolder in sessionFolders:
+        for sessionFolder in self.sessionFolders:
 
             logger.info("Processing session folder: " + sessionFolder)
             [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
@@ -228,10 +230,10 @@ class CreateStitchedSections(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateStitchedSections")
 
-    def run(self, sessionFolders):
+    def run(self):
         p = self.paras
 
-        for sessionFolder in sessionFolders:
+        for sessionFolder in self.sessionFolders:
 
             logger.info("Processing session folder: " + sessionFolder)
             [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
@@ -275,10 +277,10 @@ class DropStitchingMistakes(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "DropStitchingMistakes")
 
-    def run(self, sessionFolders):
+    def run(self):
         p = self.paras
 
-        for sessionFolder in sessionFolders:
+        for sessionFolder in self.sessionFolders:
             logger.info("Processing session folder: " + sessionFolder)
             [projectroot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
