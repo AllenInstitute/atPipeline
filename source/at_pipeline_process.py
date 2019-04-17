@@ -3,6 +3,7 @@ import logging
 import subprocess
 import at_system_config
 import os
+from abc import ABC, abstractmethod
 
 logger = logging.getLogger('atPipeline')
 
@@ -11,6 +12,10 @@ class PipelineProcess():
         self.paras = _paras
         self.name = _name
         self.sessionFolders = self.createSessionFolders()
+
+    @abstractmethod
+    def checkIfDone(self):
+        pass
 
     def createSessionFolders(self):
         p = self.paras
@@ -24,6 +29,7 @@ class PipelineProcess():
 
     def run(self):
         logger.info(" Running Pipeline Process: " + self.name + " =======================")
+        self.checkIfDone()
 
     def submit(self, cmd):
         logger.info(" Submitting job: " + self.name + ". \n\nCMD: " + cmd.replace('--', '\n--') + "\n...........................")

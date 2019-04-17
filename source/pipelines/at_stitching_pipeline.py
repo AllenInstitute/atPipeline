@@ -54,7 +54,15 @@ class CreateStateTables(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateStateTables")
 
+    def checkIfDone(self):
+        #Query render for stack metadata for each session
+        #If stacks exists, then don't create new ones, unless overwrite data is True
+        #Optionally, check existence of raw data as well
+        #for sessionFolder in self.sessionFolders:
+        pass
+
     def run(self):
+        super().run()
         p = self.paras
 
         for sessionFolder in self.sessionFolders:
@@ -86,14 +94,23 @@ class CreateStateTables(atpp.PipelineProcess):
 
     		        #Run ====================
                     self.submit(cmd)
+        self.validate()
 
 class CreateRawDataRenderStacks(atpp.PipelineProcess):
 
     def __init__(self, _paras):
         super().__init__(_paras, "CreateRawDataRenderStacks")
 
-    def run(self):
+    def checkIfDone(self):
+        #Query render for stack metadata for each session
+        #If stacks exists, then don't create new ones, unless overwrite data is True
+        #Optionally, check existence of raw data as well
+        #for sessionFolder in self.sessionFolders:
+        pass
 
+
+    def run(self):
+        super().run()
         p = self.paras
         for sessionFolder in self.sessionFolders:
 
@@ -138,6 +155,7 @@ class CreateMedianFiles(atpp.PipelineProcess):
         super().__init__(_paras, "CreateMedianFiles")
 
     def run(self):
+        super().run()
         p = self.paras
 
         for sessionFolder in self.sessionFolders:
@@ -182,6 +200,7 @@ class CreateFlatFieldCorrectedData(atpp.PipelineProcess):
         super().__init__(_paras, "CreateFlatFieldCorrectedData")
 
     def run(self):
+        super().run()
         p = self.paras
 
         for sessionFolder in self.sessionFolders:
@@ -231,6 +250,7 @@ class CreateStitchedSections(atpp.PipelineProcess):
         super().__init__(_paras, "CreateStitchedSections")
 
     def run(self):
+        super().run()
         p = self.paras
 
         for sessionFolder in self.sessionFolders:
@@ -278,6 +298,7 @@ class DropStitchingMistakes(atpp.PipelineProcess):
         super().__init__(_paras, "DropStitchingMistakes")
 
     def run(self):
+        super().run()
         p = self.paras
 
         for sessionFolder in self.sessionFolders:
