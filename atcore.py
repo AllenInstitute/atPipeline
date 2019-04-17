@@ -6,20 +6,19 @@ import docker
 import argparse
 import logging
 import at_logging
-
-logger = at_logging.setup_custom_logger('atPipeline')
+logger = at_logging.create_logger('atPipeline')
 import at_docker_manager
-from fine_align import at_fine_align_pipeline
+from pipelines import at_fine_align_pipeline, at_stitching_pipeline, at_rough_align_pipeline
+
 from source import *
 import source.at_utils as u
 import at_system_config
 import at_pipeline
-import at_stitching_pipeline
-import at_rough_align_pipeline
-
 
 
 def scriptArguments(caller = None):
+
+
     #Get processing parameters
     parser = argparse.ArgumentParser(prog = caller)
     parser._action_groups.pop()
@@ -94,6 +93,7 @@ def main():
         if system_parameters.pipeline == 'stitch':
             logger.info('Running stitching pipeline')
             aPipeline = at_stitching_pipeline.Stitch(system_parameters)
+
         elif system_parameters.pipeline == 'roughalign':
             aPipeline = at_rough_align_pipeline.RoughAlign(system_parameters)
 
