@@ -112,7 +112,6 @@ def main():
                print("Create FineAligned Stacks.")
                create_fine_aligned_stacks.run(parameters, sessionFolder)
 
-
         timeDuration = "{0:.2f}".format((timeit.default_timer() - timeStart)/60.0)
         print("Elapsed time: " + timeDuration + " minutes")
 
