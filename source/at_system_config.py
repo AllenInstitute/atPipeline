@@ -21,6 +21,7 @@ class ATSystemConfig:
         self.SPARK_SEC                                     = self.config['SPARK']
         self.DATA_INPUT                                    = self.config['DATA_INPUT']
         self.mounts                                        = ast.literal_eval(self.general['DATA_ROOTS'])
+        self.createCommonReferences()
 
     def getNrOfSectionsInRibbon(self, ribbon):
         #Get ribbon index
@@ -70,8 +71,13 @@ class ATSystemConfig:
     #The arguments passed here are captured from the commandline and will over ride any option
     #present in the system config file
     def createReferences(self, args = None, caller = None, dataInfo = None):
-
         self.dataInfo                                 = dataInfo
+        if caller == "pipeline":
+            self.createReferencesForPipeline(args, dataInfo)
+        elif caller == "backend_management":
+            self.createReferencesForBackend(args)
+
+    def createCommonReferences(self):
         self.atCoreContainer                          = self.general['AT_CORE_DOCKER_CONTAINER']
         self.atCoreThreads                            = int(self.general['AT_CORE_THREADS'])
         self.downSampleScale                          = self.general['DOWN_SAMPLE_SCALE']
@@ -129,11 +135,6 @@ class ATSystemConfig:
         self.excludeSameSectionNeighbors              = u.toBool(self.tp_client['EXCLUDE_SAME_SECTION_NEIGHBOR'])
         self.zNeighborDistance                        = int(self.tp_client['Z_NEIGHBOR_DISTANCE'])
         self.xyNeighborFactor                         = float(self.tp_client['XY_NEIGHBOR_FACTOR'])
-
-        if caller == "pipeline":
-            self.createReferencesForPipeline(args, dataInfo)
-        elif caller == "backend_management":
-            self.createReferencesForBackend(args)
 
     def createReferencesForBackend(self, args = None):
         self.mountRenderPythonApps                    = u.toBool(self.general['MOUNT_RENDER_PYTHON_APPS'])

@@ -4,7 +4,7 @@ import os
 import pathlib
 import docker
 import argparse
-import logging
+#import logging
 import at_logging
 logger = at_logging.create_logger('atPipeline')
 import at_docker_manager
@@ -15,10 +15,7 @@ import source.at_utils as u
 import at_system_config
 import at_pipeline
 
-
-def scriptArguments(caller = None):
-
-
+def parseArguments(caller = None):
     #Get processing parameters
     parser = argparse.ArgumentParser(prog = caller)
     parser._action_groups.pop()
@@ -39,7 +36,8 @@ def scriptArguments(caller = None):
     optional.add_argument('--lastsection',          help='Specify end section',                                                 type=int)
     optional.add_argument('--overwritedata',        help='Overwrite any already processed data',                                            action='store_true')
     optional.add_argument('--loglevel',             help='Set program loglevel',                                                type=str,   default='INFO' )
-    return parser
+    args = parser.parse_args()
+    return parser, args
 
 def main():
 
@@ -52,8 +50,8 @@ def main():
 
         system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, 'at-system-config.ini'))
 
-        parser = scriptArguments('pipeline')
-        args = parser.parse_args()
+        parser, args = parseArguments('pipeline')
+
 
         if args.loglevel == 'INFO':
             logger.setLevel(logging.INFO)

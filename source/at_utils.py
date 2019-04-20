@@ -17,7 +17,6 @@ logger = logging.getLogger('atPipeline')
 def toBool(v):
   return  v.lower() in ("yes", "true", "t", "1")
 
-
 def setupParameters():
     parser = argparse.ArgumentParser()
     parser.add_argument('parameter_file', help='Input file')
@@ -131,7 +130,6 @@ def getChannelNamesInSessionFolder(directory):
         for name in dirs:
             directory_list.append(os.path.join(root, name))
     return dirs
-
 
 def dump_json(data, fileName):
     with open(fileName, 'w') as outfile:
