@@ -62,6 +62,8 @@ class SubVolume(Resource):
         #Run =============
         logger.info("Running: " + cmd.replace('--', '\n--'))
 
-        #proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
-        #for line in proc.stdout.readlines():
-        #    logger.info(line.rstrip())
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+        for line in proc.stdout.readlines():
+            logger.info(line.rstrip())
+
+        return ostack.stack_name
