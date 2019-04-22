@@ -62,6 +62,7 @@ def main():
 
         test = renderapi.render.get_owners(render = rc)
 
+        renderapi.stack.
         #Create a SubVolume object, pass renderhost parameters and system parameters
         sv = SubVolume(rc, system_config)
 
