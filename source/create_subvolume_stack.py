@@ -1,6 +1,9 @@
 import os
 import timeit
 import subprocess
+import at_logging
+
+logger = at_logging.create_logger('atPipeline')
 ##example_parameters={
 ##    "render":{
 ##        "host":"ibs-forrestc-ux1",
@@ -22,22 +25,21 @@ import subprocess
 ##
 ##}
 
-
 def run():
-    input_stack  = "STI_Session1"
-    output_stack = "SV_STI_Session1"
-    owner        = "ATExplorer"
+    input_stack  = "S1_Stitched"
+    output_stack = "S1_Stitched_Subvolume"
+    owner        = "Testing"
     project      = "M33"
     minZ         = 400
-    maxZ         = 404
-    minX         = 1500
-    maxX         = 2500
-    minY         = 5700
-    maxY         = 6700
+    maxZ         = 403
+    minX         = 1973
+    maxX         = 4454
+    minY         = 4633
+    maxY         = 6068
     pool_size    = 5
 
     #upload acquisition stacks
-    cmd = "docker exec renderapps_multchan python -m renderapps.stack.create_subvolume_stack"
+    cmd = "docker exec atcore python -m renderapps.stack.create_subvolume_stack"
     cmd = cmd + " --render.host W10DTMJ03EG6Z.corp.alleninstitute.org"
     cmd = cmd + " --render.client_scripts /shared/render/render-ws-java-client/src/main/scripts"
     cmd = cmd + " --render.port 80"
@@ -45,7 +47,7 @@ def run():
     cmd = cmd + " --render.owner %s "%owner
     cmd = cmd + " --render.project %s "%project
     cmd = cmd + " --log_level INFO"
-    cmd = cmd + " --directory %s "%("/mnt/data/M33/processed/subvolume")
+    cmd = cmd + " --directory %s "%("/data/M33/processed/subvolume")
     cmd = cmd + " --input_stack %s"%input_stack
     cmd = cmd + " --output_stack %s"%output_stack
     cmd = cmd + " --minX %d"%minX

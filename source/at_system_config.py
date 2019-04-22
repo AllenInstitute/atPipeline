@@ -21,6 +21,7 @@ class ATSystemConfig:
         self.SPARK_SEC                                     = self.config['SPARK']
         self.DATA_INPUT                                    = self.config['DATA_INPUT']
         self.mounts                                        = ast.literal_eval(self.general['DATA_ROOTS'])
+        self.createCommonReferences()
 
     def getNrOfSectionsInRibbon(self, ribbon):
         #Get ribbon index
@@ -34,12 +35,14 @@ class ATSystemConfig:
         #The ribbons are consecutive, with various number of sections
         #The user will supply a start, end section to process. That range may span
         #multiple ribbons and are numbered 1-N ("global" indexes).
+        #When a ribbon is being processed, a "local" section index is used, starting at 0 for each
+        #ribbon
         sectionIndices = []
         sectionIndicesArray = []
 
         #First create a "ribbon indices" arrays, holding global and local indices
         for i in range(self.dataInfo['NumberOfSections']):
-            sectionIndices = {'global' : i + 1, 'local' : -1, 'ribbon' : ''} #Simple dict helping with book keeping
+            sectionIndices = {'global' : i, 'local' : -1, 'ribbon' : ''} #Simple dict helping with book keeping
             sectionIndicesArray.append(sectionIndices)
 
         #Populate 'local' indices, i.e. section index per ribbon. These starts at 0
@@ -53,20 +56,28 @@ class ATSystemConfig:
                 globalIndex = globalIndex + 1
 
         #Now loop over first to last, and capture 'indices' falling on current input ribbon
+        #First section starts at '1' (not zero)
         wantedIndices = []
         for i in range(self.firstSection, self.lastSection + 1):
-            indices = sectionIndicesArray[i-1]
+            indices = sectionIndicesArray[i]
             if indices['ribbon'] == _ribbon:
                 wantedIndices.append(indices)
 
         length = len (wantedIndices)
+        if length == 0:
+            return -1, -1
         return wantedIndices[0]['local'], wantedIndices[length - 1]['local']
 
     #The arguments passed here are captured from the commandline and will over ride any option
     #present in the system config file
     def createReferences(self, args = None, caller = None, dataInfo = None):
-
         self.dataInfo                                 = dataInfo
+        if caller == "pipeline":
+            self.createReferencesForPipeline(args, dataInfo)
+        elif caller == "backend_management":
+            self.createReferencesForBackend(args)
+
+    def createCommonReferences(self):
         self.atCoreContainer                          = self.general['AT_CORE_DOCKER_CONTAINER']
         self.atCoreThreads                            = int(self.general['AT_CORE_THREADS'])
         self.downSampleScale                          = self.general['DOWN_SAMPLE_SCALE']
@@ -125,11 +136,6 @@ class ATSystemConfig:
         self.zNeighborDistance                        = int(self.tp_client['Z_NEIGHBOR_DISTANCE'])
         self.xyNeighborFactor                         = float(self.tp_client['XY_NEIGHBOR_FACTOR'])
 
-        if caller == "pipeline":
-            self.createReferencesForPipeline(args, dataInfo)
-        elif caller == "backend_management":
-            self.createReferencesForBackend(args)
-
     def createReferencesForBackend(self, args = None):
         self.mountRenderPythonApps                    = u.toBool(self.general['MOUNT_RENDER_PYTHON_APPS'])
         self.mountRenderModules                       = u.toBool(self.general['MOUNT_RENDER_MODULES'])
@@ -143,9 +149,6 @@ class ATSystemConfig:
         self.DATA_INPUT['PROJECT_NAME']               = self.projectName
         self.dataOutputFolder                         = os.path.join(self.dataOutputFolder, self.projectName)
         self.absoluteDataOutputFolder                 = os.path.join(self.projectDataFolder, self.dataOutputFolder)
-
-        self.ribbons                                  = "" #ast.literal_eval(self.DATA_INPUT['RIBBONS'])
-        self.sessions                                 = "" #ast.literal_eval(self.DATA_INPUT['SESSIONS'])
 
         #Over write any default values with any argument/values from the command line
         if args.firstsection != None:
@@ -189,7 +192,6 @@ class ATSystemConfig:
         #When used for input data
         #Create a "renderProject" to make things easier
         self.renderProject = rp.RenderProject(self.renderProjectOwner, self.projectName, self.renderHost, self.renderHostPort, self.clientScripts, self.memGB, self.logLevel)
-
 
     def getStateTableFileName(self, ribbon, session, sectnum):
         return os.path.join(self.absoluteDataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))

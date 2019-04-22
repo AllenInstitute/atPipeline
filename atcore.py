@@ -4,19 +4,18 @@ import os
 import pathlib
 import docker
 import argparse
-import logging
+#import logging
 import at_logging
-
-logger = at_logging.setup_custom_logger('atPipeline')
+logger = at_logging.create_logger('atPipeline')
 import at_docker_manager
+from pipelines import at_fine_align_pipeline, at_stitching_pipeline, at_rough_align_pipeline
+
 from source import *
 import source.at_utils as u
 import at_system_config
 import at_pipeline
-import at_stitching_pipeline
 
-
-def scriptArguments(caller = None):
+def parseArguments(caller = None):
     #Get processing parameters
     parser = argparse.ArgumentParser(prog = caller)
     parser._action_groups.pop()
@@ -37,7 +36,8 @@ def scriptArguments(caller = None):
     optional.add_argument('--lastsection',          help='Specify end section',                                                 type=int)
     optional.add_argument('--overwritedata',        help='Overwrite any already processed data',                                            action='store_true')
     optional.add_argument('--loglevel',             help='Set program loglevel',                                                type=str,   default='INFO' )
-    return parser
+    args = parser.parse_args()
+    return parser, args
 
 def main():
 
@@ -50,8 +50,8 @@ def main():
 
         system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, 'at-system-config.ini'))
 
-        parser = scriptArguments('pipeline')
-        args = parser.parse_args()
+        parser, args = parseArguments('pipeline')
+
 
         if args.loglevel == 'INFO':
             logger.setLevel(logging.INFO)
@@ -65,17 +65,16 @@ def main():
         if args.dataroot and not args.pipeline:
             lvl = logger.getEffectiveLevel()
             lvlName = logging.getLevelName(lvl)
-            cmd = 'docker exec clang atcore --dataroot ' + system_parameters.toMount(args.dataroot) + ' --datainfo --loglevel ' + lvlName
+            cmd = 'docker exec clang atcli --dataroot ' + system_parameters.toMount(args.dataroot) + ' --datainfo --loglevel ' + lvlName
             lines = u.runShellCMD(cmd, True)
             for line in lines:
                 print (line.rstrip())
-
 
             print ('To process this data, supply a valid pipeline name to --pipeline. Valid pipelines are stitch, align and register')
             return
 
         #Query atcore for any data processing information we may need to setup, such as Ribbon, session and section information
-        cmd = 'docker exec clang atcore --json --dataroot ' + system_parameters.toMount(args.dataroot)
+        cmd = 'docker exec clang atcli --json --dataroot ' + system_parameters.toMount(args.dataroot)
         dataInfo = json.loads(u.getJSON(cmd))
 
         #All parameters are now well defined, copy them (and do some parsing) to a file where output data is written
@@ -92,8 +91,14 @@ def main():
         if system_parameters.pipeline == 'stitch':
             logger.info('Running stitching pipeline')
             aPipeline = at_stitching_pipeline.Stitch(system_parameters)
+
+        elif system_parameters.pipeline == 'roughalign':
+            aPipeline = at_rough_align_pipeline.RoughAlign(system_parameters)
+
+        elif system_parameters.pipeline == 'finealign':
+            aPipeline = at_fine_align_pipeline.FineAlign(system_parameters)
         else:
-            logger.error('No such pipeline: ' + system_parameters.pipeline)
+            logger.error('No such pipeline: "' + system_parameters.pipeline + '"')
             raise Exception('No such pipeline')
 
         #Run the pipeline
