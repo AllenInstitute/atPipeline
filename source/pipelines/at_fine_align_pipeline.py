@@ -17,7 +17,7 @@ class FineAlign(atp.ATPipeline):
         super().__init__(_paras)
 
         #Define the pipeline
-        self.roughAlignPipeline                     =  at_rough_align_pipeline.RoughAlign(_paras)
+        #self.roughAlignPipeline                     =  at_rough_align_pipeline.RoughAlign(_paras)
         self.consolidateRoughAlignedStackTransforms = ConsolidateRoughAlignedStackTransforms(_paras)
         self.create_2D_pointmatches                 = Create_2D_pointmatches(_paras)
         self.create_HR_tilepairs                    = Create_HR_tilepairs(_paras)
@@ -28,7 +28,7 @@ class FineAlign(atp.ATPipeline):
         atp.ATPipeline.run(self)
 
         #Run any pre pipeline(s)
-        self.roughAlignPipeline.run()
+        #self.roughAlignPipeline.run()
 
         self.consolidateRoughAlignedStackTransforms.run()
         logger.newline()
@@ -124,7 +124,7 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
             cmd = cmd + " --output_json Test"
 
             # Run =============
-            #self.submit(cmd)
+            self.submit(cmd)
         self.validate()
 
 class Create_HR_tilepairs(atpp.PipelineProcess):
@@ -151,7 +151,7 @@ class Create_HR_tilepairs(atpp.PipelineProcess):
             if os.path.isdir(jsonOutputFolder) == False:
                 os.mkdir(jsonOutputFolder)
 
-            jsonfile = os.path.join(jsonOutputFolder, "tilepairs-%d-%d-%d-nostitch.json"     %(p.zNeighborDistance, firstSection, lastSection))
+            jsonfile = os.path.join(jsonOutputFolder, "tilepairs-%d-%d-%d-%d-nostitch.json"     %(session, p.zNeighborDistance, firstSection, lastSection))
 
             #Run the TilePairClient
             cmd = "docker exec " + p.atCoreContainer
@@ -170,18 +170,19 @@ class Create_HR_tilepairs(atpp.PipelineProcess):
             cmd = cmd + " --xyNeighborFactor %s"                    %(p.xyNeighborFactor)
 
             #Run =============
-            #self.submit(cmd)
+            self.submit(cmd)
 
             #Prepare json file for the SIFTPointMatch Client
-            jsonfileedit      = os.path.join(jsonOutputFolder, "tilepairs-%d-%d-%d-nostitch-EDIT.json"%(p.zNeighborDistance, firstSection, lastSection))
+            jsonfileedit      = os.path.join(jsonOutputFolder, "tilepairs-%d-%d-%d-%d-nostitch-EDIT.json"%(session, p.zNeighborDistance, firstSection, lastSection))
 
-##            if os.path.isfile(jsonfileedit) == False:
-##                raise ValueError("The file: " + jsonfileedit + " don't exist. Bailing..")
-##
-##            copyfile(jsonfile, jsonfileedit)
-##            for line in fileinput.input(jsonfileedit, inplace=True):
-##                print(line.replace("render-parameters", "render-parameters?removeAllOption=true"), end="")
-        self.validate()
+            copyfile(jsonfile, jsonfileedit)
+
+            if os.path.isfile(jsonfileedit) == False:
+                raise ValueError("The file: " + jsonfileedit + " don't exist. Bailing..")
+
+            for line in fileinput.input(jsonfileedit, inplace=True):
+                print(line.replace("render-parameters", "render-parameters?removeAllOption=true"), end="")
+            self.validate()
 
 
 class Create_HR_pointmatches(atpp.PipelineProcess):
@@ -208,7 +209,7 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
             match_collection_name = "%s_HR_3D"%(rp.projectName)
 
             jsonInputFolder = os.path.join(projectRoot, p.dataOutputFolder, "high_res_tilepairfiles")
-            jsonInput       = os.path.join(jsonInputFolder, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, firstSection, lastSection))
+            jsonInput       = os.path.join(jsonInputFolder, "tilepairs-%d-%d-%d-%d-nostitch-EDIT.json"     %(session, p.zNeighborDistance, firstSection, lastSection))
 
             #SIFT Point Match Client
             cmd = "docker exec " + p.atCoreContainer
@@ -239,6 +240,8 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
             cmd = cmd + " --renderScale 1.0"
             cmd = cmd + " --matchRod 0.5"
             #cmd = cmd + " --matchFilter CONSENSUS_SETS"
+            self.submit(cmd)
+
         self.validate()
 
 class Create_fine_aligned_stacks(atpp.PipelineProcess):
@@ -292,6 +295,6 @@ class Create_fine_aligned_stacks(atpp.PipelineProcess):
             cmd = cmd + " --output_json %s"%(p.toMount(output_json))
 
             # Run =============
-            #self.submit(cmd)
+            self.submit(cmd)
         self.validate()
 

@@ -4,7 +4,7 @@ import os
 import pathlib
 import docker
 import argparse
-#import logging
+import logging
 import at_logging
 logger = at_logging.create_logger('atPipeline')
 import at_docker_manager

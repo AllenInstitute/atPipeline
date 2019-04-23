@@ -30,7 +30,7 @@ class RoughAlign(atp.ATPipeline):
     def run(self):
         atp.ATPipeline.run(self)
         #Run any pre pipeline(s)
-        self.stitchingPipeline.run()
+        #self.stitchingPipeline.run()
 
         self.create_lowres_stacks.run()
         self.create_lowres_tilepairs.run()
@@ -117,7 +117,7 @@ class CreateLowResTilePairs(atpp.PipelineProcess):
             if os.path.isdir(jsondir) == False:
                 os.mkdir(jsondir)
 
-            jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch.json"     %(p.zNeighborDistance, firstSection, lastSection))
+            jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-%d-nostitch.json"     %(session, p.zNeighborDistance, firstSection, lastSection))
 
             #Run the TilePairClient
             cmd = "docker exec " + p.atCoreContainer
@@ -139,7 +139,7 @@ class CreateLowResTilePairs(atpp.PipelineProcess):
             self.submit(cmd)
 
             #Prepare json file for the SIFTPointMatch Client
-            jsonfileedit      = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"%(p.zNeighborDistance, firstSection, lastSection))
+            jsonfileedit      = os.path.join(jsondir, "tilepairs-%d-%d-%d-%d-nostitch-EDIT.json"%(session, p.zNeighborDistance, firstSection, lastSection))
             copyfile(jsonfile, jsonfileedit)
 
             for line in fileinput.input(jsonfileedit, inplace=True):
@@ -172,7 +172,7 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             downsample_dir   = os.path.join(projectRoot, p.dataOutputFolder, "low_res")
 
             jsondir  = os.path.join(projectRoot, p.dataOutputFolder, "lowres_tilepairfiles")
-            jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-nostitch-EDIT.json"     %(p.zNeighborDistance, firstSection, lastSection))
+            jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-%d-nostitch-EDIT.json"     %(session, p.zNeighborDistance, firstSection, lastSection))
 
             #SIFT Point Match Client
             cmd = "docker exec " + p.atCoreContainer
