@@ -106,6 +106,18 @@ RUN pip install -e /shared/render-python-apps
 WORKDIR /pipeline
 COPY ./pipeline/ /pipeline
 
-WORKDIR /work
+# Build atcli
+ENV CC=/usr/bin/clang
+ENV CXX=/usr/bin/clang++
+RUN mkdir /libs
+COPY ./docker/clang-container/third-party-libs /libs
+RUN mkdir /build 
+COPY ./docker/clang-container/build-thirdparty-libs.bash /build
+WORKDIR /build
+RUN bash build-thirdparty-libs.bash
 
+ENV TZ=US/Pacific
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+WORKDIR /work
 CMD [ "/bin/bash" ]
