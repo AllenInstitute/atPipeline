@@ -5,36 +5,44 @@ import docker
 import argparse
 import traceback
 import at_logging
-logger = at_logging.setup_custom_logger('atPipeline')
+logger = at_logging.create_logger('atPipeline')
 import at_docker_manager
 import at_system_config
 
 def setupArguments(parser):
     #Get processing parameters
-    parser.add_argument('--startall',            help='Start the whole AT backend',          action='store_true')
-    parser.add_argument('--startbackend',        help='Start the whole backend',             action='store_true')
-    parser.add_argument('--startrenderbackend',  help='Start the Render backend',            action='store_true')
-    parser.add_argument('--killall',             help='Stop the AT backend',                 action='store_true')
-    parser.add_argument('--prune_all',           help='Prune the AT backend',                action='store_true')
-    parser.add_argument('--prune_containers',    help='Prune the AT backend',                action='store_true')
-    parser.add_argument('--prune_images',        help='Prune the AT backend',                action='store_true')
-    parser.add_argument('--restartall',          help='Restart all AT backend container',    action='store_true' )
-    parser.add_argument('--status',              help='Get backend status',                  action='store_true' )
+    cmdgroup = parser.add_mutually_exclusive_group()
+    cmdgroup.add_argument('--startall',            help='Start the whole AT backend',          action='store_true')
+    cmdgroup.add_argument('--startrenderbackend',  help='Start the Render backend',            action='store_true')
+    cmdgroup.add_argument('--killall',             help='Stop the AT backend',                 action='store_true')
+    cmdgroup.add_argument('--prune_all',           help='Prune the AT backend',                action='store_true')
+    cmdgroup.add_argument('--prune_containers',    help='Prune the AT backend',                action='store_true')
+    cmdgroup.add_argument('--prune_images',        help='Prune the AT backend',                action='store_true')
+    cmdgroup.add_argument('--restartall',          help='Restart all AT backend container',    action='store_true' )
+    cmdgroup.add_argument('--status',              help='Get backend status',                  action='store_true' )
 
-    parser.add_argument('-s', '--start',         help='Start a specific backend container, e.g. atcore',     nargs='?',const='atcore', type=str)
-    parser.add_argument('-k', '--kill',          help='Stop a specific backend cointainer',                  nargs='?',const='atcore', type=str)
-    parser.add_argument('-r', '--restart',       help='Restart a specific backend container, e.g. atcore',   nargs='?',const='atcore', type=str)
+    cmdgroup.add_argument('-s', '--start',         help='Start a specific backend container, e.g. atcore',     nargs='?',const='atcore', type=str)
+    cmdgroup.add_argument('-k', '--kill',          help='Stop a specific backend cointainer',                  nargs='?',const='atcore', type=str)
+    cmdgroup.add_argument('-r', '--restart',       help='Restart a specific backend container, e.g. atcore',   nargs='?',const='atcore', type=str)
+
+    # Flags to alter behaviour
+    parser.add_argument('--atcore_image', type=str, help='Name of atcore image to use', default='atpipeline/atcore:dev')
+    parser.add_argument('--config_folder', type=str, help='Path to config folder', default=None)
 
 def main():
 
     try:
         logger.info('============ Managing the atBackend =============')
+        
+        parser = argparse.ArgumentParser()
+        setupArguments(parser)
+        args = parser.parse_args()
 
-        dManager = at_docker_manager.DockerManager()
+        dManager = at_docker_manager.DockerManager(configFolder=args.config_folder, atcore_image=args.atcore_image)
 
         #Keep arguments in main module for visibility
-        setupArguments(dManager.argparser)
-        args = dManager.parseCommandLineArguments()
+        #setupArguments(dManager.argparser)
+        #args = dManager.parseCommandLineArguments()
 
         if args.restart:
             dManager.reStartContainer(args.restart)
