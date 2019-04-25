@@ -9,7 +9,7 @@ logger = logging.getLogger('atPipeline')
 
 #A simple docker manager, wrapping some of the DockerSDK
 class DockerManager:
-    def __init__(self,):
+    def __init__(self, configFolder=None, atcore_image=None):
 
         logger = logging.getLogger('atPipeline')
         self.argparser = argparse.ArgumentParser('backend_management')
@@ -18,21 +18,25 @@ class DockerManager:
         self.atCoreMounts = {}
         self.composeFile = ""
 
-        if os.name == 'posix':
-            self.configFolder = '/usr/local/etc/'
-        elif os.name == 'nt':
-            #Read from environment
+        if configFolder:
+            self.configFolder = configFolder
+        elif 'AT_SYSTEM_CONFIG_FOLDER' in os.environ:
             self.configFolder = os.environ['AT_SYSTEM_CONFIG_FOLDER']
+        elif os.name == 'posix':
+            self.configFolder = '/usr/local/etc/'
+        else:
+            raise Exception("No configFolder folder defined for %s." % os.name)
 
         self.paras = at_system_config.ATSystemConfig(os.path.join(self.configFolder, 'at-system-config.ini'))
+        self.paras.createReferences(caller="backend_management")
         self.setComposeFile(os.path.join(self.configFolder, 'at-docker-compose.yml'))
         self.setupMounts()
 
-    def parseCommandLineArguments(self):
-        args = self.argparser.parse_args()
-        self.paras.createReferences(args, self.argparser.prog)
-        return args
-
+        if atcore_image:
+            self.atcore_image = atcore_image
+        else:
+            self.atcore_image = 'atpipeline/atcore:dev'
+            
     def prune_containers(self):
         val = self.dClient.containers.prune()
         logger.info(val)
@@ -99,7 +103,7 @@ class DockerManager:
         if ctrName == "atcore":
             #This will do nothing, forever
             cmd = "tail -f /dev/null"
-            ctr = self.dClient.containers.run('atpipeline/atcore:dev-190320', volumes=self.atCoreMounts, command=cmd, cap_add=["SYS_ADMIN"], privileged=True, name=ctrName, detach=True)
+            ctr = self.dClient.containers.run(self.atcore_image, volumes=self.atCoreMounts, command=cmd, cap_add=["SYS_ADMIN"], privileged=True, name=ctrName, detach=True)
 
             if ctr == None:
                return False
