@@ -28,12 +28,7 @@ from at_system_config import ATSystemConfig
 def main():
     try:
         data_root = "c:\data"
-        if os.name == 'posix':
-            configFolder = '/usr/local/etc/'
-        elif os.name == 'nt':
-            #Read from environment
-            configFolder = os.environ['AT_SYSTEM_CONFIG_FOLDER']
-
+        configFolder = os.environ['AT_SYSTEM_CONFIG_FOLDER']
 
         system_config = ATSystemConfig(os.path.join(configFolder, 'at-system-config.ini'))
         system_config.DATA_INPUT['DATA_ROOT_FOLDER'] = data_root
@@ -62,7 +57,7 @@ def main():
 
         test = renderapi.render.get_owners(render = rc)
 
-        renderapi.stack.
+        #renderapi.stack.
         #Create a SubVolume object, pass renderhost parameters and system parameters
         sv = SubVolume(rc, system_config)
 

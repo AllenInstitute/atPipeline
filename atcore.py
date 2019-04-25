@@ -36,8 +36,12 @@ def parseArguments(caller = None):
     optional.add_argument('--lastsection',          help='Specify end section',                                                 type=int)
     optional.add_argument('--overwritedata',        help='Overwrite any already processed data',                                            action='store_true')
     optional.add_argument('--loglevel',             help='Set program loglevel',                                                type=str,   default='INFO' )
+    optional.add_argument('--version',              help='The version',                                                                     action='store_true')
+
     args = parser.parse_args()
     return parser, args
+
+ATCORE_VERSION = '0.0.1'
 
 def main():
 
@@ -52,6 +56,9 @@ def main():
 
         parser, args = parseArguments('pipeline')
 
+        if args.version:
+            print (ATCORE_VERSION)
+            return
 
         if args.loglevel == 'INFO':
             logger.setLevel(logging.INFO)
@@ -65,12 +72,11 @@ def main():
         if args.dataroot and not args.pipeline:
             lvl = logger.getEffectiveLevel()
             lvlName = logging.getLevelName(lvl)
-            cmd = 'docker exec clang atcli --dataroot ' + system_parameters.toMount(args.dataroot) + ' --datainfo --loglevel ' + lvlName
+            cmd = 'docker exec clang atcli --json --dataroot ' + system_parameters.toMount(args.dataroot)
             lines = u.runShellCMD(cmd, True)
             for line in lines:
                 print (line.rstrip())
 
-            print ('To process this data, supply a valid pipeline name to --pipeline. Valid pipelines are stitch, align and register')
             return
 
         #Query atcore for any data processing information we may need to setup, such as Ribbon, session and section information

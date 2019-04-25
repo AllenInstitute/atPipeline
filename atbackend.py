@@ -5,7 +5,7 @@ import docker
 import argparse
 import traceback
 import at_logging
-logger = at_logging.setup_custom_logger('atPipeline')
+logger = at_logging.create_logger('atPipeline')
 import at_docker_manager
 import at_system_config
 

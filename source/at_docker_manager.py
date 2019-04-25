@@ -47,8 +47,12 @@ class DockerManager:
 
     def status(self):
         containers = self.dClient.containers.list(all=True)
+
         for ctr in containers:
             logger.info("Container: " + ctr.name + " : " + ctr.status)
+
+        #If everythin is ok, return 0
+        return 0
 
     def setComposeFile(self, fName):
         #Check that file exists, otherwise raise an error
