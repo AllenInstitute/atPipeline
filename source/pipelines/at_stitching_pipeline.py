@@ -281,7 +281,7 @@ class CreateStitchedSections(atpp.PipelineProcess):
                 with open(p.stitching_template) as json_data:
                      stitching_template = json.load(json_data)
 
-                stitching_json = os.path.join(stitching_dir, "flatfield""_%s_%s_%d.json"%(ribbon, session, sectnum))
+                stitching_json = os.path.join(stitching_dir, "stitched""_%s_%s_%d.json"%(ribbon, session, sectnum))
                 z = ribbon*100 + sectnum
 
                 u.savestitchingjson(stitching_template, stitching_json, renderProject, flatfield_stack, stitched_stack, z)
