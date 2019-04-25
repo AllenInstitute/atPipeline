@@ -72,7 +72,7 @@ def main():
         if args.dataroot and not args.pipeline:
             lvl = logger.getEffectiveLevel()
             lvlName = logging.getLevelName(lvl)
-            cmd = 'docker exec clang atcli --json --dataroot ' + system_parameters.toMount(args.dataroot)
+            cmd = 'docker exec atcore atcli --json --dataroot ' + system_parameters.toMount(args.dataroot)
             lines = u.runShellCMD(cmd, True)
             for line in lines:
                 print (line.rstrip())
@@ -80,7 +80,7 @@ def main():
             return
 
         #Query atcore for any data processing information we may need to setup, such as Ribbon, session and section information
-        cmd = 'docker exec clang atcli --json --dataroot ' + system_parameters.toMount(args.dataroot)
+        cmd = 'docker exec atcore atcli --json --dataroot ' + system_parameters.toMount(args.dataroot)
         dataInfo = json.loads(u.getJSON(cmd))
 
         #All parameters are now well defined, copy them (and do some parsing) to a file where output data is written
