@@ -84,7 +84,7 @@ class CreateStateTables(atpp.PipelineProcess):
                    logger.info("The statetable: " + statetablefile + " already exists. Continuing..")
                 else:
                     cmd = "docker exec " + self.paras.atCoreContainer
-                    cmd = cmd + " python /pipeline/make_state_table_ext_multi_pseudoz.py"
+                    cmd = cmd + " /opt/conda/bin/python /pipeline/make_state_table_ext_multi_pseudoz.py"
                     cmd = cmd + " --projectDirectory %s"        %(p.toMount(project_root))
                     cmd = cmd + " --outputFile %s"              %(p.toMount(statetablefile))
                     cmd = cmd + " --ribbon %d"                  %(ribbon)
@@ -131,7 +131,7 @@ class CreateRawDataRenderStacks(atpp.PipelineProcess):
 
                 #upload acquisition stacks
                 cmd = "docker exec " + p.atCoreContainer
-                cmd = cmd + " python -m renderapps.dataimport.create_fast_stacks_multi"
+                cmd = cmd + " /opt/conda/bin/python -m renderapps.dataimport.create_fast_stacks_multi"
                 cmd = cmd + " --render.host %s"           %rp.host
                 cmd = cmd + " --render.owner %s "         %rp.owner
                 cmd = cmd + " --render.project %s"        %rp.projectName
@@ -187,7 +187,7 @@ class CreateMedianFiles(atpp.PipelineProcess):
             u.savemedianjson(med, median_json, rp, acq_stack, median_stack, self.paras.toMount(median_dir), ribbon*100 + firstSection, ribbon*100 + lastSection, True)
 
             cmd = "docker exec " + p.atCoreContainer
-            cmd = cmd + " python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
+            cmd = cmd + " /opt/conda/bin/python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
             cmd = cmd + " --render.port 80"
             cmd = cmd + " --input_json %s"%(self.paras.toMount(median_json))
 
@@ -238,7 +238,7 @@ class CreateFlatFieldCorrectedData(atpp.PipelineProcess):
 
                 u.saveflatfieldjson(ff, flatfield_json, renderProject, acq_stack, median_stack, flatfield_stack, p.toMount(flatfield_dir), z, True)
                 cmd = "docker exec " + p.atCoreContainer
-                cmd = cmd + " python -m rendermodules.intensity_correction.apply_multiplicative_correction"
+                cmd = cmd + " /opt/conda/bin/python -m rendermodules.intensity_correction.apply_multiplicative_correction"
                 cmd = cmd + " --render.port 80"
                 cmd = cmd + " --input_json %s"%(p.toMount(flatfield_json))
 
@@ -321,7 +321,7 @@ class DropStitchingMistakes(atpp.PipelineProcess):
 
             # command string
             cmd = "docker exec " + p.atCoreContainer
-            cmd = cmd + " python -m renderapps.stitching.detect_and_drop_stitching_mistakes"
+            cmd = cmd + " /opt/conda/bin/python -m renderapps.stitching.detect_and_drop_stitching_mistakes"
             cmd = cmd + " --render.owner %s"                        %(rp.owner)
             cmd = cmd + " --render.host %s"                         %(rp.host)
             cmd = cmd + " --render.project %s"                      %(rp.projectName)
