@@ -3,10 +3,10 @@ import logging
 import json
 import fileinput
 from shutil import copyfile
-import at_pipeline as atp
-import at_pipeline_process as atpp
+from .. import at_pipeline as atp
+from .. import at_pipeline_process as atpp
 from . import at_rough_align_pipeline
-import at_utils as u
+from .. import at_utils as u
 
 
 logger = logging.getLogger('atPipeline')

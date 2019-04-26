@@ -1,10 +1,10 @@
 import os
 import logging
 import json
-import at_pipeline as atp
-import at_pipeline_process as atpp
+from .. import at_pipeline as atp
+from .. import at_pipeline_process as atpp
 from . import at_stitching_pipeline
-import at_utils as u
+from .. import at_utils as u
 import fileinput
 from shutil import copyfile
 import posixpath

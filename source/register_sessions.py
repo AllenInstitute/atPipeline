@@ -1,6 +1,6 @@
-import at_utils as u
 import os
 import json
+from . import at_utils as u
 
 def run(p : u.ATDataIni, sessionFolder):
     owner = "multchan"
