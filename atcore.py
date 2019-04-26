@@ -79,7 +79,7 @@ def main():
 
         #All parameters are now well defined, copy them (and do some parsing) to a file where output data is written
         #The create references functions appends and overrides various arguments
-        system_parameters.createReferences(args, parser.prog, dataInfo)
+        system_parameters.createReferences(args, "pipeline", dataInfo)
 
         #Create data outputfolder and write processing parametrs to output folder
         if os.path.isdir(system_parameters.absoluteDataOutputFolder) == False:
