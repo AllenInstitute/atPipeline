@@ -17,11 +17,11 @@ def parseArguments(parser):
 
     parser.add_argument('--dataroot',
         help='Full path to data folder for project data to process',
-        required=True)
+        required=False)
     parser.add_argument('--pipeline',
         help='Specify the pipeline to use',
         choices={'stitch', 'roughalign', 'finealign'},
-        required=True)
+        required=False)
 
     parser.add_argument('--renderprojectowner',   help='Specify a RenderProject owner',                                       type=str,   nargs='?')
     parser.add_argument('--sessions',             help='Specify sessions to process',                                         type=str)
@@ -66,7 +66,6 @@ def main():
             lvl = logger.getEffectiveLevel()
             lvlName = logging.getLevelName(lvl)
             cmd = 'docker exec atcore atcli --json --dataroot ' + system_parameters.toMount(args.dataroot)
-            cmd = 'docker exec atcore atcli --dataroot ' + system_parameters.toMount(args.dataroot) + ' --datainfo --loglevel ' + lvlName
             lines = u.runShellCMD(cmd, True)
             for line in lines:
                 print (line.rstrip())

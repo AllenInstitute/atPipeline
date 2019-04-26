@@ -7,12 +7,12 @@ TEST_DATA_SET = 'Q1023'
 
 @pytest.fixture
 def at_backend():
-    import at_docker_manager
+    from source import at_docker_manager
     return at_docker_manager.DockerManager()
 
 @pytest.fixture
 def system_config():
-    import at_system_config
+    from source import at_system_config
     configFolder = os.environ[AT_SYSTEM_CONFIG_FOLDER_NAME]
     return at_system_config.ATSystemConfig(os.path.join(configFolder, AT_SYSTEM_CONFIG_FILE_NAME))
 

@@ -51,17 +51,21 @@ def test_test_data_folder(test_data_folder):
     assert res == True
 
 def test_atcore_version():
-    import at_utils as u
-    out = u.runShellCMD('python ..\\atcore.py --version --dataroot')
+    from source import at_utils as u
+    import atcore
+
+    #argv = ['atcore.py', '--version', '--dataroot']
+    #out = atcore.__main__(argv)
+    out = u.runShellCMD(r'python ..\..\atcore.py --version')
     res = (out == ['0.0.1\n'])
     assert res == True
 
 #Test integrity of input data.
 def test_meta_data(test_data_folder, test_data_set):
-    import at_utils as u
+    from source import at_utils as u
 
     data_root = os.path.join(test_data_folder, test_data_set)
-    cmd = 'python ..\\atcore.py --dataroot ' + data_root
+    cmd = 'python ..\\..\\atcore.py --dataroot ' + data_root
     out = u.getJSON(cmd)
     data = json.loads(out)
 
@@ -78,9 +82,9 @@ def test_meta_data(test_data_folder, test_data_set):
 
 #Create output data and compare output
 def test_data_creation(test_data_folder, test_data_set):
-    import at_utils as u
+    from source import at_utils as u
     data_root = os.path.join(test_data_folder, test_data_set)
-    cmd = 'python ..\\atcore.py --dataroot ' + data_root + ' --pipeline stitch --overwritedata --renderprojectowner PyTest'
+    cmd = r'python ..\..\atcore.py --dataroot ' + data_root + ' --pipeline stitch --overwritedata --renderprojectowner PyTest'
 
     #This will take about 15 minutes
     out = u.runShellCMD(cmd)
