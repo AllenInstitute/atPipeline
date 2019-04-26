@@ -1,11 +1,11 @@
 #The ATPipeline class
-import at_utils as u
 import logging
 import os
-import at_system_config as c
 import docker
 import subprocess
 import json
+from . import at_system_config as c
+from . import at_utils as u
 
 logger = logging.getLogger('atPipeline')
 

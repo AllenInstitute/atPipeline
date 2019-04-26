@@ -1,9 +1,9 @@
-import at_utils as u
 import logging
 import subprocess
-import at_system_config
 import os
 from abc import ABC, abstractmethod
+from . import at_system_config
+from . import at_utils as u
 
 logger = logging.getLogger('atPipeline')
 

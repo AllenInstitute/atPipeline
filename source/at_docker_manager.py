@@ -3,7 +3,7 @@ import logging
 import os
 import subprocess
 import pathlib
-import at_system_config
+from . import at_system_config
 import argparse
 logger = logging.getLogger('atPipeline')
 
@@ -25,7 +25,7 @@ class DockerManager:
         elif os.name == 'posix':
             self.configFolder = '/usr/local/etc/'
         else:
-            raise Exception("No configFolder folder defined for %s." % os.name)
+            raise Exception("No default configFolder folder defined for %s." % os.name)
 
         self.paras = at_system_config.ATSystemConfig(os.path.join(self.configFolder, 'at-system-config.ini'))
         self.paras.createReferences(caller="backend_management")
@@ -36,7 +36,7 @@ class DockerManager:
             self.atcore_image = atcore_image
         else:
             self.atcore_image = 'atpipeline/atcore:dev'
-            
+
     def prune_containers(self):
         val = self.dClient.containers.prune()
         logger.info(val)

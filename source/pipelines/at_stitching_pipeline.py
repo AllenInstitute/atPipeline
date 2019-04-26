@@ -1,9 +1,9 @@
 import os
 import logging
 import json
-import at_pipeline as atp
-import at_pipeline_process as atpp
-import at_utils as u
+from .. import at_pipeline as atp
+from .. import at_pipeline_process as atpp
+from .. import at_utils as u
 import posixpath
 
 logger = logging.getLogger('atPipeline')

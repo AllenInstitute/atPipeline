@@ -5,65 +5,58 @@ import pathlib
 import docker
 import argparse
 import logging
-import at_logging
+from source import at_logging, at_system_config, at_pipeline, at_docker_manager
+from source import at_utils as u
 logger = at_logging.create_logger('atPipeline')
-import at_docker_manager
-from pipelines import at_fine_align_pipeline, at_stitching_pipeline, at_rough_align_pipeline
-
-from source import *
-import source.at_utils as u
-import at_system_config
-import at_pipeline
-
-def parseArguments(caller = None):
-    #Get processing parameters
-    parser = argparse.ArgumentParser(prog = caller)
-    parser._action_groups.pop()
-    required = parser.add_argument_group('required arguments')
-    optional = parser.add_argument_group('optional arguments')
-
-    #Required arguments
-    required.add_argument('--dataroot',             help='Full path to data folder for project data to process',                type=str,   nargs='?',    required=True)
-
-    required.add_argument('--pipeline',             help='Specify the pipeline to use, e.g. stitch, finealign or register. \
-                                                                                                     Default = \'stitch\'',     type=str,   nargs='?',    const='stitch'    )
-
-    #Optional arguments
-    optional.add_argument('--renderprojectowner',   help='Specify a RenderProject owner',                                       type=str,   nargs='?')
-    optional.add_argument('--sessions',             help='Specify sessions to process',                                         type=str)
-    optional.add_argument('--ribbons',              help='Specify ribbons  to process',                                         type=str)
-    optional.add_argument('--firstsection',         help='Specify start section (e.g. \'1\' to start with a datasets first section)',                                             type=int)
-    optional.add_argument('--lastsection',          help='Specify end section',                                                 type=int)
-    optional.add_argument('--overwritedata',        help='Overwrite any already processed data',                                            action='store_true')
-    optional.add_argument('--loglevel',             help='Set program loglevel',                                                type=str,   default='INFO' )
-    optional.add_argument('--version',              help='The version',                                                                     action='store_true')
-
-    args = parser.parse_args()
-    return parser, args
+from source.pipelines import at_fine_align_pipeline, at_stitching_pipeline, at_rough_align_pipeline
 
 ATCORE_VERSION = '0.0.1'
 
+def parseArguments(parser):
+    parser.add_argument('--config_folder', help='Path to config folder', default=None)
+
+    parser.add_argument('--dataroot',
+        help='Full path to data folder for project data to process',
+        required=True)
+    parser.add_argument('--pipeline',
+        help='Specify the pipeline to use',
+        choices={'stitch', 'roughalign', 'finealign'},
+        required=True)
+
+    parser.add_argument('--renderprojectowner',   help='Specify a RenderProject owner',                                       type=str,   nargs='?')
+    parser.add_argument('--sessions',             help='Specify sessions to process',                                         type=str)
+    parser.add_argument('--ribbons',              help='Specify ribbons  to process',                                         type=str)
+    parser.add_argument('--firstsection',         help='Specify start section (e.g. \'1\' to start with a datasets first section)',                                             type=int)
+    parser.add_argument('--lastsection',          help='Specify end section',                                                 type=int)
+    parser.add_argument('--overwritedata',        help='Overwrite any already processed data',                                            action='store_true')
+    parser.add_argument('--loglevel',
+        choices={'INFO', 'DEBUG'},
+        help='Set program loglevel',
+        default='INFO')
+    parser.add_argument('--version', action='store_true', default=False)
+
 def main():
+    parser = argparse.ArgumentParser()
+    parseArguments(parser)
+    args = parser.parse_args()
 
     try:
-        if os.name == 'posix':
-            configFolder = '/usr/local/etc/'
-        elif os.name == 'nt':
-            #Read from environment
+        if args.config_folder:
+            configFolder = args.config_folder
+        elif 'AT_SYSTEM_CONFIG_FOLDER' in os.environ:
             configFolder = os.environ['AT_SYSTEM_CONFIG_FOLDER']
+        elif os.name == 'posix':
+            configFolder = '/usr/local/etc/'
+        else:
+            raise Exception("No default configFolder folder defined for %s." % os.name)
 
         system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, 'at-system-config.ini'))
-
-        parser, args = parseArguments('pipeline')
 
         if args.version:
             print (ATCORE_VERSION)
             return
 
-        if args.loglevel == 'INFO':
-            logger.setLevel(logging.INFO)
-        elif args.loglevel == 'DEBUG':
-            logger.setLevel(logging.DEBUG)
+        logger.setLevel(getattr(logging, args.loglevel))
 
         #What project to process?
         if args.dataroot:
@@ -73,6 +66,7 @@ def main():
             lvl = logger.getEffectiveLevel()
             lvlName = logging.getLevelName(lvl)
             cmd = 'docker exec atcore atcli --json --dataroot ' + system_parameters.toMount(args.dataroot)
+            cmd = 'docker exec atcore atcli --dataroot ' + system_parameters.toMount(args.dataroot) + ' --datainfo --loglevel ' + lvlName
             lines = u.runShellCMD(cmd, True)
             for line in lines:
                 print (line.rstrip())
