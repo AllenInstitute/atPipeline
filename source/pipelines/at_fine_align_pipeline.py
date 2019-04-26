@@ -3,10 +3,10 @@ import logging
 import json
 import fileinput
 from shutil import copyfile
-import at_pipeline as atp
-import at_pipeline_process as atpp
+from .. import at_pipeline as atp
+from .. import at_pipeline_process as atpp
 from . import at_rough_align_pipeline
-import at_utils as u
+from .. import at_utils as u
 
 
 logger = logging.getLogger('atPipeline')
@@ -66,7 +66,7 @@ class ConsolidateRoughAlignedStackTransforms(atpp.PipelineProcess):
             [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
             cmd = "docker exec "+ p.atCoreContainer
-            cmd = cmd + " python -m rendermodules.stack.consolidate_transforms"
+            cmd = cmd + " /opt/conda/bin/python -m rendermodules.stack.consolidate_transforms"
             cmd = cmd + " --render.host %s"                             %(rp.host)
             cmd = cmd + " --render.project %s"                          %(rp.projectName)
             cmd = cmd + " --render.owner %s"                            %(rp.owner)
@@ -107,7 +107,7 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
             delta = 250
 
             cmd = "docker exec " + p.atCoreContainer
-            cmd = cmd + " python -m renderapps.stitching.create_montage_pointmatches_in_place"
+            cmd = cmd + " /opt/conda/bin/python -m renderapps.stitching.create_montage_pointmatches_in_place"
             cmd = cmd + " --render.host %s"                           %(rp.host)
             cmd = cmd + " --render.project %s"                        %(rp.projectName)
             cmd = cmd + " --render.owner %s"                          %(rp.owner)
@@ -290,7 +290,7 @@ class Create_fine_aligned_stacks(atpp.PipelineProcess):
 
             #Run docker command
             cmd = "docker exec " + p.atCoreContainer
-            cmd = cmd + " python -m rendermodules.solver.solve"
+            cmd = cmd + " /opt/conda/bin/python -m rendermodules.solver.solve"
             cmd = cmd + " --input_json %s" %(p.toMount(input_json))
             cmd = cmd + " --output_json %s"%(p.toMount(output_json))
 

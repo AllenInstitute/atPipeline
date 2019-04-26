@@ -4,10 +4,8 @@ import pathlib
 import docker
 import argparse
 import traceback
-import at_logging
+from source import at_logging, at_docker_manager, at_system_config
 logger = at_logging.create_logger('atPipeline')
-import at_docker_manager
-import at_system_config
 
 def setupArguments(parser):
     #Get processing parameters
@@ -26,8 +24,8 @@ def setupArguments(parser):
     cmdgroup.add_argument('-r', '--restart',       help='Restart a specific backend container, e.g. atcore',   nargs='?',const='atcore', type=str)
 
     # Flags to alter behaviour
-    parser.add_argument('--atcore_image', type=str, help='Name of atcore image to use', default='atpipeline/atcore:dev')
-    parser.add_argument('--config_folder', type=str, help='Path to config folder', default=None)
+    parser.add_argument('--atcore_image', help='Name of atcore image to use', default='atpipeline/atcore:dev')
+    parser.add_argument('--config_folder', help='Path to config folder', default=None)
 
 def main():
 

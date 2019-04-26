@@ -1,7 +1,7 @@
 import os
 import timeit
 import subprocess
-import at_logging
+from . import at_logging
 
 logger = at_logging.create_logger('atPipeline')
 ##example_parameters={

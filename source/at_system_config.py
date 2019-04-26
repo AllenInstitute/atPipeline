@@ -1,9 +1,9 @@
 import configparser
 import os
 import ast
-import at_utils as u
+from . import at_utils as u
 import posixpath
-import at_render_project as rp
+from . import at_render_project as rp
 
 class ATSystemConfig:
     def __init__(self, iniFile):

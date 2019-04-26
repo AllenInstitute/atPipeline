@@ -8,10 +8,10 @@ import ast
 import argparse
 import shutil
 import timeit
-import at_system_config
 import pathlib
 import subprocess
 import logging
+from . import at_system_config
 logger = logging.getLogger('atPipeline')
 
 def toBool(v):
