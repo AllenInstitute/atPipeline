@@ -30,7 +30,7 @@ class RoughAlign(atp.ATPipeline):
     def run(self):
         atp.ATPipeline.run(self)
         #Run any pre pipeline(s)
-        #self.stitchingPipeline.run()
+        self.stitchingPipeline.run()
 
         self.create_lowres_stacks.run()
         self.create_lowres_tilepairs.run()
@@ -70,7 +70,7 @@ class CreateLowResStacks(atpp.PipelineProcess):
 
             # docker commands
             cmd = "docker exec " + p.atCoreContainer
-            cmd = cmd + " python -m renderapps.materialize.make_downsample_image_stack"
+            cmd = cmd + " /opt/conda/bin/python -m renderapps.materialize.make_downsample_image_stack"
             cmd = cmd + " --render.host %s"                                %(rp.host)
             cmd = cmd + " --render.project %s"                             %(rp.projectName)
             cmd = cmd + " --render.owner %s"                               %(rp.owner)
@@ -160,7 +160,7 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             ribbonLabel = u.getRibbonLabelFromSessionFolder(sessionFolder)
             firstSection, lastSection = p.convertGlobalSectionIndexesToCurrentRibbon(ribbonLabel)
 
-            if firstSection == -1: #This just means that no section in the current ribbon are selected for processing
+            if firstSection == -1: #This just means that no section in the current ribbon are selected for processing. This happens only when not all sections are selected
                 continue
 
             logger.info("Processing session folder: " + sessionFolder)
@@ -177,7 +177,7 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             #SIFT Point Match Client
             cmd = "docker exec " + p.atCoreContainer
             cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
-            cmd = cmd + " --conf spark.default.parallelism=4750"
+            cmd = cmd + " --conf spark.default.parallelism=100"
             cmd = cmd + " --driver-memory %s"                       %(p.SPARK['driverMemory'])
             cmd = cmd + " --executor-memory %s"                     %(p.SPARK['executorMemory'])
             cmd = cmd + " --executor-cores %s"                      %(p.SPARK['executorCores'])
@@ -190,7 +190,7 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             cmd = cmd + " --owner %s"                               %(rp.owner)
             cmd = cmd + " --pairJson %s"                            %(p.toMount(jsonfile))
             cmd = cmd + " --renderWithFilter true"
-            cmd = cmd + " --maxFeatureCacheGb 40"
+            cmd = cmd + " --maxFeatureCacheGb 16"
             cmd = cmd + " --matchModelType RIGID"
             cmd = cmd + " --matchMinNumInliers 15"
             #cmd = cmd + " --matchMaxEpsilon 15.0"
@@ -248,7 +248,7 @@ class CreateRoughAlignedStacks(atpp.PipelineProcess):
 
             #Run docker command
             cmd = "docker exec " + p.atCoreContainer
-            cmd = cmd + " python -m rendermodules.solver.solve"
+            cmd = cmd + " /opt/conda/bin/python -m rendermodules.solver.solve"
             cmd = cmd + " --input_json %s" %(p.toMount(input_json))
             cmd = cmd + " --output_json %s"%(p.toMount(output_json))
             self.submit(cmd)
@@ -284,7 +284,7 @@ class ApplyLowResToHighRes(atpp.PipelineProcess):
 
             #Run docker command
             cmd = "docker exec " + p.atCoreContainer
-            cmd = cmd + " python -m renderapps.rough_align.ApplyLowRes2HighRes"
+            cmd = cmd + " /opt/conda/bin/python -m renderapps.rough_align.ApplyLowRes2HighRes"
             cmd = cmd + " --render.host %s"                %(rp.host)
             cmd = cmd + " --render.owner %s "              %(rp.owner)
             cmd = cmd + " --render.project %s"             %(rp.projectName)

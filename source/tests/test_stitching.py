@@ -28,6 +28,8 @@ def compareFileInFolders(the_file, folder_1,folder_2):
     return diff_result
 
 
+##============ Tests below
+
 #Test to check if environment variable is setup
 def test_config_file_environment_variable():
     res = (AT_SYSTEM_CONFIG_FOLDER_NAME in os.environ)
