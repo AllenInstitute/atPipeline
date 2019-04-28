@@ -4,7 +4,7 @@ import pathlib
 import docker
 import argparse
 import traceback
-from source import at_logging, at_docker_manager, at_system_config
+from . import at_logging, at_docker_manager, at_system_config
 logger = at_logging.create_logger('atPipeline')
 
 def setupArguments(parser):
@@ -12,7 +12,7 @@ def setupArguments(parser):
     cmdgroup = parser.add_mutually_exclusive_group()
     cmdgroup.add_argument('--startall',            help='Start the whole AT backend',          action='store_true')
     cmdgroup.add_argument('--startrenderbackend',  help='Start the Render backend',            action='store_true')
-    cmdgroup.add_argument('--killall',             help='Stop the AT backend',                 action='store_true')
+    cmdgroup.add_argument('--killall', '--stopall', help='Stop the AT backend',                 action='store_true')
     cmdgroup.add_argument('--prune_all',           help='Prune the AT backend',                action='store_true')
     cmdgroup.add_argument('--prune_containers',    help='Prune the AT backend',                action='store_true')
     cmdgroup.add_argument('--prune_images',        help='Prune the AT backend',                action='store_true')

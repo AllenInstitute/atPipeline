@@ -5,10 +5,10 @@ import pathlib
 import docker
 import argparse
 import logging
-from source import at_logging, at_system_config, at_pipeline, at_docker_manager
-from source import at_utils as u
+from . import at_logging, at_system_config, at_pipeline, at_docker_manager
+from . import at_utils as u
 logger = at_logging.create_logger('atPipeline')
-from source.pipelines import at_fine_align_pipeline, at_stitching_pipeline, at_rough_align_pipeline
+from .pipelines import at_fine_align_pipeline, at_stitching_pipeline, at_rough_align_pipeline
 
 ATCORE_VERSION = '0.0.1'
 
