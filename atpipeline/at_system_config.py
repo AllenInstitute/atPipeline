@@ -18,7 +18,7 @@ class ATSystemConfig:
 
         for flag in cmdFlags:
             # Overrides from the command line in the form <section>.<setting>=<value>
-            result = re.fullmatch(r'(.*)\.(.*)=(.*)', flag)
+            result = re.fullmatch(r'(.*?)\.(.*?)=(.*)', flag)
             if result:
                 if result.group(1) not in self.config:
                     self.config[result.group(1)] = {}
