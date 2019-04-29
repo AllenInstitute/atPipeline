@@ -6,6 +6,7 @@ import argparse
 import traceback
 from . import at_logging, at_docker_manager, at_system_config
 logger = at_logging.create_logger('atPipeline')
+from . import __version__
 
 def setupArguments(parser):
     #Get processing parameters
@@ -32,6 +33,8 @@ def setupArguments(parser):
         default=[],
         help="Override a value in the config file (-D section.item=value)")
 
+    parser.add_argument('--version', '-v', action='version', version=('%%(prog)s %s' % __version__))
+    
 def main():
 
     try:

@@ -9,34 +9,39 @@ from . import at_logging, at_system_config, at_pipeline, at_docker_manager
 from . import at_utils as u
 logger = at_logging.create_logger('atPipeline')
 from .pipelines import at_fine_align_pipeline, at_stitching_pipeline, at_rough_align_pipeline
-
-ATCORE_VERSION = '0.0.2'
+from . import __version__
 
 def parseArguments(parser):
-    parser.add_argument('--config_folder', help='Path to config folder', default=None)
-
+    parser.add_argument('--config_folder',
+        metavar="PATH",
+        help='Path to config folder',
+        default=None)
     parser.add_argument('--dataroot',
-        help='Full path to data folder for project data to process')
+        metavar="PATH",
+        help='Full path to data folder for project data to process',
+        required=True)
     parser.add_argument('--pipeline',
         help='Specify the pipeline to use',
-        choices={'stitch', 'roughalign', 'finealign'})
+        choices={'stitch', 'roughalign', 'finealign'},
+        required=True)
 
-    parser.add_argument('--renderprojectowner',   help='Specify a RenderProject owner',                                       type=str,   nargs='?')
+    parser.add_argument('--renderprojectowner', metavar="OWNER", help='Specify a RenderProject owner',                                       type=str,   nargs='?')
     parser.add_argument('--sessions',             help='Specify sessions to process',                                         type=str)
     parser.add_argument('--ribbons',              help='Specify ribbons  to process',                                         type=str)
-    parser.add_argument('--firstsection',         help='Specify start section (e.g. \'1\' to start with a datasets first section)',                                             type=int)
-    parser.add_argument('--lastsection',          help='Specify end section',                                                 type=int)
+    parser.add_argument('--firstsection', metavar='N', help='Specify start section (e.g. \'1\' to start with a datasets first section)',                                             type=int)
+    parser.add_argument('--lastsection', metavar='N', help='Specify end section',                                                 type=int)
     parser.add_argument('--overwritedata',        help='Overwrite any already processed data',                                            action='store_true')
     parser.add_argument('--loglevel',
-        choices={'INFO', 'DEBUG'},
+        choices={'INFO', 'DEBUG', 'WARNING', 'ERROR'},
         help='Set program loglevel',
         default='INFO')
-    parser.add_argument('--version', action='store_true', default=False)
 
     parser.add_argument('--define', '-D',
         action='append',
         default=[],
         help="Override a value in the config file (-D section.item=value)")
+
+    parser.add_argument('--version', '-v', action='version', version=('%%(prog)s %s' % __version__))
 
 def main():
     parser = argparse.ArgumentParser()
@@ -55,10 +60,6 @@ def main():
 
         system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, 'at-system-config.ini'),
                                 cmdFlags=args.define)
-
-        if args.version:
-            print (ATCORE_VERSION)
-            return
 
         logger.setLevel(getattr(logging, args.loglevel))
 
