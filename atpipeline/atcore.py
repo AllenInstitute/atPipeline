@@ -5,23 +5,21 @@ import pathlib
 import docker
 import argparse
 import logging
-from source import at_logging, at_system_config, at_pipeline, at_docker_manager
-from source import at_utils as u
+from . import at_logging, at_system_config, at_pipeline, at_docker_manager
+from . import at_utils as u
 logger = at_logging.create_logger('atPipeline')
-from source.pipelines import at_fine_align_pipeline, at_stitching_pipeline, at_rough_align_pipeline
+from .pipelines import at_fine_align_pipeline, at_stitching_pipeline, at_rough_align_pipeline
 
-ATCORE_VERSION = '0.0.1'
+ATCORE_VERSION = '0.0.2'
 
 def parseArguments(parser):
     parser.add_argument('--config_folder', help='Path to config folder', default=None)
 
     parser.add_argument('--dataroot',
-        help='Full path to data folder for project data to process',
-        required=True)
+        help='Full path to data folder for project data to process')
     parser.add_argument('--pipeline',
         help='Specify the pipeline to use',
-        choices={'stitch', 'roughalign', 'finealign'},
-        required=True)
+        choices={'stitch', 'roughalign', 'finealign'})
 
     parser.add_argument('--renderprojectowner',   help='Specify a RenderProject owner',                                       type=str,   nargs='?')
     parser.add_argument('--sessions',             help='Specify sessions to process',                                         type=str)
@@ -66,7 +64,6 @@ def main():
             lvl = logger.getEffectiveLevel()
             lvlName = logging.getLevelName(lvl)
             cmd = 'docker exec atcore atcli --json --dataroot ' + system_parameters.toMount(args.dataroot)
-            cmd = 'docker exec atcore atcli --dataroot ' + system_parameters.toMount(args.dataroot) + ' --datainfo --loglevel ' + lvlName
             lines = u.runShellCMD(cmd, True)
             for line in lines:
                 print (line.rstrip())

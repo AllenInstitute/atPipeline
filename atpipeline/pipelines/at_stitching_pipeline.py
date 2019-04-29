@@ -188,7 +188,7 @@ class CreateMedianFiles(atpp.PipelineProcess):
 
             cmd = "docker exec " + p.atCoreContainer
             cmd = cmd + " /opt/conda/bin/python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
-            cmd = cmd + " --render.port 80"
+            cmd = cmd + " --render.port %d"           %rp.hostPort
             cmd = cmd + " --input_json %s"%(self.paras.toMount(median_json))
 
             #Run =============
@@ -239,7 +239,7 @@ class CreateFlatFieldCorrectedData(atpp.PipelineProcess):
                 u.saveflatfieldjson(ff, flatfield_json, renderProject, acq_stack, median_stack, flatfield_stack, p.toMount(flatfield_dir), z, True)
                 cmd = "docker exec " + p.atCoreContainer
                 cmd = cmd + " /opt/conda/bin/python -m rendermodules.intensity_correction.apply_multiplicative_correction"
-                cmd = cmd + " --render.port 80"
+                cmd = cmd + " --render.port %d"           % renderProject.hostPort
                 cmd = cmd + " --input_json %s"%(p.toMount(flatfield_json))
 
                 #Run =============
