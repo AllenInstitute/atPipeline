@@ -9,7 +9,7 @@ logger = logging.getLogger('atPipeline')
 
 #A simple docker manager, wrapping some of the DockerSDK
 class DockerManager:
-    def __init__(self, configFolder=None, atcore_image=None):
+    def __init__(self, configFolder=None, atcore_image=None, cmdFlags=[]):
 
         logger = logging.getLogger('atPipeline')
         self.argparser = argparse.ArgumentParser('backend_management')
@@ -27,7 +27,8 @@ class DockerManager:
         else:
             raise Exception("No default configFolder folder defined for %s." % os.name)
 
-        self.paras = at_system_config.ATSystemConfig(os.path.join(self.configFolder, 'at-system-config.ini'))
+        self.paras = at_system_config.ATSystemConfig(os.path.join(self.configFolder, 'at-system-config.ini'),
+            cmdFlags=cmdFlags)
         self.paras.createReferences(caller="backend_management")
         self.setComposeFile(os.path.join(self.configFolder, 'at-docker-compose.yml'))
         self.setupMounts()

@@ -7,7 +7,7 @@ if sys.version_info < (3,4):
 if __name__ == '__main__':
     setup(
         name='atpipeline',
-        version='0.0.2',
+        version='0.0.3',
         description='Scripts to run the Allen Institute array tomography pipeline',
         url='https://github.com/allenInstitute/atPipeline',
         packages=['atpipeline'],
