@@ -4,9 +4,10 @@ import ast
 from . import at_utils as u
 import posixpath
 from . import at_render_project as rp
+import re
 
 class ATSystemConfig:
-    def __init__(self, iniFile):
+    def __init__(self, iniFile, cmdFlags=[]):
         self.config = configparser.ConfigParser()
 
         #Check that file exists, otherwise raise an error
@@ -14,6 +15,17 @@ class ATSystemConfig:
             raise Exception("The file: " + iniFile + " don't exist..")
 
         self.config.read(iniFile)
+
+        for flag in cmdFlags:
+            # Overrides from the command line in the form <section>.<setting>=<value>
+            result = re.fullmatch(r'(.*)\.(.*)=(.*)', flag)
+            if result:
+                if result.group(1) not in self.config:
+                    self.config[result.group(1)] = {}
+                self.config[result.group(1)][result.group(2)] = result.group(3)
+            else:
+                raise Exception("Unable to config override: %s" % flag)
+
         self.general                                       = self.config['GENERAL']
         self.deconv                                        = self.config['DECONV']
         self.align                                         = self.config['ALIGN']

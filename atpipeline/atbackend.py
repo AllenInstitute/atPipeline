@@ -27,6 +27,11 @@ def setupArguments(parser):
     parser.add_argument('--atcore_image', help='Name of atcore image to use', default='atpipeline/atcore:dev')
     parser.add_argument('--config_folder', help='Path to config folder', default=None)
 
+    parser.add_argument('--define', '-D',
+        action='append',
+        default=[],
+        help="Override a value in the config file (-D section.item=value)")
+
 def main():
 
     try:
@@ -36,7 +41,9 @@ def main():
         setupArguments(parser)
         args = parser.parse_args()
 
-        dManager = at_docker_manager.DockerManager(configFolder=args.config_folder, atcore_image=args.atcore_image)
+        dManager = at_docker_manager.DockerManager(configFolder=args.config_folder,
+                        atcore_image=args.atcore_image,
+                        cmdFlags=args.define)
 
         #Keep arguments in main module for visibility
         #setupArguments(dManager.argparser)

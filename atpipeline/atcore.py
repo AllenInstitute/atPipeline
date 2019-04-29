@@ -33,6 +33,11 @@ def parseArguments(parser):
         default='INFO')
     parser.add_argument('--version', action='store_true', default=False)
 
+    parser.add_argument('--define', '-D',
+        action='append',
+        default=[],
+        help="Override a value in the config file (-D section.item=value)")
+
 def main():
     parser = argparse.ArgumentParser()
     parseArguments(parser)
@@ -48,7 +53,8 @@ def main():
         else:
             raise Exception("No default configFolder folder defined for %s." % os.name)
 
-        system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, 'at-system-config.ini'))
+        system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, 'at-system-config.ini'),
+                                cmdFlags=args.define)
 
         if args.version:
             print (ATCORE_VERSION)
