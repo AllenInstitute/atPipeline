@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        test_1
+# Name:        test-stitching
 # Purpose:     test integrity of input/output data, up to stitching
 #              These are tests for the Q1023 TestDataset
 #
@@ -27,39 +27,8 @@ def compareFileInFolders(the_file, folder_1,folder_2):
     print (diff_result)
     return diff_result
 
-@pytest.fixture
-def at_backend():
-    import at_docker_manager
-    return at_docker_manager.DockerManager()
 
-@pytest.fixture
-def system_config():
-    import at_system_config
-    configFolder = os.environ[AT_SYSTEM_CONFIG_FOLDER_NAME]
-    return at_system_config.ATSystemConfig(os.path.join(configFolder, AT_SYSTEM_CONFIG_FILE_NAME))
-
-@pytest.fixture
-def render_client(system_config):
-    import renderapi
-    render_project_owner = 'PyTest'
-
-    args = {
-        'host': system_config.renderHost,
-        'port': system_config.renderHostPort,
-        'owner': '',
-        'project': '',
-        'client_scripts': system_config.clientScripts
-    }
-
-    return renderapi.render.connect(**args)
-
-@pytest.fixture
-def test_data_folder(system_config):
-    return system_config.config['GENERAL']['TEST_DATA_FOLDER']
-
-@pytest.fixture
-def test_data_set():
-    return TEST_DATA_SET
+##============ Tests below
 
 #Test to check if environment variable is setup
 def test_config_file_environment_variable():
@@ -84,17 +53,21 @@ def test_test_data_folder(test_data_folder):
     assert res == True
 
 def test_atcore_version():
-    import at_utils as u
-    out = u.runShellCMD('python ..\\atcore.py --version --dataroot')
+    from source import at_utils as u
+    import atcore
+
+    #argv = ['atcore.py', '--version', '--dataroot']
+    #out = atcore.__main__(argv)
+    out = u.runShellCMD(r'python ..\..\atcore.py --version')
     res = (out == ['0.0.1\n'])
     assert res == True
 
 #Test integrity of input data.
 def test_meta_data(test_data_folder, test_data_set):
-    import at_utils as u
+    from source import at_utils as u
 
     data_root = os.path.join(test_data_folder, test_data_set)
-    cmd = 'python ..\\atcore.py --dataroot ' + data_root
+    cmd = 'python ..\\..\\atcore.py --dataroot ' + data_root
     out = u.getJSON(cmd)
     data = json.loads(out)
 
@@ -111,9 +84,9 @@ def test_meta_data(test_data_folder, test_data_set):
 
 #Create output data and compare output
 def test_data_creation(test_data_folder, test_data_set):
-    import at_utils as u
+    from source import at_utils as u
     data_root = os.path.join(test_data_folder, test_data_set)
-    cmd = 'python ..\\atcore.py --dataroot ' + data_root + ' --pipeline stitch --overwritedata --renderprojectowner PyTest'
+    cmd = r'python ..\..\atcore.py --dataroot ' + data_root + ' --pipeline stitch --overwritedata --renderprojectowner PyTest'
 
     #This will take about 15 minutes
     out = u.runShellCMD(cmd)
@@ -165,7 +138,8 @@ def test_median_jsons(test_data_folder, test_data_set):
 
     #TODO populate this automatically later on, so we can run the whole test on any dataset
     #Values for the Q1023 dataset
-    files = [  'median_10_2_0_5.json',
+    files = [
+               'median_10_2_0_5.json',
                'median_11_2_0_3.json'
             ]
     for f in files:

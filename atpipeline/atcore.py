@@ -64,7 +64,6 @@ def main():
             lvl = logger.getEffectiveLevel()
             lvlName = logging.getLevelName(lvl)
             cmd = 'docker exec atcore atcli --json --dataroot ' + system_parameters.toMount(args.dataroot)
-            cmd = 'docker exec atcore atcli --dataroot ' + system_parameters.toMount(args.dataroot) + ' --datainfo --loglevel ' + lvlName
             lines = u.runShellCMD(cmd, True)
             for line in lines:
                 print (line.rstrip())
