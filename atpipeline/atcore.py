@@ -10,18 +10,16 @@ from . import at_utils as u
 logger = at_logging.create_logger('atPipeline')
 from .pipelines import at_fine_align_pipeline, at_stitching_pipeline, at_rough_align_pipeline
 
-ATCORE_VERSION = '0.0.1'
+ATCORE_VERSION = '0.0.2'
 
 def parseArguments(parser):
     parser.add_argument('--config_folder', help='Path to config folder', default=None)
 
     parser.add_argument('--dataroot',
-        help='Full path to data folder for project data to process',
-        required=True)
+        help='Full path to data folder for project data to process')
     parser.add_argument('--pipeline',
         help='Specify the pipeline to use',
-        choices={'stitch', 'roughalign', 'finealign'},
-        required=True)
+        choices={'stitch', 'roughalign', 'finealign'})
 
     parser.add_argument('--renderprojectowner',   help='Specify a RenderProject owner',                                       type=str,   nargs='?')
     parser.add_argument('--sessions',             help='Specify sessions to process',                                         type=str)

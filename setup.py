@@ -1,4 +1,8 @@
+import sys
 from setuptools import setup
+
+if sys.version_info < (3,4):
+    sys.exit('Sorry, Python < 3.4 is not supported')
 
 if __name__ == '__main__':
     setup(
