@@ -13,10 +13,12 @@ from .pipelines import at_fine_align_pipeline, at_stitching_pipeline, at_rough_a
 ATCORE_VERSION = '0.0.2'
 
 def parseArguments(parser):
-    parser.add_argument('--config_folder', help='Path to config folder', default=None)
+    parser.add_argument('--config_folder',      help='Path to config folder',       default=None)
+    parser.add_argument('--config_file_name',   help='Name for system config file', default='at-system-config.ini')
 
     parser.add_argument('--dataroot',
         help='Full path to data folder for project data to process')
+
     parser.add_argument('--pipeline',
         help='Specify the pipeline to use',
         choices={'stitch', 'roughalign', 'finealign'})
@@ -24,7 +26,7 @@ def parseArguments(parser):
     parser.add_argument('--renderprojectowner',   help='Specify a RenderProject owner',                                       type=str,   nargs='?')
     parser.add_argument('--sessions',             help='Specify sessions to process',                                         type=str)
     parser.add_argument('--ribbons',              help='Specify ribbons  to process',                                         type=str)
-    parser.add_argument('--firstsection',         help='Specify start section (e.g. \'1\' to start with a datasets first section)',                                             type=int)
+    parser.add_argument('--firstsection',         help='Specify start section (e.g. \'0\' to start with a datasets first section)',                                             type=int)
     parser.add_argument('--lastsection',          help='Specify end section',                                                 type=int)
     parser.add_argument('--overwritedata',        help='Overwrite any already processed data',                                            action='store_true')
     parser.add_argument('--loglevel',
@@ -48,7 +50,10 @@ def main():
         else:
             raise Exception("No default configFolder folder defined for %s." % os.name)
 
-        system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, 'at-system-config.ini'))
+        if os.path.exists(args.config_file_name):
+            system_parameters = at_system_config.ATSystemConfig(args.config_file_name)
+        else:
+            system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, args.config_file_name))
 
         if args.version:
             print (ATCORE_VERSION)
@@ -82,6 +87,8 @@ def main():
         if os.path.isdir(system_parameters.absoluteDataOutputFolder) == False:
             os.makedirs(system_parameters.absoluteDataOutputFolder)
 
+
+        #Save current config values to the data output folder
         system_parameters.write(os.path.join(system_parameters.absoluteDataOutputFolder, system_parameters.projectName + '.ini'))
 
         #Check which pipeline to run

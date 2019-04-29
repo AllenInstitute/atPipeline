@@ -30,13 +30,13 @@ class RoughAlign(atp.ATPipeline):
     def run(self):
         atp.ATPipeline.run(self)
         #Run any pre pipeline(s)
-        self.stitchingPipeline.run()
+        #self.stitchingPipeline.run()
 
         self.create_lowres_stacks.run()
-        self.create_lowres_tilepairs.run()
-        self.create_lowres_pointmatches.run()
-        self.create_rough_aligned_stacks.run()
-        self.apply_lowres_to_highres.run()
+        #self.create_lowres_tilepairs.run()
+        #self.create_lowres_pointmatches.run()
+        #self.create_rough_aligned_stacks.run()
+        #self.apply_lowres_to_highres.run()
         return True
 
 class CreateLowResStacks(atpp.PipelineProcess):
@@ -56,7 +56,7 @@ class CreateLowResStacks(atpp.PipelineProcess):
 
             # output directories
             downsample_dir   = os.path.join(projectRoot, p.dataOutputFolder, "low_res")
-            numsections_file = os.path.join(downsample_dir,                   "numsections")
+            numsections_file = os.path.join(downsample_dir,                   "numsections-%d-%d"%(session, ribbon))
 
             # Make sure output folder exist
             if os.path.isdir(downsample_dir) == False:
@@ -177,10 +177,11 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             #SIFT Point Match Client
             cmd = "docker exec " + p.atCoreContainer
             cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
-            cmd = cmd + " --conf spark.default.parallelism=100"
-            cmd = cmd + " --driver-memory %s"                       %(p.SPARK['driverMemory'])
-            cmd = cmd + " --executor-memory %s"                     %(p.SPARK['executorMemory'])
-            cmd = cmd + " --executor-cores %s"                      %(p.SPARK['executorCores'])
+
+            cmd = cmd + " --conf spark.default.parallelism=%s"      %(p.LOWRES_POINTMATCHES['SPARK_DEFAULT_PARALLELISM'])
+            cmd = cmd + " --driver-memory %s"                       %(p.LOWRES_POINTMATCHES['SPARK_DRIVER_MEMORY'])
+            cmd = cmd + " --executor-memory %s"                     %(p.LOWRES_POINTMATCHES['SPARK_EXECUTOR_MEMORY'])
+            cmd = cmd + " --executor-cores %s"                      %(p.LOWRES_POINTMATCHES['SPARK_EXECUTOR_CORES'])
 
             cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
             cmd = cmd + " --name PointMatchFull"
@@ -189,19 +190,19 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             cmd = cmd + " --collection %s_lowres_round"             %(rp.projectName)
             cmd = cmd + " --owner %s"                               %(rp.owner)
             cmd = cmd + " --pairJson %s"                            %(p.toMount(jsonfile))
-            cmd = cmd + " --renderWithFilter true"
-            cmd = cmd + " --maxFeatureCacheGb 16"
-            cmd = cmd + " --matchModelType RIGID"
-            cmd = cmd + " --matchMinNumInliers 15"
-            #cmd = cmd + " --matchMaxEpsilon 15.0"
-            #cmd = cmd + " --matchMaxTrust 1.0"
+            cmd = cmd + " --renderWithFilter %s"                    %(p.LOWRES_POINTMATCHES['RENDER_WITH_FILTER'])
+            cmd = cmd + " --maxFeatureCacheGb %s"                   %(p.LOWRES_POINTMATCHES['MAX_FEATURE_CACHE_GB'])
+            cmd = cmd + " --matchModelType %s"                      %(p.LOWRES_POINTMATCHES['MATCH_MODEL_TYPE'])
+            cmd = cmd + " --matchMinNumInliers %s"                  %(p.LOWRES_POINTMATCHES['MATCH_MIN_NUMBER_OF_INLIERS'])
+            #cmd = cmd + " --matchMaxEpsilon %s"                     %(p.LOWRES_POINTMATCHES['MATCH_MAX_EPSILON'])
+            #cmd = cmd + " --matchMaxTrust %s"                       %(p.LOWRES_POINTMATCHES['MATCH_AX_TRUST'])
 
-            cmd = cmd + " --SIFTmaxScale 0.85"
-            cmd = cmd + " --SIFTminScale 0.7"
-            cmd = cmd + " --SIFTsteps 5"
-            cmd = cmd + " --renderScale 1.0"
-            cmd = cmd + " --matchRod 0.5"
-            #cmd = cmd + " --matchFilter CONSENSUS_SETS"
+            cmd = cmd + " --SIFTmaxScale %s"                        %(p.LOWRES_POINTMATCHES['SIFT_MAX_SCALE'])
+            cmd = cmd + " --SIFTminScale %s"                        %(p.LOWRES_POINTMATCHES['SIFT_MIN_SCALE'])
+            cmd = cmd + " --SIFTsteps %s"                           %(p.LOWRES_POINTMATCHES['SIFT_STEPS'])
+            cmd = cmd + " --renderScale %s"                         %(p.LOWRES_POINTMATCHES['RENDER_SCALE'])
+            cmd = cmd + " --matchRod %s"                            %(p.LOWRES_POINTMATCHES['MATCH_ROD'])
+            #cmd = cmd + " --matchFilter %s"                         %(p.LOWRES_POINTMATCHES['CONSENSUS_SETS'])
 
             #Run =============
             self.submit(cmd)
@@ -279,9 +280,6 @@ class ApplyLowResToHighRes(atpp.PipelineProcess):
             if os.path.isdir(roughalign_ts_dir) == False:
                 os.mkdir(roughalign_ts_dir)
 
-            #Put this in ini file later on..
-            scale = 0.05
-
             #Run docker command
             cmd = "docker exec " + p.atCoreContainer
             cmd = cmd + " /opt/conda/bin/python -m renderapps.rough_align.ApplyLowRes2HighRes"
@@ -299,12 +297,11 @@ class ApplyLowResToHighRes(atpp.PipelineProcess):
             cmd = cmd + " --prealigned_stack %s"           %(inputStack)
             cmd = cmd + " --output_stack %s"     		   %(outputStack)
 
-            #TODO: get the Z's right..
-            #firstribbon             = p.firstRibbon
-            #lastribbon              = p.lastRibbon
+            #cmd = cmd + " --minZ 0"#%d"                  %(p.firstSection*100)
+            #cmd = cmd + " --maxZ 5000"#%d"                  %(p.lastSection*100)
+            first_ribbon = ribbon
+            last_ribbon = int(p.ribbons[-1][6:])
 
-            cmd = cmd + " --minZ 0"#%d"                  %(p.firstSection*100)
-            cmd = cmd + " --maxZ 500"#%d"                  %(p.lastSection*100)
-            #cmd = cmd + " --minZ %d --maxZ %d "       %(firstribbon*100, (lastribbon+1) * 100)
+            cmd = cmd + " --minZ %d --maxZ %d"       %(first_ribbon*100, (last_ribbon+1) * 100)
 
             self.submit(cmd)
