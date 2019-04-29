@@ -33,7 +33,7 @@ services:
        ports:
            - 5000:5000
        volumes:
-           - ./vizrelay_config.json:/app/config.json
+           - ./at-vizrelay-config.json:/app/config.json
     ndviz:
       image: neurodata/ndviz:beta
       ports:
