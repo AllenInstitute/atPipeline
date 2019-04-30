@@ -4,9 +4,9 @@ import pathlib
 import docker
 import argparse
 import traceback
-from . import at_logging, at_docker_manager, at_system_config
+from atpipeline import at_logging, at_docker_manager, at_system_config
 logger = at_logging.create_logger('atPipeline')
-from . import __version__
+from atpipeline import __version__
 
 def setupArguments(parser):
     #Get processing parameters
