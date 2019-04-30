@@ -1,13 +1,17 @@
 import sys
+import os
 from setuptools import setup
 
 if sys.version_info < (3,4):
     sys.exit('Sorry, Python < 3.4 is not supported')
 
+with open(os.path.join(os.path.dirname(__file__), "VERSION.txt")) as fp:
+    version = fp.read().strip()
+
 if __name__ == '__main__':
     setup(
         name='atpipeline',
-        version='0.0.3',
+        version=version,
         description='Scripts to run the Allen Institute array tomography pipeline',
         url='https://github.com/allenInstitute/atPipeline',
         packages=['atpipeline'],

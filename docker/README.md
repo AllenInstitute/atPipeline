@@ -49,7 +49,6 @@ docker push atpipeline/render-ws
 docker push atpipeline/atcore
 docker push atpipeline/vizrelay
 ```
-
 ...or to push with today's date:
 
 ```console
@@ -62,10 +61,16 @@ docker push atpipeline/atcore:dev-`date +"%y%m%d"`
 docker push atpipeline/vizrelay:dev-`date +"%y%m%d"`
 ```
 
+...or to push with the version number:
+```console
+docker tag atpipeline/render-ws:dev atpipeline/render-ws:`cat VERSION.txt`
+docker tag atpipeline/atcore:dev atpipeline/atcore:dev-`cat VERSION.txt`
+docker tag atpipeline/vizrelay:dev atpipeline/vizrelay:`cat VERSION.txt`
 
-Or to push with today's date:
-
-
+docker push atpipeline/render-ws:`cat VERSION.txt`
+docker push atpipeline/atcore:`cat VERSION.txt`
+docker push atpipeline/vizrelay:`cat VERSION.txt`
+```
 
 ### Using the atcore container
 
