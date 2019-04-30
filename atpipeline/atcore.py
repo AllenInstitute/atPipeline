@@ -5,11 +5,11 @@ import pathlib
 import docker
 import argparse
 import logging
-from . import at_logging, at_system_config, at_pipeline, at_docker_manager
-from . import at_utils as u
+from atpipeline import at_logging, at_system_config, at_pipeline, at_docker_manager
+from atpipeline import at_utils as u
 logger = at_logging.create_logger('atPipeline')
-from .pipelines import at_fine_align_pipeline, at_stitching_pipeline, at_rough_align_pipeline
-from . import __version__
+from atpipeline.pipelines import at_fine_align_pipeline, at_stitching_pipeline, at_rough_align_pipeline
+from atpipeline import __version__
 
 def parseArguments(parser):
     parser.add_argument('--config_folder',
