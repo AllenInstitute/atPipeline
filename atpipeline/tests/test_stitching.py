@@ -58,7 +58,7 @@ def test_atcore_version():
 
     #argv = ['atcore.py', '--version', '--dataroot']
     #out = atcore.__main__(argv)
-    out = u.runShellCMD(r'python ..\..\atcore.py --version')
+    out = u.runShellCMD(r'python -m atpipeline.atcore --version')
     res = (out == ['0.0.1\n'])
     assert res == True
 

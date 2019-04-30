@@ -31,7 +31,9 @@ class ATSystemConfig:
         self.align                                         = self.config['ALIGN']
         self.tp_client                                     = self.config['TILE_PAIR_CLIENT']
         self.SPARK_SEC                                     = self.config['SPARK']
+        self.LOWRES_POINTMATCHES                           = self.config['LOWRES_POINTMATCHES']
         self.DATA_INPUT                                    = self.config['DATA_INPUT']
+
         self.mounts                                        = ast.literal_eval(self.general['DATA_ROOTS'])
         self.createCommonReferences()
 

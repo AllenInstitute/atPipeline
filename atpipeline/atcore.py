@@ -58,7 +58,10 @@ def main():
         else:
             raise Exception("No default configFolder folder defined for %s." % os.name)
 
-        system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, 'at-system-config.ini'),
+        if os.path.exists(args.config_file_name):
+            system_parameters = at_system_config.ATSystemConfig(args.config_file_name)
+        else:
+        	system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, args.config_file_name),
                                 cmdFlags=args.define)
 
         logger.setLevel(getattr(logging, args.loglevel))
@@ -89,6 +92,8 @@ def main():
         if os.path.isdir(system_parameters.absoluteDataOutputFolder) == False:
             os.makedirs(system_parameters.absoluteDataOutputFolder)
 
+
+        #Save current config values to the data output folder
         system_parameters.write(os.path.join(system_parameters.absoluteDataOutputFolder, system_parameters.projectName + '.ini'))
 
         #Check which pipeline to run
