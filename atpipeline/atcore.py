@@ -16,10 +16,17 @@ def parseArguments(parser):
         metavar="PATH",
         help='Path to config folder',
         default=None)
+
+    parser.add_argument('--config_file_name',
+        metavar="PATH",
+        help='Name of config file, may include the path',
+        default="at-system-config.ini")
+
     parser.add_argument('--dataroot',
         metavar="PATH",
         help='Full path to data folder for project data to process',
         required=True)
+
     parser.add_argument('--pipeline',
         help='Specify the pipeline to use',
         choices={'stitch', 'roughalign', 'finealign'},

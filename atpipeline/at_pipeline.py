@@ -6,6 +6,7 @@ import subprocess
 import json
 from . import at_system_config as c
 from . import at_utils as u
+from . import at_pipeline_process as pp
 
 logger = logging.getLogger('atPipeline')
 
@@ -23,8 +24,12 @@ class ATPipeline:
         if atcore.status != "running":
             raise ValueError("The atcore docker container is not running!")
 
+        self.pipeline_processes = []
+
     def run(self):
         pass
 
+    def append_pipeline_process(self, process : pp.PipelineProcess):
+        self.pipeline_processes.append(process)
 
 
