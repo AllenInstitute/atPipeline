@@ -26,5 +26,9 @@ ninja -C /build/dsl/ThirdParties install
 ninja -C /build/dsl install
 ninja -C /build/atExplorer install
 
-ldconfig 
+#Clean build directory
+ninja -C /build/dsl/ThirdParties clean
+ninja -C /build/dsl clean
+ninja -C /build/atExplorer clean
+
 echo "Done"
