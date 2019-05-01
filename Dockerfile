@@ -11,8 +11,9 @@ FROM ubuntu:18.04
 
 # Updating Ubuntu packages
 RUN apt-get update && apt-get -y upgrade && \
-  apt-get -y install --no-install-recommends wget curl git openjdk-8-jdk ca-certificates-java gcc build-essential vim maven && \
-  apt-get -y install --no-install-recommends cmake ninja-build libboost-all-dev clang
+    apt-get -y install --no-install-recommends wget curl git openjdk-8-jdk ca-certificates-java gcc build-essential vim maven && \
+    apt-get -y install --no-install-recommends cmake ninja-build libboost-all-dev clang && \
+    apt-get -y install --no-install-recommends libspatialindex-dev
 
 # Install conda
 # Based on https://github.com/ContinuumIO/docker-images/blob/master/miniconda/Dockerfile
@@ -75,32 +76,28 @@ ENV RENDER_CLIENT_SCRIPTS=/shared/render/render-ws-java-client/src/main/scripts
 
 # Install Render
 WORKDIR /shared/render/
-RUN git clone --branch at_develop --single-branch https://github.com/perlman/render.git /shared/render
-RUN mvn clean && mvn -T 1C -Dproject.build.sourceEncoding=UTF-8 package
+RUN git clone --branch at_develop --single-branch https://github.com/perlman/render.git /shared/render && \
+    mvn clean && mvn -T 1C -Dproject.build.sourceEncoding=UTF-8 package
 
 # Install at_modules
 WORKDIR /shared/at_modules
 COPY ./at-modules/ /shared/at_modules
 RUN mvn install
 
-# Install EM_Aligner from github (we need >= 0.3.5 for multiple match collections)
-RUN pip install git+https://github.com/AllenInstitute/EM_aligner_python
-
 # Install render-python
 WORKDIR /shared/render-python
-RUN git clone --branch master --single-branch https://github.com/fcollman/render-python.git /shared/render-python
-RUN pip install -e /shared/render-python
+RUN git clone --branch master --single-branch https://github.com/fcollman/render-python.git /shared/render-python && \
+    pip install -e /shared/render-python
 
 # Install render-modules
 WORKDIR /shared/render-modules
-RUN git clone --branch at_develop --single-branch https://github.com/AllenInstitute/render-modules.git /shared/render-modules
-RUN pip install -e /shared/render-modules
+RUN git clone --branch at_develop --single-branch https://github.com/AllenInstitute/render-modules.git /shared/render-modules && \
+    pip install -e /shared/render-modules
 
 # Install render-python-apps
-RUN apt-get install libspatialindex-dev -y
 WORKDIR /shared/render-python-apps
-RUN git clone --branch at_develop --single-branch https://github.com/AllenInstitute/render-python-apps.git /shared/render-python-apps
-RUN pip install -e /shared/render-python-apps
+RUN git clone --branch at_develop --single-branch https://github.com/AllenInstitute/render-python-apps.git /shared/render-python-apps && \
+    pip install -e /shared/render-python-apps
 
 # Copy pipeline files
 WORKDIR /pipeline
@@ -109,9 +106,8 @@ COPY ./pipeline/ /pipeline
 # Build atcli
 ENV CC=/usr/bin/clang
 ENV CXX=/usr/bin/clang++
-RUN mkdir /libs
+RUN mkdir -p /libs && mkdir -p /build
 COPY ./docker/clang-container/third-party-libs /libs
-RUN mkdir /build 
 COPY ./docker/clang-container/build-thirdparty-libs.bash /build
 WORKDIR /build
 RUN bash build-thirdparty-libs.bash
