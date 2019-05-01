@@ -32,6 +32,9 @@ class ATSystemConfig:
         self.tp_client                                     = self.config['TILE_PAIR_CLIENT']
         self.SPARK_SEC                                     = self.config['SPARK']
         self.LOWRES_POINTMATCHES                           = self.config['LOWRES_POINTMATCHES']
+        self.CREATE_2D_POINTMATCHES                        = self.config['CREATE_2D_POINTMATCHES']
+        self.CREATE_HR_TILEPAIRS                           = self.config['CREATE_HR_TILEPAIRS']
+        self.CREATE_HR_POINTMATCHES                        = self.config['CREATE_HR_POINTMATCHES']
         self.DATA_INPUT                                    = self.config['DATA_INPUT']
 
         self.mounts                                        = ast.literal_eval(self.general['DATA_ROOTS'])

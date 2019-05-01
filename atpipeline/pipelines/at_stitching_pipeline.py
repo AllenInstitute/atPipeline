@@ -37,7 +37,6 @@ class Stitch(atp.ATPipeline):
                     return False
             else:
                 logger.info("Skipping pipeline step: " + process.get_name())
-                logger.newline()
 
 
         return True
