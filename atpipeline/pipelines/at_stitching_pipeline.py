@@ -13,35 +13,32 @@ class Stitch(atp.ATPipeline):
         super().__init__(_paras)
 
         #Define the pipeline
-        self.create_state_tables              = CreateStateTables(_paras)
-        self.create_raw_data_render_stacks    = CreateRawDataRenderStacks(_paras)
-        self.create_median_files              = CreateMedianFiles(_paras)
-        self.create_flatfield_corrected_data  = CreateFlatFieldCorrectedData(_paras)
-        self.create_stitched_sections         = CreateStitchedSections(_paras)
-        self.drop_stitching_mistakes          = DropStitchingMistakes(_paras)
-
-        #We could store these in an array and pop them off one by one
+        self.append_pipeline_process(CreateStateTables(_paras))
+        self.append_pipeline_process(CreateRawDataRenderStacks(_paras))
+        self.append_pipeline_process(CreateMedianFiles(_paras))
+        self.append_pipeline_process(CreateFlatFieldCorrectedData(_paras))
+        self.append_pipeline_process(CreateStitchedSections(_paras))
+        self.append_pipeline_process(DropStitchingMistakes(_paras))
 
     def run(self):
         atp.ATPipeline.run(self)
 
-        self.create_state_tables.run()
-        logger.newline()
+        #Iterate through the pipeline
+        for process in self.pipeline_processes:
 
-        self.create_raw_data_render_stacks.run()
-        logger.newline()
+            if process.check_if_done() == False:
+                process.run()
 
-        self.create_median_files.run()
-        logger.newline()
+                #Validate the result of the run
+                res = process.validate()
 
-        self.create_flatfield_corrected_data.run()
-        logger.newline()
+                if res == False:
+                    logger.info("Failed in pipelinestep" + process.get_name())
+                    return False
+            else:
+                logger.info("Skipping pipeline step: " + process.get_name())
+                logger.newline()
 
-        self.create_stitched_sections.run()
-        logger.newline()
-
-        self.drop_stitching_mistakes.run()
-        logger.newline()
 
         return True
 
@@ -54,12 +51,15 @@ class CreateStateTables(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateStateTables")
 
-    def checkIfDone(self):
+    #def check_if_done(self):
         #Query render for stack metadata for each session
         #If stacks exists, then don't create new ones, unless overwrite data is True
         #Optionally, check existence of raw data as well
         #for sessionFolder in self.sessionFolders:
-        pass
+    #    pass
+
+    #def validate(self):
+    #    pass
 
     def run(self):
         super().run()
@@ -94,19 +94,18 @@ class CreateStateTables(atpp.PipelineProcess):
 
     		        #Run ====================
                     self.submit(cmd)
-        self.validate()
 
 class CreateRawDataRenderStacks(atpp.PipelineProcess):
 
     def __init__(self, _paras):
         super().__init__(_paras, "CreateRawDataRenderStacks")
 
-    def checkIfDone(self):
+    #def check_if_done(self):
         #Query render for stack metadata for each session
         #If stacks exists, then don't create new ones, unless overwrite data is True
         #Optionally, check existence of raw data as well
         #for sessionFolder in self.sessionFolders:
-        pass
+    #    pass
 
 
     def run(self):
@@ -194,6 +193,9 @@ class CreateMedianFiles(atpp.PipelineProcess):
             #Run =============
             self.submit(cmd)
 
+    #def check_if_done(self):
+    #    pass
+
 class CreateFlatFieldCorrectedData(atpp.PipelineProcess):
 
     def __init__(self, _paras):
@@ -245,6 +247,9 @@ class CreateFlatFieldCorrectedData(atpp.PipelineProcess):
                 #Run =============
                 self.submit(cmd)
 
+    #def check_if_done(self):
+    #    pass
+
 class CreateStitchedSections(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateStitchedSections")
@@ -293,6 +298,9 @@ class CreateStitchedSections(atpp.PipelineProcess):
                 #Run =============
                 self.submit(cmd)
 
+    #def check_if_done(self):
+    #    pass
+
 class DropStitchingMistakes(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "DropStitchingMistakes")
@@ -339,3 +347,6 @@ class DropStitchingMistakes(atpp.PipelineProcess):
 
             # Run =============
             self.submit(cmd)
+
+    #def check_if_done(self):
+    #    pass
