@@ -30,11 +30,16 @@ class ATSystemConfig:
         self.deconv                                        = self.config['DECONV']
         self.align                                         = self.config['ALIGN']
         self.tp_client                                     = self.config['TILE_PAIR_CLIENT']
-        self.SPARK_SEC                                     = self.config['SPARK']
+
+        #SPARK stuff
+        self.SPARK                                         = self.config['SPARK']
+
         self.LOWRES_POINTMATCHES                           = self.config['LOWRES_POINTMATCHES']
         self.CREATE_2D_POINTMATCHES                        = self.config['CREATE_2D_POINTMATCHES']
         self.CREATE_HR_TILEPAIRS                           = self.config['CREATE_HR_TILEPAIRS']
         self.CREATE_HR_POINTMATCHES                        = self.config['CREATE_HR_POINTMATCHES']
+
+
         self.DATA_INPUT                                    = self.config['DATA_INPUT']
 
         self.mounts                                        = ast.literal_eval(self.general['DATA_ROOTS'])
@@ -117,7 +122,7 @@ class ATSystemConfig:
         self.deconvolution_template                   = os.path.join(self.JSONTemplatesFolder, "deconvolution.json")
         self.alignment_template                       = os.path.join(self.JSONTemplatesFolder, "roughalign.json")
         self.fine_alignment_template                  = os.path.join(self.JSONTemplatesFolder, "fine_align.json")
-        self.registrationTemplate                     = os.path.join(self.JSONTemplatesFolder, "registration.json")
+        self.registration_template                    = os.path.join(self.JSONTemplatesFolder, "registration.json")
 
         #Deconvolution parameters
         self.channels                                 = ast.literal_eval(self.deconv['CHANNELS'])
@@ -135,12 +140,6 @@ class ATSystemConfig:
         self.siftSteps                                = int(self.align['SIFTSTEPS'])
         self.renderScale                              = float(self.align['RENDERSCALE'])
 
-        #SPARK stuff
-        self.SPARK = {}
-        self.SPARK['driverMemory']                    = self.SPARK_SEC['DRIVER_MEMORY']
-        self.SPARK['executorMemory']                  = self.SPARK_SEC['EXECUTOR_MEMORY']
-        self.SPARK['executorCores']                   = self.SPARK_SEC['EXECUTOR_CORES']
-        self.SPARK['maxFeatureCacheGb']               = self.SPARK_SEC['MAX_FEATURE_CACHE_GB']
 
         self.ch405                                    = self.config['DECONV_405']
         self.ch488                                    = self.config['DECONV_488']

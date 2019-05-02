@@ -88,7 +88,7 @@ class ConsolidateRoughAlignedStackTransforms(atpp.PipelineProcess):
 
                 # Run =============
                 self.submit(cmd)
-                return True
+            return True
         except:
             return False
 
@@ -129,7 +129,7 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
 
                 # Run =============
                 self.submit(cmd)
-                return True
+            return True
         except:
             return False
 
@@ -188,7 +188,7 @@ class Create_HR_tilepairs(atpp.PipelineProcess):
                 for line in fileinput.input(jsonfileedit, inplace=True):
                     print(line.replace("render-parameters", "render-parameters?removeAllOption=true"), end="")
 
-                return True
+            return True
         except ValueError as e:
             logger.error('ValueError: ' + str(e))
             print(traceback.format_exc())
@@ -218,10 +218,10 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
                 #SIFT Point Match Client
                 cmd = "docker exec " + p.atCoreContainer
                 cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
-                cmd = cmd + " --conf spark.default.parallelism=4750"
-                cmd = cmd + " --driver-memory %s"                       %(p.SPARK['driverMemory'])
-                cmd = cmd + " --executor-memory %s"                     %(p.SPARK['executorMemory'])
-                cmd = cmd + " --executor-cores %s"                      %(p.SPARK['executorCores'])
+                cmd = cmd + " --conf spark.default.parallelism=%s"      %(p.SPARK['SPARK_DEFAULT_PARALLELISM'])
+                cmd = cmd + " --driver-memory %s"                       %(p.SPARK['DRIVER_MEMORY'])
+                cmd = cmd + " --executor-memory %s"                     %(p.SPARK['EXECUTOR_MEMORY'])
+                cmd = cmd + " --executor-cores %s"                      %(p.SPARK['EXECUTOR_CORES'])
 
                 cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
                 cmd = cmd + " --name PointMatchFull"
@@ -245,7 +245,7 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
                 #cmd = cmd + " --matchFilter CONSENSUS_SETS"
                 self.submit(cmd)
 
-                return True
+            return True
         except ValueError as e:
             logger.error('ValueError: ' + str(e))
             print(traceback.format_exc())
@@ -306,7 +306,7 @@ class Create_fine_aligned_stacks(atpp.PipelineProcess):
                 # Run =============
                 self.submit(cmd)
 
-                return True
+            return True
         except:
             return False
 

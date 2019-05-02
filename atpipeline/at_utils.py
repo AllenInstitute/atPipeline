@@ -218,6 +218,8 @@ def saveRoughAlignJSON(template, outFile, renderProject, input_stack, output_sta
     template['log_level']                                    = "INFO"
     dump_json(template, outFile)
 
+
+
 def saveFineAlignJSON(template, outFile, renderHost, port, owner, project, input_stack, output_stack, collection_2D, collection_3D, clientScripts, logLevel, nFirst, nLast, dataOutputFolder):
     template['regularization']['log_level']                  = logLevel
     template['matrix_assembly']['log_level']                 = logLevel
