@@ -122,7 +122,7 @@ class ATSystemConfig:
         self.deconvolution_template                   = os.path.join(self.JSONTemplatesFolder, "deconvolution.json")
         self.alignment_template                       = os.path.join(self.JSONTemplatesFolder, "roughalign.json")
         self.fine_alignment_template                  = os.path.join(self.JSONTemplatesFolder, "fine_align.json")
-        self.registrationTemplate                     = os.path.join(self.JSONTemplatesFolder, "registration.json")
+        self.registration_template                    = os.path.join(self.JSONTemplatesFolder, "registration.json")
 
         #Deconvolution parameters
         self.channels                                 = ast.literal_eval(self.deconv['CHANNELS'])

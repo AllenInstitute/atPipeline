@@ -8,7 +8,7 @@ import logging
 from atpipeline import at_logging, at_system_config, at_pipeline, at_docker_manager
 from atpipeline import at_utils as u
 logger = at_logging.create_logger('atPipeline')
-from atpipeline.pipelines import at_fine_align_pipeline, at_stitching_pipeline, at_rough_align_pipeline
+from atpipeline.pipelines import at_rough_align_pipeline, at_stitching_pipeline, at_fine_align_pipeline, at_registration_pipeline
 from atpipeline import __version__
 
 def parseArguments(parser):
@@ -29,7 +29,7 @@ def parseArguments(parser):
 
     parser.add_argument('--pipeline',
         help='Specify the pipeline to use',
-        choices={'stitch', 'roughalign', 'finealign'},
+        choices={'stitch', 'roughalign', 'finealign', 'register_sessions'},
         required=True)
 
     parser.add_argument('--renderprojectowner', metavar="OWNER", help='Specify a RenderProject owner',                                       type=str,   nargs='?')
@@ -105,7 +105,6 @@ def main():
 
         #Check which pipeline to run
         if system_parameters.pipeline == 'stitch':
-            logger.info('Running stitching pipeline')
             aPipeline = at_stitching_pipeline.Stitch(system_parameters)
 
         elif system_parameters.pipeline == 'roughalign':
@@ -113,6 +112,10 @@ def main():
 
         elif system_parameters.pipeline == 'finealign':
             aPipeline = at_fine_align_pipeline.FineAlign(system_parameters)
+
+        elif system_parameters.pipeline == 'register_sessions':
+            aPipeline = at_registration_pipeline.RegisterSessions(system_parameters)
+
         else:
             logger.error('No such pipeline: "' + system_parameters.pipeline + '"')
             raise Exception('No such pipeline')
