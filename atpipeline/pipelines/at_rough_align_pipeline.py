@@ -114,7 +114,8 @@ class CreateLowResStacks(atpp.PipelineProcess):
 
                 # Run =============
                 self.submit(cmd)
-                return True
+
+            return True
         except:
             return False
 
