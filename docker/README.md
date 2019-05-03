@@ -4,20 +4,7 @@
 
 ```console
 git clone --branch at_develop --single-branch https://github.com/perlman/render.git build/render
-# Workaround for maven surefire bug [https://github.com/saalfeldlab/render/issues/95]
-cat build/render/Dockerfile  | sed 's|openjdk:8-jdk|openjdk:8u171-jdk|g' > build/Dockerfile-render-ws
-docker build -t atpipeline/render-ws:dev -f build/Dockerfile-render-ws build/render
-```
-
-### Check out source code
-
-Note: These comands should be run from the ```atPipeline/docker``` directory.
-
-TODO: Figure out how to revert to old git submodule behavior with per-submodule .git directories, which is needed in the build process for render and render-python.[https://github.com/git/git/blob/master/Documentation/RelNotes/1.7.8.txt#L109]
-
-```console
-git clone --branch at_develop --single-branch https://github.com/perlman/render.git build/render
-git clone --branch master --single-branch git@github.com:AllenInstitute/at_modules.git build/at_modules
+docker build -t atpipeline/render-ws:dev build/render
 ```
 
 ### Build monolithic docker image for ATPipeline
@@ -40,11 +27,11 @@ TBD
 ### Push images to Docker hub
 
 Suggest tag use:
-* _latest_: (default tag) Latest version of (probably) stable builds
-* _dev_: Current development images; may be unstable
+* _latest_: (default tag) Latest version of (probably) stable builds.
+* _dev_: Current development images; may be unstable.
+* _dev-YYMMDD_: Tag with specific date of dev build.
 * _stable_: A known good & test configuration.
 
-TODO: Add specific version numbers (or dates?) to align with ATExplroer distribution.
 
 ```console
 docker push atpipeline/render-ws:dev
@@ -58,10 +45,33 @@ docker tag atpipeline/render-ws:dev atpipeline/render-ws
 docker tag atpipeline/atcore:dev atpipeline/atcore
 docker tag atpipeline/vizrelay:dev atpipeline/vizrelay
 
-docker push atpipeline/render-ws:dev
-docker push atpipeline/atcore:dev
-docker push atpipeline/vizrelay:dev
+docker push atpipeline/render-ws
+docker push atpipeline/atcore
+docker push atpipeline/vizrelay
 ```
+...or to push with today's date:
+
+```console
+docker tag atpipeline/render-ws:dev atpipeline/render-ws:dev-`date +"%y%m%d"`
+docker tag atpipeline/atcore:dev atpipeline/atcore:dev-`date +"%y%m%d"`
+docker tag atpipeline/vizrelay:dev atpipeline/vizrelay:dev-`date +"%y%m%d"`
+
+docker push atpipeline/render-ws:dev-`date +"%y%m%d"`
+docker push atpipeline/atcore:dev-`date +"%y%m%d"`
+docker push atpipeline/vizrelay:dev-`date +"%y%m%d"`
+```
+
+...or to push with the version number:
+```console
+docker tag atpipeline/render-ws:dev atpipeline/render-ws:`cat VERSION.txt`
+docker tag atpipeline/atcore:dev atpipeline/atcore:dev-`cat VERSION.txt`
+docker tag atpipeline/vizrelay:dev atpipeline/vizrelay:`cat VERSION.txt`
+
+docker push atpipeline/render-ws:`cat VERSION.txt`
+docker push atpipeline/atcore:`cat VERSION.txt`
+docker push atpipeline/vizrelay:`cat VERSION.txt`
+```
+
 ### Using the atcore container
 
 The ``atpipeline/atcore`` container keeps render-python, render-modules and at_modules in ```/shared``` for easy developing via using a volume mount to the a local copy of the source code.

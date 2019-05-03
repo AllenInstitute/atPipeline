@@ -7,5 +7,5 @@ fi
 
 imagetag=$1
 
-
+echo docker build -t atpipeline/clang-base-image:$imagetag -f ClangBaseDockerFile.txt . 
 docker build -t atpipeline/clang-base-image:$imagetag -f ClangBaseDockerFile.txt . 

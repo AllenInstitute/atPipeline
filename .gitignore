@@ -99,3 +99,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 tksProject.psproj
+/docker/clang-container/build/build-thirdparty-libs.bash

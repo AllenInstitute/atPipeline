@@ -1,6 +1,6 @@
 [submodule "docker/clang_container/third-party-libs/dsl"]
 	path = docker/clang-container/third-party-libs/dsl
-	url = https://github.com/TotteKarlsson/dsl.git
+	url = ../../TotteKarlsson/dsl.git
 [submodule "docker/clang_container/third-party-libs/atExplorer"]
 	path = docker/clang-container/third-party-libs/atExplorer
-	url = https://github.com/AllenInstitute/atExplorer.git
+	url = ../../AllenInstitute/atExplorer.git
