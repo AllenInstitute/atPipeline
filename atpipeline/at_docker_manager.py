@@ -9,7 +9,7 @@ logger = logging.getLogger('atPipeline')
 
 #A simple docker manager, wrapping some of the DockerSDK
 class DockerManager:
-    def __init__(self, configFolder=None, atcore_image=None, cmdFlags=[]):
+    def __init__(self, configFolder=None, atcore_image_tag=None, cmdFlags=[]):
 
         logger = logging.getLogger('atPipeline')
         self.argparser = argparse.ArgumentParser('backend_management')
@@ -25,18 +25,19 @@ class DockerManager:
         elif os.name == 'posix':
             self.configFolder = '/usr/local/etc/'
         else:
-            raise Exception("No default configFolder folder defined for %s." % os.name)
+            raise Exception("No default configFolder folder defined for %s. Set environment variable 'AT_SYSTEM_CONFIG_FOLDER' to the folder where the file 'at-system-config.ini' exists." % os.name)
 
         self.paras = at_system_config.ATSystemConfig(os.path.join(self.configFolder, 'at-system-config.ini'),
             cmdFlags=cmdFlags)
+
         self.paras.createReferences(caller="backend_management")
         self.setComposeFile(os.path.join(self.configFolder, 'at-docker-compose.yml'))
         self.setupMounts()
 
-        if atcore_image:
-            self.atcore_image = atcore_image
+        if atcore_image_tag:
+            self.atcore_image_tag = atcore_image_tag
         else:
-            self.atcore_image = 'atpipeline/atcore:dev'
+            self.atcore_image_tag = self.paras.general['AT_CORE_DOCKER_IMAGE_TAG']
 
     def prune_containers(self):
         val = self.dClient.containers.prune()
@@ -104,7 +105,7 @@ class DockerManager:
         if ctrName == "atcore":
             #This will do nothing, forever
             cmd = "tail -f /dev/null"
-            ctr = self.dClient.containers.run(self.atcore_image, volumes=self.atCoreMounts, command=cmd, cap_add=["SYS_ADMIN"], privileged=True, name=ctrName, detach=True)
+            ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcore_image_tag, volumes=self.atCoreMounts, command=cmd, cap_add=["SYS_ADMIN"], privileged=True, name=ctrName, detach=True)
 
             if ctr == None:
                return False
@@ -112,10 +113,12 @@ class DockerManager:
             if ctr.status != "running" and ctr.status != "created":
                 #Failing starting a container is considered a showstopper. Raise an exception
                 raise Exception("Failed starting container: " + ctrName)
+            logger.info("Started the " + ctrName + " container using image tag: " + self.atcore_image_tag)
+
         else:
                 raise Exception("The ATBackend don't manage the container: \"" + ctrName + "\"")
 
-        logger.info("Started the " + ctrName + " container")
+
         return True
 
     def getContainer(self, ctrName):
@@ -170,7 +173,6 @@ class DockerManager:
         cmd = "docker-compose -p default -f " + str(self.composeFile)
         cmd = cmd + " up -d "
         logger.info("Running: " + cmd)
-        logger.info("Using compose file: " + self.composeFile)
 
         #Output here looks ugly !!
         if os.name =='posix':

@@ -157,8 +157,8 @@ class ATSystemConfig:
         self.mountRenderModules                       = u.toBool(self.general['MOUNT_RENDER_MODULES'])
 
     def createReferencesForPipeline(self, args = None, dataInfo = None):
-        self.dataRootFolder                           = self.DATA_INPUT['DATA_ROOT_FOLDER']
-        self.projectDataFolder                        = self.DATA_INPUT['PROJECT_DATA_FOLDER']
+        self.dataRootFolder                           = os.path.abspath(self.DATA_INPUT['DATA_ROOT_FOLDER'])
+        self.projectDataFolder                        = os.path.abspath(self.DATA_INPUT['PROJECT_DATA_FOLDER'])
 
         #Process parameters
         self.projectName                              = os.path.basename(self.projectDataFolder)
@@ -238,8 +238,10 @@ class ATSystemConfig:
         for index in range(nrOfMounts):
             theMount = self.mounts[index][0]
 
+            aPathLowerCase = aPath.lower()
+            theMountLowerCase = theMount.lower()
             #Remove root part from aPath
-            if aPath.startswith(theMount):
+            if aPathLowerCase.startswith(theMountLowerCase):
                 aPath = aPath[len(theMount):]
                 found = True
                 break

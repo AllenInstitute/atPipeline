@@ -25,7 +25,7 @@ def setupArguments(parser):
     cmdgroup.add_argument('-r', '--restart',       help='Restart a specific backend container, e.g. atcore',   nargs='?',const='atcore', type=str)
 
     # Flags to alter behaviour
-    parser.add_argument('--atcore_image', help='Name of atcore image to use', default='atpipeline/atcore:dev')
+    parser.add_argument('--atcore_image_tag', help='atcore image tag to use', default=None)
     parser.add_argument('--config_folder', help='Path to config folder', default=None)
 
     parser.add_argument('--define', '-D',
@@ -34,18 +34,18 @@ def setupArguments(parser):
         help="Override a value in the config file (-D section.item=value)")
 
     parser.add_argument('--version', '-v', action='version', version=('%%(prog)s %s' % __version__))
-    
+
 def main():
 
     try:
         logger.info('============ Managing the atBackend =============')
-        
+
         parser = argparse.ArgumentParser()
         setupArguments(parser)
         args = parser.parse_args()
 
         dManager = at_docker_manager.DockerManager(configFolder=args.config_folder,
-                        atcore_image=args.atcore_image,
+                        atcore_image_tag=args.atcore_image_tag,
                         cmdFlags=args.define)
 
         #Keep arguments in main module for visibility

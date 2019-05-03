@@ -63,7 +63,7 @@ def main():
         elif os.name == 'posix':
             configFolder = '/usr/local/etc/'
         else:
-            raise Exception("No default configFolder folder defined for %s." % os.name)
+            raise Exception("No default configFolder folder defined for %s. Set environment variable 'AT_SYSTEM_CONFIG_FOLDER' to the folder where the file 'at-system-config.ini' exists." % os.name)
 
         if os.path.exists(args.config_file_name):
             system_parameters = at_system_config.ATSystemConfig(args.config_file_name)
@@ -75,7 +75,7 @@ def main():
 
         #What project to process?
         if args.dataroot:
-            system_parameters.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = args.dataroot
+            system_parameters.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = os.path.abspath(args.dataroot)
 
         if args.dataroot and not args.pipeline:
             lvl = logger.getEffectiveLevel()
