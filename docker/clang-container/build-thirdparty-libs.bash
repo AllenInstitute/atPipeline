@@ -1,8 +1,6 @@
 #! /bin/bash
 
-echo "Building.."
-
-
+echo "Building atcore ThirdParty libraries.."
 
 CC=$CC
 CXX=$CXX
@@ -28,5 +26,8 @@ ninja -C /build/dsl/ThirdParties install
 ninja -C /build/dsl install
 ninja -C /build/atExplorer install
 
+#COnfigure runtime paths to shared libraries and apps
 ldconfig 
-echo "Done"
+
+
+echo "Done Building"
