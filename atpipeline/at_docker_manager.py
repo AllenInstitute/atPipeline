@@ -107,6 +107,7 @@ class DockerManager:
             cmd = "tail -f /dev/null"
             ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcore_image_tag, volumes=self.atCoreMounts, command=cmd, cap_add=["SYS_ADMIN"], privileged=True, name=ctrName, detach=True)
 
+
             if ctr == None:
                return False
 

@@ -151,7 +151,7 @@ class CreateLowResTilePairs(atpp.PipelineProcess):
             if os.path.isdir(jsondir) == False:
                 os.mkdir(jsondir)
 
-            jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-%d-nostitch.json"     %(sessionNR, p.zNeighborDistance, p.firstSection, p.lastSection))
+            jsonfile = os.path.join(jsondir, "tilepairs-%d-%s-%d-%d-nostitch.json"     %(sessionNR, p.LOWRES_TILE_PAIR_CLIENT['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
 
             #Run the TilePairClient
             cmd = "docker exec " + p.atCoreContainer
@@ -164,16 +164,16 @@ class CreateLowResTilePairs(atpp.PipelineProcess):
             cmd = cmd + " --minZ %d"                                %(p.firstSection)
             cmd = cmd + " --maxZ %d"                                %(p.lastSection)
             cmd = cmd + " --toJson %s"                              %(p.toMount(jsonfile))
-            cmd = cmd + " --excludeCornerNeighbors %s"              %(p.excludeCornerNeighbors)
-            cmd = cmd + " --excludeSameSectionNeighbors %s"         %(p.excludeSameSectionNeighbors)
-            cmd = cmd + " --zNeighborDistance %s"                   %(p.zNeighborDistance)
-            cmd = cmd + " --xyNeighborFactor %s"                    %(p.xyNeighborFactor)
+            cmd = cmd + " --excludeCornerNeighbors %s"              %(u.toBool(p.LOWRES_TILE_PAIR_CLIENT['EXCLUDE_CORNER_NEIGHBOURS']))
+            cmd = cmd + " --excludeSameSectionNeighbors %s"         %(u.toBool(p.LOWRES_TILE_PAIR_CLIENT['EXCLUDE_SAME_SECTION_NEIGHBOR']))
+            cmd = cmd + " --zNeighborDistance %s"                   %(p.LOWRES_TILE_PAIR_CLIENT['Z_NEIGHBOR_DISTANCE'])
+            cmd = cmd + " --xyNeighborFactor %s"                    %(p.LOWRES_TILE_PAIR_CLIENT['XY_NEIGHBOR_FACTOR'])
 
             #Run =============
             self.submit(cmd)
 
             #Prepare json file for the SIFTPointMatch Client
-            jsonfileedit      = os.path.join(jsondir, "tilepairs-%d-%d-%d-%d-nostitch-EDIT.json"%(sessionNR, p.zNeighborDistance, p.firstSection, p.lastSection))
+            jsonfileedit      = os.path.join(jsondir, "tilepairs-%d-%s-%d-%d-nostitch-EDIT.json"%(sessionNR, p.LOWRES_TILE_PAIR_CLIENT['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
             copyfile(jsonfile, jsonfileedit)
 
             for line in fileinput.input(jsonfileedit, inplace=True):
@@ -203,7 +203,7 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             downsample_dir   = os.path.join(p.absoluteDataOutputFolder, "low_res")
 
             jsondir  = os.path.join(p.absoluteDataOutputFolder, "lowres_tilepairfiles")
-            jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-%d-nostitch-EDIT.json"     %(sessionNR, p.zNeighborDistance, p.firstSection, p.lastSection))
+            jsonfile = os.path.join(jsondir, "tilepairs-%d-%s-%d-%d-nostitch-EDIT.json"     %(sessionNR, p.LOWRES_TILE_PAIR_CLIENT['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
 
             #SIFT Point Match Client
             cmd = "docker exec " + p.atCoreContainer

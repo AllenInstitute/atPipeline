@@ -340,9 +340,10 @@ class DropStitchingMistakes(atpp.PipelineProcess):
             cmd = cmd + " --poststitchedStack %s"                   %(stitched_dapi_Stack)
             cmd = cmd + " --outputStack %s"                         %(dropped_dapi_Stack)
             cmd = cmd + " --jsonDirectory %s"                       %(p.toMount(dropped_dir))
-            cmd = cmd + " --edge_threshold %d"                      %(p.edgeThreshold)
-            cmd = cmd + " --pool_size %d"                           %(p.atCoreThreads)
-            cmd = cmd + " --distance_threshold %d"                  %(p.distance)
+
+            cmd = cmd + " --edge_threshold %s"                      %(p.DROP_STITCHING_MISTAKES['EDGE_THRESHOLD'])
+            cmd = cmd + " --pool_size %s"                           %(p.DROP_STITCHING_MISTAKES['POOL_SIZE'])
+            cmd = cmd + " --distance_threshold %s"                  %(p.DROP_STITCHING_MISTAKES['DISTANCE_THRESHOLD'])
 
             # Run =============
             self.submit(cmd)
