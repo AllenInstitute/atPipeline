@@ -19,11 +19,11 @@ from atpipeline import at_test_utils as tu
 AT_SYSTEM_CONFIG_FOLDER_NAME    = 'AT_SYSTEM_CONFIG_FOLDER'
 AT_SYSTEM_CONFIG_FILE_NAME      = 'at-system-config.ini'
 
-TEST_DATA_CONFIG_FILE_NAME      = 'Q1023.ini'
 
 #Projectname will create data in a folder with the same name
 #Render stacks are also created using the project name
 PROJECT_NAME                    = 'pytest_Q1023'
+PROJECT_INI                     = 'Q1023.ini'
 
 @pytest.fixture
 def test_data_set():
@@ -55,6 +55,7 @@ def test_meta_data(test_data_folder, test_data_set):
 def test_data_creation(test_data_folder, test_data_set):
     from atpipeline import at_utils as u
     data_input_root = os.path.join(test_data_folder, 'input', test_data_set)
+    data_ini_file = os.path.join(test_data_folder, PROJECT_INI)
 
     #remove any output data
     data_output_folder = os.path.join(data_input_root, 'processed', PROJECT_NAME)
@@ -63,7 +64,7 @@ def test_data_creation(test_data_folder, test_data_set):
 #        shutil.rmtree(data_output_folder)
 
     #Remove data that exists in render
-    cmd = r'atcore --dataroot ' + data_input_root + ' --pipeline stitch --renderprojectowner PyTest --project_name ' + PROJECT_NAME
+    cmd = r'atcore --dataroot ' + data_input_root + ' --pipeline stitch --renderprojectowner PyTest --project_name ' + PROJECT_NAME + ' --config_file_name ' + data_ini_file
 
     #This will take about 15 minutes
     out = u.runShellCMD(cmd)

@@ -17,8 +17,8 @@ from atpipeline import at_test_utils as tu
 
 #Projectname will create data in a folder with the same name
 #Render stacks are also created using the project name
-PROJECT_NAME                    = 'pytest_1'
-
+PROJECT_NAME                    = 'pytest_Q1023'
+PROJECT_INI                     = 'Q1023.ini'
 
 @pytest.fixture
 def test_data_set():
@@ -26,38 +26,72 @@ def test_data_set():
 
 
 #Create output data and compare output
-def test_low_res_folder(test_data_folder, test_data_set):
+def test_rough_aligning(test_data_folder, test_data_set):
     from atpipeline import at_utils as u
-    data_root = os.path.join(test_data_folder, test_data_set)
-    cmd = r'atcore --dataroot ' + data_root + ' --pipeline roughalign --overwritedata --renderprojectowner PyTest'
+    data_root = os.path.join(test_data_folder, 'input', test_data_set)
+    data_ini_file = os.path.join(test_data_folder, PROJECT_INI)
+    cmd = r'atcore --dataroot ' + data_root + ' --pipeline roughalign --overwritedata --renderprojectowner PyTest --config_file_name ' + data_ini_file + ' --project_name ' + PROJECT_NAME
 
     #This will take about 15 minutes ===============
     print (cmd)
-    out = u.runShellCMD(cmd)
-    #assert False
+    try:
+        out = u.runShellCMD(cmd)
+    except Exception:
+        assert False
 
-def test_dropped_jsons(test_data_folder, test_data_set):
-    sub_dir = 'dropped'
+def test_stacks(render_client):
+    stacks= renderapi.render.get_stacks_by_owner_project(owner='PyTest', project=PROJECT_NAME, render = render_client)
+    assert 'S2_RoughAligned_LowRes'     in stacks
+    assert 'S2_RoughAligned'            in stacks
+    assert 'S2_LowRes'                  in stacks
+
+def test_lowres_tilepairs_jsons(test_data_folder, test_data_set):
+    sub_dir = 'lowres_tilepairfiles'
+    ref_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
+    test_folder = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME, sub_dir)
+
+    #TODO populate this automatically later on, so we can run the whole test on any dataset
+    #Values for the Q1023 dataset
+    files = [
+                'tilepairs-2-1-0-9-nostitch.json',
+                'tilepairs-2-1-0-9-nostitch-EDIT.json'
+            ]
+    for f in files:
+        assert tu.compare_file_in_folders(f, test_folder, ref_folder) == True
+
+def test_rough_aligned_jsons(test_data_folder, test_data_set):
+    sub_dir = 'rough_aligned'
     ref_folder  = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
     test_folder = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME, sub_dir)
 
     #TODO populate this automatically later on, so we can run the whole test on any dataset
     #Values for the Q1023 dataset
     files = [
-                'S2_Stitched_Dropped_z1000.json',
-                'S2_Stitched_Dropped_z1001.json',
-                'S2_Stitched_Dropped_z1002.json',
-                'S2_Stitched_Dropped_z1003.json',
-                'S2_Stitched_Dropped_z1004.json',
-                'S2_Stitched_Dropped_z1005.json',
-                'S2_Stitched_Dropped_z1100.json',
-                'S2_Stitched_Dropped_z1101.json',
-                'S2_Stitched_Dropped_z1102.json',
-                'S2_Stitched_Dropped_z1103.json'
+                'roughalignment_2_0_9.json',
+                'output_roughalignment_2_0_9.json'
+            ]
+    for f in files:
+        assert tu.compare_file_in_folders(f, test_folder, ref_folder) == True
+
+def test_rough_aligned_tilespecs(test_data_folder, test_data_set):
+    sub_dir = 'rough_aligned_tilespecs'
+    ref_folder  = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
+    test_folder = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME, sub_dir)
+
+    #TODO populate this automatically later on, so we can run the whole test on any dataset
+    #Values for the Q1023 dataset
+    files = [
+                'tilespec_0000.json',
+                'tilespec_0001.json',
+                'tilespec_0002.json',
+                'tilespec_0003.json',
+                'tilespec_0004.json',
+                'tilespec_0005.json',
+                'tilespec_0006.json',
+                'tilespec_0007.json',
+                'tilespec_0008.json',
+                'tilespec_0009.json'
             ]
 
     for f in files:
-        #For now, just check existence of files
         assert tu.compare_file_in_folders(f, test_folder, ref_folder) == True
-        #assert os.path.exists(os.path.join(test_folder, f))
-
