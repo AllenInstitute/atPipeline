@@ -27,10 +27,15 @@ def parseArguments(parser):
         help='Full path to data folder for project data to process',
         required=True)
 
+
     parser.add_argument('--pipeline',
         help='Specify the pipeline to use',
         choices={'stitch', 'roughalign', 'finealign', 'register_sessions'},
-        required=True)
+        required=False)
+
+    parser.add_argument('--project_name',
+        help='Set project name. Defualt: name of input datas basefolder',
+        required=False)
 
     parser.add_argument('--renderprojectowner', metavar="OWNER", help='Specify a RenderProject owner',                                       type=str,   nargs='?')
     parser.add_argument('--sessions',             help='Specify sessions to process',                                         type=str)
@@ -101,7 +106,7 @@ def main():
 
 
         #Save current config values to the data output folder
-        system_parameters.write(os.path.join(system_parameters.absoluteDataOutputFolder, system_parameters.projectName + '.ini'))
+        system_parameters.write(os.path.join(system_parameters.absoluteDataOutputFolder, system_parameters.project_name + '.ini'))
 
         #Check which pipeline to run
         if system_parameters.pipeline == 'stitch':

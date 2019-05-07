@@ -27,13 +27,10 @@ class ATSystemConfig:
                 raise Exception("Unable to config override: %s" % flag)
 
         self.GENERAL                                       = self.config['GENERAL']
-        #self.deconv                                        = self.config['DECONV']
-        #self.align                                         = self.config['ALIGN']
-        #self.tp_client                                     = self.config['TILE_PAIR_CLIENT']
 
         #SPARK stuff
         self.SPARK                                         = self.config['SPARK']
-
+        self.CREATE_LOWRES_STACKS                          = self.config['CREATE_LOWRES_STACKS']
         self.LOWRES_TILE_PAIR_CLIENT                       = self.config['LOWRES_TILE_PAIR_CLIENT']
         self.LOWRES_POINTMATCHES                           = self.config['LOWRES_POINTMATCHES']
         self.CREATE_2D_POINTMATCHES                        = self.config['CREATE_2D_POINTMATCHES']
@@ -101,13 +98,13 @@ class ATSystemConfig:
             self.createReferencesForBackend(args)
 
     def createCommonReferences(self):
-        self.atCoreContainer                          = self.GENERAL['AT_CORE_DOCKER_CONTAINER']
+        self.atCoreContainer                          = self.GENERAL['AT_CORE_DOCKER_CONTAINER_NAME']
         self.dataOutputFolder                         = self.GENERAL['PROCESSED_DATA_FOLDER']
         self.renderHost                               = self.GENERAL['RENDER_HOST']
         self.renderHostPort                           = int(self.GENERAL['RENDER_HOST_PORT'])
         self.logLevel                                 = self.GENERAL['LOG_LEVEL']
         self.clientScripts                            = self.GENERAL['CLIENT_SCRIPTS']
-        self.render_mem_GB                           = self.GENERAL['RENDER_MEM_GB']
+        self.render_mem_GB                            = self.GENERAL['RENDER_MEM_GB']
         #self.atCoreThreads                            = int(self.GENERAL['AT_CORE_THREADS'])
         #self.downSampleScale                          = self.GENERAL['DOWN_SAMPLE_SCALE']
 
@@ -159,12 +156,17 @@ class ATSystemConfig:
 
     def createReferencesForPipeline(self, args = None, dataInfo = None):
         self.dataRootFolder                           = os.path.abspath(self.DATA_INPUT['DATA_ROOT_FOLDER'])
+
         self.projectDataFolder                        = os.path.abspath(self.DATA_INPUT['PROJECT_DATA_FOLDER'])
 
         #Process parameters
-        self.projectName                              = os.path.basename(self.projectDataFolder)
-        self.DATA_INPUT['PROJECT_NAME']               = self.projectName
-        self.dataOutputFolder                         = os.path.join(self.dataOutputFolder, self.projectName)
+        if args.project_name != None:
+            self.project_name                          = args.project_name
+        else:
+            self.project_name                          = os.path.basename(self.projectDataFolder)
+
+        self.DATA_INPUT['PROJECT_NAME']               = self.project_name
+        self.dataOutputFolder                         = os.path.join(self.dataOutputFolder, self.project_name)
         self.absoluteDataOutputFolder                 = os.path.join(self.projectDataFolder, self.dataOutputFolder)
 
         #Over write any default values with any argument/values from the command line
@@ -208,7 +210,7 @@ class ATSystemConfig:
 
         #When used for input data
         #Create a "renderProject" to make things easier
-        self.renderProject = rp.RenderProject(self.renderProjectOwner, self.projectName, self.renderHost, self.renderHostPort, self.clientScripts, self.render_mem_GB, self.logLevel)
+        self.renderProject = rp.RenderProject(self.renderProjectOwner, self.project_name, self.renderHost, self.renderHostPort, self.clientScripts, self.render_mem_GB, self.logLevel)
 
     def getStateTableFileName(self, ribbon, session, sectnum):
         return os.path.join(self.absoluteDataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))

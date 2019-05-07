@@ -37,7 +37,7 @@ class DockerManager:
         if atcore_image_tag:
             self.atcore_image_tag = atcore_image_tag
         else:
-            self.atcore_image_tag = self.paras.general['AT_CORE_DOCKER_IMAGE_TAG']
+            self.atcore_image_tag = self.paras.GENERAL['AT_CORE_DOCKER_IMAGE_TAG']
 
     def prune_containers(self):
         val = self.dClient.containers.prune()

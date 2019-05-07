@@ -15,8 +15,8 @@ import difflib
 import renderapi
 
 AT_SYSTEM_CONFIG_FOLDER_NAME    = 'AT_SYSTEM_CONFIG_FOLDER'
-AT_SYSTEM_CONFIG_FILE_NAME      = 'at-system-config.ini'
-TEST_DATA_SET = 'Q1023'
+AT_SYSTEM_CONFIG_FILE_NAME      = 'M33Quarter.ini'
+TEST_DATA_SET = 'M33Quarter'
 
 def compareFileInFolders(the_file, folder_1,folder_2):
     f1 = open(os.path.join(folder_1, the_file)).read()
@@ -39,6 +39,7 @@ def test_config_file_environment_variable():
 def test_config_file_exists():
     config_file = os.path.join(os.environ.get(AT_SYSTEM_CONFIG_FOLDER_NAME), AT_SYSTEM_CONFIG_FILE_NAME)
     res = os.path.exists(config_file)
+
     assert res == True
 
 #Test to check status of at backend
@@ -53,21 +54,19 @@ def test_test_data_folder(test_data_folder):
     assert res == True
 
 def test_atcore_version():
-    from source import at_utils as u
-    import atcore
+    from atpipeline import at_utils as u
 
-    #argv = ['atcore.py', '--version', '--dataroot']
-    #out = atcore.__main__(argv)
-    out = u.runShellCMD(r'python -m atpipeline.atcore --version')
-    res = (out == ['0.0.1\n'])
+    out = u.runShellCMD(r'atcore --version')
+    res = (out == ['atcore 0.5.0\n'])
     assert res == True
+
 
 #Test integrity of input data.
 def test_meta_data(test_data_folder, test_data_set):
-    from source import at_utils as u
+    from atpipeline import at_utils as u
 
     data_root = os.path.join(test_data_folder, test_data_set)
-    cmd = 'python ..\\..\\atcore.py --dataroot ' + data_root
+    cmd = 'atcore --dataroot ' + data_root
     out = u.getJSON(cmd)
     data = json.loads(out)
 
@@ -84,9 +83,9 @@ def test_meta_data(test_data_folder, test_data_set):
 
 #Create output data and compare output
 def test_data_creation(test_data_folder, test_data_set):
-    from source import at_utils as u
+    from atpipeline import at_utils as u
     data_root = os.path.join(test_data_folder, test_data_set)
-    cmd = r'python ..\..\atcore.py --dataroot ' + data_root + ' --pipeline stitch --overwritedata --renderprojectowner PyTest'
+    cmd = r'atcore --dataroot ' + data_root + ' --pipeline stitch --overwritedata --renderprojectowner PyTest'
 
     #This will take about 15 minutes
     out = u.runShellCMD(cmd)

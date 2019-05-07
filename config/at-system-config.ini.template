@@ -1,4 +1,5 @@
 [GENERAL]
+#Folders to mount in docker containers
 DATA_ROOTS=[["C:\data", "/data"] , ["C:\data2", "/data2"]]
 #Folder for test data
 TEST_DATA_FOLDER=c:\data
@@ -8,7 +9,8 @@ MOUNT_RENDER_MODULES=false
 
 #AT Backend 
 AT_CORE_DOCKER_IMAGE_TAG=0.5.1
-AT_CORE_DOCKER_CONTAINER=atcore
+AT_CORE_DOCKER_CONTAINER_NAME=atcore
+AT_CORE_THREADS=15
 RENDER_DOCKER_IMAGE_TAG=0.5.1
 MONGO_DOCKER_IMAGE_TAG=3.4.2
 NDVIZ_DOCKER_IMAGE_TAG=beta
@@ -21,9 +23,6 @@ DOCKER_CONTAINER_PREFIX=default
 #JSON Template folder location
 JSON_TEMPLATES_FOLDER=c:\\pDisk\\ATPipeline\\templates
 
-#AT_CORE_THREADS=10
-#DOWN_SAMPLE_SCALE=0.05
-
 #Render host parameters
 RENDER_HOST=W10DTMJ03EG6Z.corp.alleninstitute.org
 RENDER_HOST_PORT=80
@@ -33,6 +32,9 @@ CLIENT_SCRIPTS=/shared/render/render-ws-java-client/src/main/scripts
 LOG_LEVEL=INFO
 
 #PARAMETERS for pipeline processes below
+
+[CREATE_LOWRES_STACKS]
+SCALE=0.05
 
 #Parameters for the tilepair client
 [LOWRES_TILE_PAIR_CLIENT]
@@ -90,7 +92,6 @@ DRIVER_MEMORY=10g
 EXECUTOR_MEMORY=10g
 EXECUTOR_CORES=10
 MAX_FEATURE_CACHE_GB=10
-SPARK_DEFAULT_PARALLELISM=200
 
 # #Parameters for alignment
 # [ALIGN]

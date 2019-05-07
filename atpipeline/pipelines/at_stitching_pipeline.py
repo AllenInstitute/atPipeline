@@ -132,7 +132,7 @@ class CreateRawDataRenderStacks(atpp.PipelineProcess):
                 cmd = cmd + " /opt/conda/bin/python -m renderapps.dataimport.create_fast_stacks_multi"
                 cmd = cmd + " --render.host %s"           %rp.host
                 cmd = cmd + " --render.owner %s "         %rp.owner
-                cmd = cmd + " --render.project %s"        %rp.projectName
+                cmd = cmd + " --render.project %s"        %rp.project_name
                 cmd = cmd + " --render.client_scripts %s" %rp.clientScripts
                 cmd = cmd + " --render.port %d"           %rp.hostPort
                 cmd = cmd + " --render.memGB %s"          %rp.memGB
@@ -233,7 +233,7 @@ class CreateFlatFieldCorrectedData(atpp.PipelineProcess):
                 with open(p.flatfield_template) as json_data:
                      ff = json.load(json_data)
 
-                flatfield_json = os.path.join(flatfield_dir, "flatfield_%s_%s_%s_%d.json"%(renderProject.projectName, ribbon, session, sectnum))
+                flatfield_json = os.path.join(flatfield_dir, "flatfield_%s_%s_%s_%d.json"%(renderProject.project_name, ribbon, session, sectnum))
 
                 z = ribbon*100 + sectnum
 
@@ -331,7 +331,7 @@ class DropStitchingMistakes(atpp.PipelineProcess):
             cmd = cmd + " /opt/conda/bin/python -m renderapps.stitching.detect_and_drop_stitching_mistakes"
             cmd = cmd + " --render.owner %s"                        %(rp.owner)
             cmd = cmd + " --render.host %s"                         %(rp.host)
-            cmd = cmd + " --render.project %s"                      %(rp.projectName)
+            cmd = cmd + " --render.project %s"                      %(rp.project_name)
             cmd = cmd + " --render.client_scripts %s"               %(rp.clientScripts)
             cmd = cmd + " --render.port %d"                         %(rp.hostPort)
             cmd = cmd + " --render.memGB %s"                        %(rp.memGB)

@@ -75,12 +75,12 @@ class ConsolidateRoughAlignedStackTransforms(atpp.PipelineProcess):
                 cmd = "docker exec "+ p.atCoreContainer
                 cmd = cmd + " /opt/conda/bin/python -m rendermodules.stack.consolidate_transforms"
                 cmd = cmd + " --render.host %s"                             %(rp.host)
-                cmd = cmd + " --render.project %s"                          %(rp.projectName)
+                cmd = cmd + " --render.project %s"                          %(rp.project_name)
                 cmd = cmd + " --render.owner %s"                            %(rp.owner)
                 cmd = cmd + " --render.client_scripts %s"                   %(rp.clientScripts)
                 cmd = cmd + " --render.memGB %s"                            %(rp.memGB)
                 cmd = cmd + " --render.port %s"                             %(rp.hostPort)
-                cmd = cmd + " --pool_size %s"                               %(p.atCoreThreads)
+                cmd = cmd + " --pool_size %s"                               %(p.GENERAL['AT_CORE_THREADS'])
                 cmd = cmd + " --stack S%d_RoughAligned"                     %(sessionNR)
                 cmd = cmd + " --output_stack S%d_RoughAligned_Consolidated" %(sessionNR)
                 cmd = cmd + " --close_stack %d"                             %(True)
@@ -113,17 +113,17 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
                 cmd = "docker exec " + p.atCoreContainer
                 cmd = cmd + " /opt/conda/bin/python -m renderapps.stitching.create_montage_pointmatches_in_place"
                 cmd = cmd + " --render.host %s"                           %(rp.host)
-                cmd = cmd + " --render.project %s"                        %(rp.projectName)
+                cmd = cmd + " --render.project %s"                        %(rp.project_name)
                 cmd = cmd + " --render.owner %s"                          %(rp.owner)
                 cmd = cmd + " --render.client_scripts %s"                 %(rp.clientScripts)
                 cmd = cmd + " --render.memGB %s"                          %(rp.memGB)
                 cmd = cmd + " --render.port %s"                           %(rp.hostPort)
-                cmd = cmd + " --pool_size %s"                             %(p.atCoreThreads)
+                cmd = cmd + " --pool_size %s"                             %(p.GENERAL['AT_CORE_THREADS'])
                 cmd = cmd + " --stack S%d_RoughAligned"                   %(sessionNR)
                 cmd = cmd + " --minZ %d"                                  %(p.firstSection)
                 cmd = cmd + " --maxZ %d"                                  %(p.lastSection)
                 cmd = cmd + " --dataRoot %s"                              %(p.toMount(p.absoluteDataOutputFolder))
-                cmd = cmd + " --matchCollection %s"                       %("%s_HR_2D"%(rp.projectName))
+                cmd = cmd + " --matchCollection %s"                       %("%s_HR_2D"%(rp.project_name))
                 cmd = cmd + " --delta %s"                                 %(p.CREATE_2D_POINTMATCHES['DELTA'])
                 cmd = cmd + " --output_json Test"
 
@@ -164,7 +164,7 @@ class Create_HR_tilepairs(atpp.PipelineProcess):
                 cmd = cmd + " org.janelia.render.client.TilePairClient"
                 cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(rp.host, rp.hostPort)
                 cmd = cmd + " --owner %s"							    %(rp.owner)
-                cmd = cmd + " --project %s"                             %(rp.projectName)
+                cmd = cmd + " --project %s"                             %(rp.project_name)
                 cmd = cmd + " --stack %s"                               %("S%d_RoughAligned_Consolidated"%(sessionNR))
                 cmd = cmd + " --minZ %d"                                %(p.firstSection)
                 cmd = cmd + " --maxZ %d"                                %(p.lastSection)
@@ -228,7 +228,7 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
                 cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"
                 cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(rp.host, rp.hostPort)
                 cmd = cmd + " --owner %s"                               %(rp.owner)
-                cmd = cmd + " --collection %s"                          %("%s_HR_3D"%(rp.projectName))
+                cmd = cmd + " --collection %s"                          %("%s_HR_3D"%(rp.project_name))
                 cmd = cmd + " --pairJson %s"                            %(p.toMount(jsonInput))
                 cmd = cmd + " --renderWithFilter true"
                 cmd = cmd + " --maxFeatureCacheGb %s"                   %(p.CREATE_HR_POINTMATCHES['MAX_FEATURE_CACHE_GB'])
@@ -286,14 +286,14 @@ class Create_fine_aligned_stacks(atpp.PipelineProcess):
                 rp     = p.renderProject
 
             	#point match collections
-                pm_collection2D     = "%s_HR_2D"%(rp.projectName)
-                pm_collection3D     = "%s_HR_3D"%(rp.projectName)
+                pm_collection2D     = "%s_HR_2D"%(rp.project_name)
+                pm_collection3D     = "%s_HR_3D"%(rp.project_name)
 
                 with open(p.fine_alignment_template) as json_data:
                    ra = json.load(json_data)
 
 
-                u.saveFineAlignJSON(ra, input_json, rp.host, rp.hostPort, rp.owner, rp.projectName,
+                u.saveFineAlignJSON(ra, input_json, rp.host, rp.hostPort, rp.owner, rp.project_name,
                                         input_stack, output_stack, pm_collection2D, pm_collection3D,
                                         rp.clientScripts, rp.logLevel, p.firstSection, p.lastSection, p.toMount(dataOutputFolder))
 
