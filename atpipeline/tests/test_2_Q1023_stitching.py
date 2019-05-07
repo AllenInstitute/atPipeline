@@ -60,7 +60,6 @@ def test_data_creation(test_data_folder, test_data_set):
         shutil.rmtree(data_output_folder)
 
     #Remove all data that exists in render
-    stacks= renderapi.render.get_stacks_by_owner_project(owner='PyTest', project=PROJECT_NAME, render = render_client)
 
 
     cmd = r'atcore --dataroot ' + data_input_root + ' --pipeline stitch --renderprojectowner PyTest --project_name ' + PROJECT_NAME + ' --config_file_name ' + data_ini_file
