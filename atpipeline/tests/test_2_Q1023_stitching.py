@@ -16,10 +16,6 @@ import renderapi
 import shutil
 from atpipeline import at_test_utils as tu
 
-AT_SYSTEM_CONFIG_FOLDER_NAME    = 'AT_SYSTEM_CONFIG_FOLDER'
-AT_SYSTEM_CONFIG_FILE_NAME      = 'at-system-config.ini'
-
-
 #Projectname will create data in a folder with the same name
 #Render stacks are also created using the project name
 PROJECT_NAME                    = 'pytest_Q1023'
@@ -60,14 +56,20 @@ def test_data_creation(test_data_folder, test_data_set):
     #remove any output data
     data_output_folder = os.path.join(data_input_root, 'processed', PROJECT_NAME)
 
-#    if os.path.exists(data_output_folder):
-#        shutil.rmtree(data_output_folder)
+    if os.path.exists(data_output_folder):
+        shutil.rmtree(data_output_folder)
 
-    #Remove data that exists in render
+    #Remove all data that exists in render
+    stacks= renderapi.render.get_stacks_by_owner_project(owner='PyTest', project=PROJECT_NAME, render = render_client)
+
+
     cmd = r'atcore --dataroot ' + data_input_root + ' --pipeline stitch --renderprojectowner PyTest --project_name ' + PROJECT_NAME + ' --config_file_name ' + data_ini_file
 
     #This will take about 15 minutes
-    out = u.runShellCMD(cmd)
+    try:
+        out = u.runShellCMD(cmd)
+    except Exception:
+        assert False
 
 def test_state_tables(test_data_folder, test_data_set):
     #If we get here, start checking output files

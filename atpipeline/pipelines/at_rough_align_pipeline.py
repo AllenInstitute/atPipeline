@@ -323,7 +323,7 @@ class ApplyLowResToHighRes(atpp.PipelineProcess):
             cmd = cmd + " --render.client_scripts %s"      %(rp.clientScripts)
             cmd = cmd + " --render.port %d"                %(rp.hostPort)
             cmd = cmd + " --render.memGB %s"               %(rp.memGB)
-            cmd = cmd + " --pool_size %s"                  %(p.CREATE_LOWRES_STACKS['POOL_SIZE'])
+            cmd = cmd + " --pool_size %s"                  %(p.GENERAL['AT_CORE_THREADS'])
             cmd = cmd + " --tilespec_directory %s"         %(p.toMount(roughalign_ts_dir))
             cmd = cmd + " --scale %s"                      %(p.CREATE_LOWRES_STACKS['SCALE'])
             cmd = cmd + " --input_stack %s"                %(inputStack)
