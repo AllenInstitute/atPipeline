@@ -27,7 +27,6 @@ def parseArguments(parser):
         help='Full path to data folder for project data to process',
         required=True)
 
-
     parser.add_argument('--pipeline',
         help='Specify the pipeline to use',
         choices={'stitch', 'roughalign', 'finealign', 'register_sessions'},
@@ -37,12 +36,32 @@ def parseArguments(parser):
         help='Set project name. Defualt: name of input datas basefolder',
         required=False)
 
-    parser.add_argument('--renderprojectowner', metavar="OWNER", help='Specify a RenderProject owner',                                       type=str,   nargs='?')
-    parser.add_argument('--sessions',             help='Specify sessions to process',                                         type=str)
-    parser.add_argument('--ribbons',              help='Specify ribbons  to process',                                         type=str)
-    parser.add_argument('--firstsection', metavar='N', help='Specify start section (e.g. \'1\' to start with a datasets first section)',                                             type=int)
-    parser.add_argument('--lastsection', metavar='N', help='Specify end section',                                                 type=int)
-    parser.add_argument('--overwritedata',        help='Overwrite any already processed data',                                            action='store_true')
+    parser.add_argument('--renderprojectowner',
+        help='Specify a RenderProject owner',
+        metavar="OWNER",
+        type=str,
+        nargs='?')
+
+    parser.add_argument('--sessions',
+        help='Specify sessions to process',
+        type=str)
+
+    parser.add_argument('--ribbons',
+        help='Specify ribbons  to process',
+        type=str)
+
+    parser.add_argument('--firstsection', metavar='N',
+        help='Specify start section (e.g. \'1\' to start with a datasets first section)',
+        type=int)
+
+    parser.add_argument('--lastsection', metavar='N',
+    help='Specify end section',
+    type=int)
+
+    parser.add_argument('--overwritedata',
+        help='Overwrite any already processed data',
+        action='store_true')
+
     parser.add_argument('--loglevel',
         choices={'INFO', 'DEBUG', 'WARNING', 'ERROR'},
         help='Set program loglevel',

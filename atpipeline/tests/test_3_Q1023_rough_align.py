@@ -13,18 +13,17 @@ import docker
 import json
 import difflib
 import renderapi
+from atpipeline import at_test_utils as tu
 
-AT_SYSTEM_CONFIG_FOLDER_NAME    = 'AT_SYSTEM_CONFIG_FOLDER'
-AT_SYSTEM_CONFIG_FILE_NAME      = 'at-system-config.ini'
-TEST_DATA_SET = 'Q1023'
+#Projectname will create data in a folder with the same name
+#Render stacks are also created using the project name
+PROJECT_NAME                    = 'pytest_1'
 
-def compareFileInFolders(the_file, folder_1,folder_2):
-    f1 = open(os.path.join(folder_1, the_file)).read()
-    f2 = open(os.path.join(folder_2, the_file)).read()
-    diff_result = (f1 == f2)
 
-    print (diff_result)
-    return diff_result
+@pytest.fixture
+def test_data_set():
+    return 'Q1023'
+
 
 #Create output data and compare output
 def test_low_res_folder(test_data_folder, test_data_set):
@@ -39,8 +38,8 @@ def test_low_res_folder(test_data_folder, test_data_set):
 
 def test_dropped_jsons(test_data_folder, test_data_set):
     sub_dir = 'dropped'
-    ref_folder  = os.path.join(test_data_folder, 'results', test_data_set, sub_dir)
-    test_folder = os.path.join(test_data_folder, test_data_set, 'processed', test_data_set, sub_dir)
+    ref_folder  = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
+    test_folder = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME, sub_dir)
 
     #TODO populate this automatically later on, so we can run the whole test on any dataset
     #Values for the Q1023 dataset
@@ -59,6 +58,6 @@ def test_dropped_jsons(test_data_folder, test_data_set):
 
     for f in files:
         #For now, just check existence of files
-        #assert compareFileInFolders(f, test_folder, ref_folder) == True
-        assert os.path.exists(os.path.join(test_folder, f))
+        assert tu.compare_file_in_folders(f, test_folder, ref_folder) == True
+        #assert os.path.exists(os.path.join(test_folder, f))
 
