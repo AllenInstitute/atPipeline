@@ -93,12 +93,11 @@ def test_data_creation(test_data_folder, test_data_set):
     from atpipeline import at_utils as u
     data_input_root = os.path.join(test_data_folder, 'input', test_data_set)
 
-
     #remove any output data
     data_output_folder = os.path.join(data_input_root, 'processed', PROJECT_NAME)
 
-    if os.path.exists(data_output_folder):
-        shutil.rmtree(data_output_folder)
+#    if os.path.exists(data_output_folder):
+#        shutil.rmtree(data_output_folder)
 
     #Remove data that exists in render
     cmd = r'atcore --dataroot ' + data_input_root + ' --pipeline stitch --renderprojectowner PyTest --project_name ' + PROJECT_NAME
@@ -141,91 +140,91 @@ def test_stacks(render_client):
     assert 'S2_Stitched'            in stacks
     assert 'S2_Stitched_Dropped'    in stacks
 
-##def test_images_and_tilespec_folders(test_data_folder):
-##    #Just check that the downsamp_images and downsamp_tilespec folders exists
-##    test_output_data_root = os.path.join(test_data_folder, test_data_set, 'processed', PROJECT_NAME)
-##    assert os.path.exists(os.path.join(test_output_data_root, 'downsamp_images')) == True
-##    assert os.path.exists(os.path.join(test_output_data_root, 'downsamp_tilespec')) == True
-##
-##def test_median_jsons(test_data_folder, test_data_set):
-##    sub_dir = 'medians'
-##    ref_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
-##    test_folder = os.path.join(test_data_folder, test_data_set, 'processed', PROJECT_NAME, sub_dir)
-##
-##    #TODO populate this automatically later on, so we can run the whole test on any dataset
-##    #Values for the Q1023 dataset
-##    files = [
-##               'median_10_2_0_5.json',
-##               'median_11_2_0_3.json'
-##            ]
-##    for f in files:
-##        assert compareFileInFolders(f, test_folder, ref_folder) == True
-##
-##def test_flatfield_jsons(test_data_folder, test_data_set):
-##    sub_dir = 'flatfield'
-##    ref_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
-##    test_folder = os.path.join(test_data_folder, test_data_set, 'processed', PROJECT_NAME, sub_dir)
-##
-##    #TODO populate this automatically later on, so we can run the whole test on any dataset
-##    #Values for the Q1023 dataset
-##    files = [
-##                'flatfield_Q1023_10_2_0.json',
-##                'flatfield_Q1023_10_2_1.json',
-##                'flatfield_Q1023_10_2_2.json',
-##                'flatfield_Q1023_10_2_3.json',
-##                'flatfield_Q1023_10_2_4.json',
-##                'flatfield_Q1023_10_2_5.json',
-##                'flatfield_Q1023_11_2_0.json',
-##                'flatfield_Q1023_11_2_1.json',
-##                'flatfield_Q1023_11_2_2.json',
-##                'flatfield_Q1023_11_2_3.json'
-##            ]
-##    for f in files:
-##        assert compareFileInFolders(f, test_folder, ref_folder) == True
-##
-##def test_stitching_jsons(test_data_folder, test_data_set):
-##    sub_dir = 'stitching'
-##    ref_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
-##    test_folder = os.path.join(test_data_folder, test_data_set, 'processed', PROJECT_NAME, sub_dir)
-##
-##    #TODO populate this automatically later on, so we can run the whole test on any dataset
-##    #Values for the Q1023 dataset
-##    files = [
-##                'stitched_11_2_3.json',
-##                'stitched_11_2_2.json',
-##                'stitched_11_2_1.json',
-##                'stitched_11_2_0.json',
-##                'stitched_10_2_5.json',
-##                'stitched_10_2_4.json',
-##                'stitched_10_2_3.json',
-##                'stitched_10_2_2.json',
-##                'stitched_10_2_1.json',
-##                'stitched_10_2_0.json'
-##            ]
-##    for f in files:
-##        assert compareFileInFolders(f, test_folder, ref_folder) == True
-##
-##def test_dropped_jsons(test_data_folder, test_data_set):
-##    sub_dir = 'dropped'
-##    ref_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
-##    test_folder = os.path.join(test_data_folder, test_data_set, 'processed', PROJECT_NAME, sub_dir)
-##
-##    #TODO populate this automatically later on, so we can run the whole test on any dataset
-##    #Values for the Q1023 dataset
-##    files = [
-##                'S2_Stitched_Dropped_z1000.json',
-##                'S2_Stitched_Dropped_z1001.json',
-##                'S2_Stitched_Dropped_z1002.json',
-##                'S2_Stitched_Dropped_z1003.json',
-##                'S2_Stitched_Dropped_z1004.json',
-##                'S2_Stitched_Dropped_z1005.json',
-##                'S2_Stitched_Dropped_z1100.json',
-##                'S2_Stitched_Dropped_z1101.json',
-##                'S2_Stitched_Dropped_z1102.json',
-##                'S2_Stitched_Dropped_z1103.json'
-##            ]
-##
-##    for f in files:
-##        #For now, just check existence of files
-##        #assert compareFileInFolders(f, test_folder, ref_folder) == True
-##        assert os.path.exists(os.path.join(test_folder, f))
+def test_images_and_tilespec_folders(test_data_folder, test_data_set):
+    #Just check that the downsamp_images and downsamp_tilespec folders exists
+    test_output_data_root = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME)
+    assert os.path.exists(os.path.join(test_output_data_root, 'downsamp_images')) == True
+    assert os.path.exists(os.path.join(test_output_data_root, 'downsamp_tilespec')) == True
+
+def test_median_jsons(test_data_folder, test_data_set):
+    sub_dir = 'medians'
+    ref_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
+    test_folder = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME, sub_dir)
+
+    #TODO populate this automatically later on, so we can run the whole test on any dataset
+    #Values for the Q1023 dataset
+    files = [
+               'median_10_2_0_5.json',
+               'median_11_2_0_3.json'
+            ]
+    for f in files:
+        assert compareFileInFolders(f, test_folder, ref_folder) == True
+
+def test_flatfield_jsons(test_data_folder, test_data_set):
+    sub_dir = 'flatfield'
+    ref_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
+    test_folder = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME, sub_dir)
+
+    #TODO populate this automatically later on, so we can run the whole test on any dataset
+    #Values for the Q1023 dataset
+    files = [
+                'flatfield_' + PROJECT_NAME + '_10_2_0.json',
+                'flatfield_' + PROJECT_NAME + '_10_2_1.json',
+                'flatfield_' + PROJECT_NAME + '_10_2_2.json',
+                'flatfield_' + PROJECT_NAME + '_10_2_3.json',
+                'flatfield_' + PROJECT_NAME + '_10_2_4.json',
+                'flatfield_' + PROJECT_NAME + '_10_2_5.json',
+                'flatfield_' + PROJECT_NAME + '_11_2_0.json',
+                'flatfield_' + PROJECT_NAME + '_11_2_1.json',
+                'flatfield_' + PROJECT_NAME + '_11_2_2.json',
+                'flatfield_' + PROJECT_NAME + '_11_2_3.json'
+            ]
+    for f in files:
+        assert compareFileInFolders(f, test_folder, ref_folder) == True
+
+def test_stitching_jsons(test_data_folder, test_data_set):
+    sub_dir = 'stitching'
+    ref_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
+    test_folder = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME, sub_dir)
+
+    #TODO populate this automatically later on, so we can run the whole test on any dataset
+    #Values for the Q1023 dataset
+    files = [
+                'stitched_11_2_3.json',
+                'stitched_11_2_2.json',
+                'stitched_11_2_1.json',
+                'stitched_11_2_0.json',
+                'stitched_10_2_5.json',
+                'stitched_10_2_4.json',
+                'stitched_10_2_3.json',
+                'stitched_10_2_2.json',
+                'stitched_10_2_1.json',
+                'stitched_10_2_0.json'
+            ]
+    for f in files:
+        assert compareFileInFolders(f, test_folder, ref_folder) == True
+
+def test_dropped_jsons(test_data_folder, test_data_set):
+    sub_dir = 'dropped'
+    ref_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
+    test_folder = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME, sub_dir)
+
+    #TODO populate this automatically later on, so we can run the whole test on any dataset
+    #Values for the Q1023 dataset
+    files = [
+                'S2_Stitched_Dropped_z1000.json',
+                'S2_Stitched_Dropped_z1001.json',
+                'S2_Stitched_Dropped_z1002.json',
+                'S2_Stitched_Dropped_z1003.json',
+                'S2_Stitched_Dropped_z1004.json',
+                'S2_Stitched_Dropped_z1005.json',
+                'S2_Stitched_Dropped_z1100.json',
+                'S2_Stitched_Dropped_z1101.json',
+                'S2_Stitched_Dropped_z1102.json',
+                'S2_Stitched_Dropped_z1103.json'
+            ]
+
+    for f in files:
+        #For now, just check existence of files
+        #assert compareFileInFolders(f, test_folder, ref_folder) == True
+        assert os.path.exists(os.path.join(test_folder, f))
