@@ -13,61 +13,26 @@ import docker
 import json
 import difflib
 import renderapi
+import shutil
+from atpipeline import at_test_utils as tu
 
-AT_SYSTEM_CONFIG_FOLDER_NAME    = 'AT_SYSTEM_CONFIG_FOLDER'
-AT_SYSTEM_CONFIG_FILE_NAME      = 'at-system-config.ini'
-TEST_DATA_SET = 'Q1023'
+#Projectname will create data in a folder with the same name
+#Render stacks are also created using the project name
+PROJECT_NAME                    = 'pytest_Q1023'
+PROJECT_INI                     = 'Q1023.ini'
 
-def compareFileInFolders(the_file, folder_1,folder_2):
-    f1 = open(os.path.join(folder_1, the_file)).read()
-    f2 = open(os.path.join(folder_2, the_file)).read()
+@pytest.fixture
+def test_data_set():
+    return 'Q1023'
 
-    diff_result = (f1 == f2)
-
-    print (diff_result)
-    return diff_result
-
-
-##============ Tests below
-
-#Test to check if environment variable is setup
-def test_config_file_environment_variable():
-    res = (AT_SYSTEM_CONFIG_FOLDER_NAME in os.environ)
-    assert res == True
-
-#Test to check if system config file exists
-def test_config_file_exists():
-    config_file = os.path.join(os.environ.get(AT_SYSTEM_CONFIG_FOLDER_NAME), AT_SYSTEM_CONFIG_FILE_NAME)
-    res = os.path.exists(config_file)
-    assert res == True
-
-#Test to check status of at backend
-def test_status_at_backend(at_backend):
-    #Success response from the status call is 0
-    response = at_backend.status()
-    assert response == 0
-
-#Test to check that the folder for test data exists
-def test_test_data_folder(test_data_folder):
-    res = os.path.exists(test_data_folder)
-    assert res == True
-
-def test_atcore_version():
-    from source import at_utils as u
-    import atcore
-
-    #argv = ['atcore.py', '--version', '--dataroot']
-    #out = atcore.__main__(argv)
-    out = u.runShellCMD(r'python -m atpipeline.atcore --version')
-    res = (out == ['0.0.1\n'])
-    assert res == True
+#----------------------------------------------------------------------------------------------------------
 
 #Test integrity of input data.
 def test_meta_data(test_data_folder, test_data_set):
-    from source import at_utils as u
+    from atpipeline import at_utils as u
 
-    data_root = os.path.join(test_data_folder, test_data_set)
-    cmd = 'python ..\\..\\atcore.py --dataroot ' + data_root
+    data_root = os.path.join(test_data_folder, 'input', test_data_set)
+    cmd = 'atcore --dataroot ' + data_root
     out = u.getJSON(cmd)
     data = json.loads(out)
 
@@ -84,19 +49,33 @@ def test_meta_data(test_data_folder, test_data_set):
 
 #Create output data and compare output
 def test_data_creation(test_data_folder, test_data_set):
-    from source import at_utils as u
-    data_root = os.path.join(test_data_folder, test_data_set)
-    cmd = r'python ..\..\atcore.py --dataroot ' + data_root + ' --pipeline stitch --overwritedata --renderprojectowner PyTest'
+    from atpipeline import at_utils as u
+    data_input_root = os.path.join(test_data_folder, 'input', test_data_set)
+    data_ini_file = os.path.join(test_data_folder, PROJECT_INI)
+
+    #remove any output data
+    data_output_folder = os.path.join(data_input_root, 'processed', PROJECT_NAME)
+
+    if os.path.exists(data_output_folder):
+        shutil.rmtree(data_output_folder)
+
+    #Remove all data that exists in render
+
+
+    cmd = r'atcore --dataroot ' + data_input_root + ' --pipeline stitch --renderprojectowner PyTest --project_name ' + PROJECT_NAME + ' --config_file_name ' + data_ini_file
 
     #This will take about 15 minutes
-    out = u.runShellCMD(cmd)
+    try:
+        out = u.runShellCMD(cmd)
+    except Exception:
+        assert False
 
 def test_state_tables(test_data_folder, test_data_set):
     #If we get here, start checking output files
-    test_output_data_root = os.path.join(test_data_folder, test_data_set, 'processed', test_data_set)
+    test_output_data_root = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME)
     assert os.path.exists(test_output_data_root) == True
 
-    ref_state_tables_folder = os.path.join(test_data_folder, 'results', test_data_set, 'statetables')
+    ref_state_tables_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, 'statetables')
 
     #Pipeline step 1: Check statetables folder ================================================
     test_state_tables_folder = os.path.join(test_output_data_root,    'statetables')
@@ -115,10 +94,10 @@ def test_state_tables(test_data_folder, test_data_set):
                     'statetable_ribbon_11_session_2_section_3'
                  ]
     for f in state_tables:
-        assert compareFileInFolders(f, test_state_tables_folder, ref_state_tables_folder) == True
+        assert tu.compare_file_in_folders(f, test_state_tables_folder, ref_state_tables_folder) == True
 
-def test_stacks(render_client, test_data_set):
-    stacks= renderapi.render.get_stacks_by_owner_project(owner='PyTest', project=test_data_set, render = render_client)
+def test_stacks(render_client):
+    stacks= renderapi.render.get_stacks_by_owner_project(owner='PyTest', project=PROJECT_NAME, render = render_client)
     assert 'S2_Session2'            in stacks
     assert 'S2_Medians'             in stacks
     assert 'S2_FlatFielded'         in stacks
@@ -127,14 +106,14 @@ def test_stacks(render_client, test_data_set):
 
 def test_images_and_tilespec_folders(test_data_folder, test_data_set):
     #Just check that the downsamp_images and downsamp_tilespec folders exists
-    test_output_data_root = os.path.join(test_data_folder, test_data_set, 'processed', test_data_set)
+    test_output_data_root = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME)
     assert os.path.exists(os.path.join(test_output_data_root, 'downsamp_images')) == True
     assert os.path.exists(os.path.join(test_output_data_root, 'downsamp_tilespec')) == True
 
 def test_median_jsons(test_data_folder, test_data_set):
     sub_dir = 'medians'
-    ref_folder = os.path.join(test_data_folder, 'results', test_data_set, sub_dir)
-    test_folder = os.path.join(test_data_folder, test_data_set, 'processed', test_data_set, sub_dir)
+    ref_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
+    test_folder = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME, sub_dir)
 
     #TODO populate this automatically later on, so we can run the whole test on any dataset
     #Values for the Q1023 dataset
@@ -143,34 +122,34 @@ def test_median_jsons(test_data_folder, test_data_set):
                'median_11_2_0_3.json'
             ]
     for f in files:
-        assert compareFileInFolders(f, test_folder, ref_folder) == True
+        assert tu.compare_file_in_folders(f, test_folder, ref_folder) == True
 
 def test_flatfield_jsons(test_data_folder, test_data_set):
     sub_dir = 'flatfield'
-    ref_folder = os.path.join(test_data_folder, 'results', test_data_set, sub_dir)
-    test_folder = os.path.join(test_data_folder, test_data_set, 'processed', test_data_set, sub_dir)
+    ref_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
+    test_folder = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME, sub_dir)
 
     #TODO populate this automatically later on, so we can run the whole test on any dataset
     #Values for the Q1023 dataset
     files = [
-                'flatfield_Q1023_10_2_0.json',
-                'flatfield_Q1023_10_2_1.json',
-                'flatfield_Q1023_10_2_2.json',
-                'flatfield_Q1023_10_2_3.json',
-                'flatfield_Q1023_10_2_4.json',
-                'flatfield_Q1023_10_2_5.json',
-                'flatfield_Q1023_11_2_0.json',
-                'flatfield_Q1023_11_2_1.json',
-                'flatfield_Q1023_11_2_2.json',
-                'flatfield_Q1023_11_2_3.json'
+                'flatfield_' + PROJECT_NAME + '_10_2_0.json',
+                'flatfield_' + PROJECT_NAME + '_10_2_1.json',
+                'flatfield_' + PROJECT_NAME + '_10_2_2.json',
+                'flatfield_' + PROJECT_NAME + '_10_2_3.json',
+                'flatfield_' + PROJECT_NAME + '_10_2_4.json',
+                'flatfield_' + PROJECT_NAME + '_10_2_5.json',
+                'flatfield_' + PROJECT_NAME + '_11_2_0.json',
+                'flatfield_' + PROJECT_NAME + '_11_2_1.json',
+                'flatfield_' + PROJECT_NAME + '_11_2_2.json',
+                'flatfield_' + PROJECT_NAME + '_11_2_3.json'
             ]
     for f in files:
-        assert compareFileInFolders(f, test_folder, ref_folder) == True
+        assert tu.compare_file_in_folders(f, test_folder, ref_folder) == True
 
 def test_stitching_jsons(test_data_folder, test_data_set):
     sub_dir = 'stitching'
-    ref_folder = os.path.join(test_data_folder, 'results', test_data_set, sub_dir)
-    test_folder = os.path.join(test_data_folder, test_data_set, 'processed', test_data_set, sub_dir)
+    ref_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
+    test_folder = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME, sub_dir)
 
     #TODO populate this automatically later on, so we can run the whole test on any dataset
     #Values for the Q1023 dataset
@@ -187,12 +166,12 @@ def test_stitching_jsons(test_data_folder, test_data_set):
                 'stitched_10_2_0.json'
             ]
     for f in files:
-        assert compareFileInFolders(f, test_folder, ref_folder) == True
+        assert tu.compare_file_in_folders(f, test_folder, ref_folder) == True
 
 def test_dropped_jsons(test_data_folder, test_data_set):
     sub_dir = 'dropped'
-    ref_folder = os.path.join(test_data_folder, 'results', test_data_set, sub_dir)
-    test_folder = os.path.join(test_data_folder, test_data_set, 'processed', test_data_set, sub_dir)
+    ref_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
+    test_folder = os.path.join(test_data_folder, 'input', test_data_set, 'processed', PROJECT_NAME, sub_dir)
 
     #TODO populate this automatically later on, so we can run the whole test on any dataset
     #Values for the Q1023 dataset
@@ -211,5 +190,5 @@ def test_dropped_jsons(test_data_folder, test_data_set):
 
     for f in files:
         #For now, just check existence of files
-        #assert compareFileInFolders(f, test_folder, ref_folder) == True
+        #assert tu.compare_file_in_folders(f, test_folder, ref_folder) == True
         assert os.path.exists(os.path.join(test_folder, f))

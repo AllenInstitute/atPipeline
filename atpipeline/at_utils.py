@@ -93,7 +93,7 @@ def runPipelineStep(cmd, stepName):
 class RenderProject:
     def __init__(self, owner, project_name, host_name, host_port, client_scripts, mem_gb, log_level):
         self.owner          = owner
-        self.projectName    = project_name
+        self.project_name    = project_name
         self.host           = host_name
         self.hostPort       = host_port
         self.clientScripts  = client_scripts
@@ -138,7 +138,7 @@ def dump_json(data, fileName):
 def savemedianjson(template, outFile, render_project, acq_stack, median_stack, median_dir, minz, maxz, close_stack):
     template['render']['host']    = render_project.host
     template['render']['owner']   = render_project.owner
-    template['render']['project'] = render_project.projectName
+    template['render']['project'] = render_project.project_name
     template['input_stack']       = acq_stack
     template['output_stack']      = median_stack
     template['minZ']              = minz
@@ -150,7 +150,7 @@ def savemedianjson(template, outFile, render_project, acq_stack, median_stack, m
 def saveflatfieldjson(template, outFile, render_project, acq_stack, median_stack, flatfield_stack, flatfield_dir, sectnum, close_stack):
     template['render']['host']    = render_project.host
     template['render']['owner']   = render_project.owner
-    template['render']['project'] = render_project.projectName
+    template['render']['project'] = render_project.project_name
     template['input_stack']       = acq_stack
     template['correction_stack']  = median_stack
     template['output_stack']      = flatfield_stack
@@ -176,7 +176,7 @@ def savedeconvjson(template,outFile, owner, project, flatfield_stack,deconv_stac
 def savestitchingjson(template, outfile, render_project, flatfield_stack, stitched_stack, sectnum):
     template['baseDataUrl']            = "http://%s/render-ws/v1"%(render_project.host)
     template['owner']                  = render_project.owner
-    template['project']                = render_project.projectName
+    template['project']                = render_project.project_name
     template['stack']                  = flatfield_stack
     template['outputStack']            = stitched_stack
     template['section']                = sectnum
@@ -189,7 +189,7 @@ def saveRoughAlignJSON(template, outFile, renderProject, input_stack, output_sta
     template['output_stack']['client_scripts']               = renderProject.clientScripts
     template['output_stack']['owner']                        = renderProject.owner
     template['output_stack']['log_level']                    = renderProject.logLevel
-    template['output_stack']['project']                      = renderProject.projectName
+    template['output_stack']['project']                      = renderProject.project_name
     template['output_stack']['port']                         = renderProject.hostPort
     template['output_stack']['host']                         = renderProject.host
     template['output_stack']['name']                         = output_stack
@@ -197,7 +197,7 @@ def saveRoughAlignJSON(template, outFile, renderProject, input_stack, output_sta
     template['input_stack']['client_scripts']                = renderProject.clientScripts
     template['input_stack']['owner']                         = renderProject.owner
     template['input_stack']['log_level']                     = renderProject.logLevel
-    template['input_stack']['project']                       = renderProject.projectName
+    template['input_stack']['project']                       = renderProject.project_name
     template['input_stack']['port']                          = renderProject.hostPort
     template['input_stack']['host']                          = renderProject.host
     template['input_stack']['name']                          = input_stack
@@ -205,7 +205,7 @@ def saveRoughAlignJSON(template, outFile, renderProject, input_stack, output_sta
     template['pointmatch']['client_scripts']                 = renderProject.clientScripts
     template['pointmatch']['owner']                          = renderProject.owner
     template['pointmatch']['log_level']                      = renderProject.logLevel
-    template['pointmatch']['project']                        = renderProject.projectName
+    template['pointmatch']['project']                        = renderProject.project_name
     template['pointmatch']['name']                           = lowresPmCollection
     template['pointmatch']['port']                           = renderProject.hostPort
     template['pointmatch']['host']                           = renderProject.host

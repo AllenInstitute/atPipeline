@@ -3,16 +3,16 @@ import os
 
 AT_SYSTEM_CONFIG_FOLDER_NAME    = 'AT_SYSTEM_CONFIG_FOLDER'
 AT_SYSTEM_CONFIG_FILE_NAME      = 'at-system-config.ini'
-TEST_DATA_SET = 'Q1023'
+
 
 @pytest.fixture
 def at_backend():
-    from source import at_docker_manager
+    from atpipeline import at_docker_manager
     return at_docker_manager.DockerManager()
 
 @pytest.fixture
 def system_config():
-    from source import at_system_config
+    from atpipeline import at_system_config
     configFolder = os.environ[AT_SYSTEM_CONFIG_FOLDER_NAME]
     return at_system_config.ATSystemConfig(os.path.join(configFolder, AT_SYSTEM_CONFIG_FILE_NAME))
 
@@ -35,6 +35,3 @@ def render_client(system_config):
 def test_data_folder(system_config):
     return system_config.config['GENERAL']['TEST_DATA_FOLDER']
 
-@pytest.fixture
-def test_data_set():
-    return TEST_DATA_SET

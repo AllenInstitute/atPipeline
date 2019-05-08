@@ -97,7 +97,7 @@ class CreateLowResStacks(atpp.PipelineProcess):
                 cmd = "docker exec " + p.atCoreContainer
                 cmd = cmd + " /opt/conda/bin/python -m renderapps.materialize.make_downsample_image_stack"
                 cmd = cmd + " --render.host %s"                                %(rp.host)
-                cmd = cmd + " --render.project %s"                             %(rp.projectName)
+                cmd = cmd + " --render.project %s"                             %(rp.project_name)
                 cmd = cmd + " --render.owner %s"                               %(rp.owner)
                 cmd = cmd + " --render.client_scripts %s"                      %(rp.clientScripts)
                 cmd = cmd + " --render.memGB %s"                               %(rp.memGB)
@@ -106,8 +106,8 @@ class CreateLowResStacks(atpp.PipelineProcess):
                 cmd = cmd + " --input_stack %s"                                %(input_stack)
                 cmd = cmd + " --output_stack %s"                               %(output_stack)
                 cmd = cmd + " --image_directory %s"                            %(p.toMount(downsample_dir))
-                cmd = cmd + " --pool_size %s"                                  %(p.atCoreThreads)
-                cmd = cmd + " --scale %s"                                      %(p.downSampleScale)
+                cmd = cmd + " --pool_size %s"                                  %(p.GENERAL['AT_CORE_THREADS'])
+                cmd = cmd + " --scale %s"                                      %(p.CREATE_LOWRES_STACKS['SCALE'])
                 cmd = cmd + " --minZ %s"                                       %(firstRibbon*100)
                 cmd = cmd + " --maxZ %s"                                       %((lastRibbon + 1)*100 - 1)
                 cmd = cmd + " --numsectionsfile %s"                            %(p.toMount(numsections_file))
@@ -151,7 +151,7 @@ class CreateLowResTilePairs(atpp.PipelineProcess):
             if os.path.isdir(jsondir) == False:
                 os.mkdir(jsondir)
 
-            jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-%d-nostitch.json"     %(sessionNR, p.zNeighborDistance, p.firstSection, p.lastSection))
+            jsonfile = os.path.join(jsondir, "tilepairs-%d-%s-%d-%d-nostitch.json"     %(sessionNR, p.LOWRES_TILE_PAIR_CLIENT['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
 
             #Run the TilePairClient
             cmd = "docker exec " + p.atCoreContainer
@@ -159,21 +159,21 @@ class CreateLowResTilePairs(atpp.PipelineProcess):
             cmd = cmd + " org.janelia.render.client.TilePairClient"
             cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(rp.host, rp.hostPort)
             cmd = cmd + " --owner %s"							    %(rp.owner)
-            cmd = cmd + " --project %s"                             %(rp.projectName)
+            cmd = cmd + " --project %s"                             %(rp.project_name)
             cmd = cmd + " --stack %s"                               %(inputStack)
             cmd = cmd + " --minZ %d"                                %(p.firstSection)
             cmd = cmd + " --maxZ %d"                                %(p.lastSection)
             cmd = cmd + " --toJson %s"                              %(p.toMount(jsonfile))
-            cmd = cmd + " --excludeCornerNeighbors %s"              %(p.excludeCornerNeighbors)
-            cmd = cmd + " --excludeSameSectionNeighbors %s"         %(p.excludeSameSectionNeighbors)
-            cmd = cmd + " --zNeighborDistance %s"                   %(p.zNeighborDistance)
-            cmd = cmd + " --xyNeighborFactor %s"                    %(p.xyNeighborFactor)
+            cmd = cmd + " --excludeCornerNeighbors %s"              %(u.toBool(p.LOWRES_TILE_PAIR_CLIENT['EXCLUDE_CORNER_NEIGHBOURS']))
+            cmd = cmd + " --excludeSameSectionNeighbors %s"         %(u.toBool(p.LOWRES_TILE_PAIR_CLIENT['EXCLUDE_SAME_SECTION_NEIGHBOR']))
+            cmd = cmd + " --zNeighborDistance %s"                   %(p.LOWRES_TILE_PAIR_CLIENT['Z_NEIGHBOR_DISTANCE'])
+            cmd = cmd + " --xyNeighborFactor %s"                    %(p.LOWRES_TILE_PAIR_CLIENT['XY_NEIGHBOR_FACTOR'])
 
             #Run =============
             self.submit(cmd)
 
             #Prepare json file for the SIFTPointMatch Client
-            jsonfileedit      = os.path.join(jsondir, "tilepairs-%d-%d-%d-%d-nostitch-EDIT.json"%(sessionNR, p.zNeighborDistance, p.firstSection, p.lastSection))
+            jsonfileedit      = os.path.join(jsondir, "tilepairs-%d-%s-%d-%d-nostitch-EDIT.json"%(sessionNR, p.LOWRES_TILE_PAIR_CLIENT['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
             copyfile(jsonfile, jsonfileedit)
 
             for line in fileinput.input(jsonfileedit, inplace=True):
@@ -203,7 +203,7 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             downsample_dir   = os.path.join(p.absoluteDataOutputFolder, "low_res")
 
             jsondir  = os.path.join(p.absoluteDataOutputFolder, "lowres_tilepairfiles")
-            jsonfile = os.path.join(jsondir, "tilepairs-%d-%d-%d-%d-nostitch-EDIT.json"     %(sessionNR, p.zNeighborDistance, p.firstSection, p.lastSection))
+            jsonfile = os.path.join(jsondir, "tilepairs-%d-%s-%d-%d-nostitch-EDIT.json"     %(sessionNR, p.LOWRES_TILE_PAIR_CLIENT['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
 
             #SIFT Point Match Client
             cmd = "docker exec " + p.atCoreContainer
@@ -218,7 +218,7 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             cmd = cmd + " --name PointMatchFull"
             cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"
             cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(rp.host, rp.hostPort)
-            cmd = cmd + " --collection %s_lowres_round"             %(rp.projectName)
+            cmd = cmd + " --collection %s_lowres_round"             %(rp.project_name)
             cmd = cmd + " --owner %s"                               %(rp.owner)
             cmd = cmd + " --pairJson %s"                            %(p.toMount(jsonfile))
             cmd = cmd + " --renderWithFilter %s"                    %(p.LOWRES_POINTMATCHES['RENDER_WITH_FILTER'])
@@ -266,7 +266,7 @@ class CreateRoughAlignedStacks(atpp.PipelineProcess):
             outputStack    = "S%d_RoughAligned_LowRes"%(sessionNR)
 
         	#point match collections
-            lowresPmCollection = "%s_lowres_round"%rp.projectName
+            lowresPmCollection = "%s_lowres_round"%rp.project_name
 
             with open(p.alignment_template) as json_data:
                ra = json.load(json_data)
@@ -319,19 +319,20 @@ class ApplyLowResToHighRes(atpp.PipelineProcess):
             cmd = cmd + " /opt/conda/bin/python -m renderapps.rough_align.ApplyLowRes2HighRes"
             cmd = cmd + " --render.host %s"                %(rp.host)
             cmd = cmd + " --render.owner %s "              %(rp.owner)
-            cmd = cmd + " --render.project %s"             %(rp.projectName)
+            cmd = cmd + " --render.project %s"             %(rp.project_name)
             cmd = cmd + " --render.client_scripts %s"      %(rp.clientScripts)
             cmd = cmd + " --render.port %d"                %(rp.hostPort)
             cmd = cmd + " --render.memGB %s"               %(rp.memGB)
-            cmd = cmd + " --pool_size %d"                  %(p.atCoreThreads)
+            cmd = cmd + " --pool_size %s"                  %(p.GENERAL['AT_CORE_THREADS'])
             cmd = cmd + " --tilespec_directory %s"         %(p.toMount(roughalign_ts_dir))
-            cmd = cmd + " --scale %s"                      %(p.downSampleScale)
+            cmd = cmd + " --scale %s"                      %(p.CREATE_LOWRES_STACKS['SCALE'])
             cmd = cmd + " --input_stack %s"                %(inputStack)
             cmd = cmd + " --lowres_stack %s"               %(lowresStack)
             cmd = cmd + " --prealigned_stack %s"           %(inputStack)
             cmd = cmd + " --output_stack %s"     		   %(outputStack)
 
-            #cmd = cmd + " --minZ 0"#%d"                  %(p.firstSection*100)
+
+       #cmd = cmd + " --minZ 0"#%d"                  %(p.firstSection*100)
             #cmd = cmd + " --maxZ 5000"#%d"                  %(p.lastSection*100)
             first_ribbon = int(p.ribbons[0][6:])
             last_ribbon  = int(p.ribbons[-1][6:])

@@ -86,7 +86,7 @@ class RegisterSessionsProcessJava(atpp.PipelineProcess):
             with open(p.registration_template) as json_data:
                 t = json.load(json_data)
 
-            u.saveRegistrationJSON(t, inputJSON, rp.host, rp.owner, rp.projectName, stitched_stack, reference_stack, outputStack, z)
+            u.saveRegistrationJSON(t, inputJSON, rp.host, rp.owner, rp.project_name, stitched_stack, reference_stack, outputStack, z)
 
             #run
             if session > 1:
