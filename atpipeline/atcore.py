@@ -30,14 +30,38 @@ def parseArguments(parser):
     parser.add_argument('--pipeline',
         help='Specify the pipeline to use',
         choices={'stitch', 'roughalign', 'finealign', 'register_sessions'},
-        required=True)
+        required=False)
 
-    parser.add_argument('--renderprojectowner', metavar="OWNER", help='Specify a RenderProject owner',                                       type=str,   nargs='?')
-    parser.add_argument('--sessions',             help='Specify sessions to process',                                         type=str)
-    parser.add_argument('--ribbons',              help='Specify ribbons  to process',                                         type=str)
-    parser.add_argument('--firstsection', metavar='N', help='Specify start section (e.g. \'1\' to start with a datasets first section)',                                             type=int)
-    parser.add_argument('--lastsection', metavar='N', help='Specify end section',                                                 type=int)
-    parser.add_argument('--overwritedata',        help='Overwrite any already processed data',                                            action='store_true')
+    parser.add_argument('--project_name',
+        help='Set project name. Defualt: name of input datas basefolder',
+        required=False)
+
+    parser.add_argument('--renderprojectowner',
+        help='Specify a RenderProject owner',
+        metavar="OWNER",
+        type=str,
+        nargs='?')
+
+    parser.add_argument('--sessions',
+        help='Specify sessions to process',
+        type=str)
+
+    parser.add_argument('--ribbons',
+        help='Specify ribbons  to process',
+        type=str)
+
+    parser.add_argument('--firstsection', metavar='N',
+        help='Specify start section (e.g. \'1\' to start with a datasets first section)',
+        type=int)
+
+    parser.add_argument('--lastsection', metavar='N',
+    help='Specify end section',
+    type=int)
+
+    parser.add_argument('--overwritedata',
+        help='Overwrite any already processed data',
+        action='store_true')
+
     parser.add_argument('--loglevel',
         choices={'INFO', 'DEBUG', 'WARNING', 'ERROR'},
         help='Set program loglevel',
@@ -63,7 +87,7 @@ def main():
         elif os.name == 'posix':
             configFolder = '/usr/local/etc/'
         else:
-            raise Exception("No default configFolder folder defined for %s." % os.name)
+            raise Exception("No default configFolder folder defined for %s. Set environment variable 'AT_SYSTEM_CONFIG_FOLDER' to the folder where the file 'at-system-config.ini' exists." % os.name)
 
         if os.path.exists(args.config_file_name):
             system_parameters = at_system_config.ATSystemConfig(args.config_file_name)
@@ -75,7 +99,7 @@ def main():
 
         #What project to process?
         if args.dataroot:
-            system_parameters.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = args.dataroot
+            system_parameters.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = os.path.abspath(args.dataroot)
 
         if args.dataroot and not args.pipeline:
             lvl = logger.getEffectiveLevel()
@@ -101,7 +125,7 @@ def main():
 
 
         #Save current config values to the data output folder
-        system_parameters.write(os.path.join(system_parameters.absoluteDataOutputFolder, system_parameters.projectName + '.ini'))
+        system_parameters.write(os.path.join(system_parameters.absoluteDataOutputFolder, system_parameters.project_name + '.ini'))
 
         #Check which pipeline to run
         if system_parameters.pipeline == 'stitch':
