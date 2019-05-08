@@ -102,6 +102,8 @@ RUN git clone --branch at_develop --single-branch https://github.com/AllenInstit
 # Copy pipeline files
 WORKDIR /pipeline
 COPY ./pipeline/ /pipeline
+# Compatability with old scripts
+RUN ln -s /shared/render /pipeline/render
 
 # Build atcli
 ENV CC=/usr/bin/clang
