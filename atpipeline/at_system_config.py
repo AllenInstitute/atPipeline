@@ -185,6 +185,8 @@ class ATSystemConfig:
         else:
             self.ribbons                             = list(dataInfo['RibbonFolders'].split(','))
 
+        self.ribbons.sort()
+
         if args.sessions  != None:
             self.sessions                            = list(args.sessions.split(','))
         else:
