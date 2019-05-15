@@ -3,8 +3,8 @@
 from flask import Flask, Blueprint, redirect, url_for
 from flask_restplus import Resource, Api
 
-from sub_volume import SubVolume
-from render import RenderStack
+from atpipeline.render_classes.sub_volume import SubVolume
+from atpipeline.render_classes.render_stack import RenderStack
 
 app = Flask(__name__)
 app.config.SWAGGER_UI_DOC_EXPANSION = 'list'

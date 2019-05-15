@@ -1,9 +1,9 @@
 import os
 import timeit
 import subprocess
-import at_logging
-from at_system_config import ATSystemConfig
-from render_classes.render_stack import RenderStack, RenderStackBounds
+from .. import at_logging
+from .. import at_system_config
+from .render_stack import RenderStack, RenderStackBounds
 from renderapi.render import RenderClient
 
 from flask_restplus import Resource, Api
@@ -11,7 +11,7 @@ logger = at_logging.create_logger('atPipeline')
 
 class SubVolume(Resource):
 
-    def __init__(self, rc:RenderClient, sc:ATSystemConfig):
+    def __init__(self, rc:RenderClient, sc:at_system_config.ATSystemConfig):
 
         self.render_client = rc
         self.system_config = sc
