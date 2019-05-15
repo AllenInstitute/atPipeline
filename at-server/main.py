@@ -31,39 +31,39 @@ class Status(Resource):
    def get(self):
       return {'status': 'UNKNOWN'}
 
-subvolume_fields = api.model('Resource', {
-   'input_stack' : fields.String,
-   'bounds' : fields.String(default=None)
+stack_model = api.model('Stack', {
+   'input' : fields.Nested(api.model('StackInput', {
+      'owner' : fields.String,
+      'project' : fields.String,
+      'stack' : fields.String,
+      'bounds' : fields.String(optional=True), 
+   }))
 })
 
-@api.route('/subvolume/<string:stack_name>')
-class Subvolume(Resource):
+@api.route('/owner/<string:owner>/project/<string:project>/stack/<string:stack>')
+class Stack(Resource):
    @api.doc(responses={501: 'Not Implemented'})
-   def get(self, stack_name):
+   def get(self, owner, project, stack):
+      stack = RenderStack(owner=owner, project_name=project, stack_name=stack)
+      # Do something. Maybe report bounding box?
       api.abort(501)
 
-   @api.expect(subvolume_fields)
+   @api.expect(stack_model, validate=True)
    @api.doc(responses={200: 'Stack created'})
-   def post(self, stack_name):
+   def post(self, owner, project, stack):
       # Create a new stack
-      api.abort(404)
+      #api.abort(404)
+      input_stack = RenderStack(owner=api.payload['input']['owner'],
+         project_name=api.payload['input']['project'],
+         stack_name=api.payload['input']['stack'])
+      output_stack = RenderStack(owner=owner, project_name=project, stack_name=stack)
+      #    output_stack = RenderStack(owner = i[0], project_name = i[1], stack_name = i[2])
+      #    subv.create(input_stack, output_stack, bounds)
+      return(api.payload['input'])
 
    @api.doc(responses={204: 'Delete successful', 404: 'No such subvolume to delete'})
-   def delete(self, stack_name):
+   def delete(self, owner, project, stack):
       api.abort(404)
-
-@app.route('/subvolume/create/input_stack/<string:input_stack>/output_stack/<string:output_stack>/bounds/<string:bounds>')
-def createsubvolume(_input_stack, _output_stack, _bounds):
-   # TODO: Why can't we call renderapps.stack.create_subvolume_stack directly?
-   i = _input_stack.split(',')
-   input_stack = RenderStack(owner = i[0], project_name = i[1], stack_name = i[2])
-
-   i = _output_stack.split(',')
-   output_stack = RenderStack(owner = i[0], project_name = i[1], stack_name = i[2])
-
-   subv = SubVolume()
-   subv.create(input_stack, output_stack, bounds)
-   return  (input_stack + output_stack)
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=50000, debug=True)
