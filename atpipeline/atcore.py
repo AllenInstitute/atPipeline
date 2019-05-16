@@ -12,28 +12,28 @@ from atpipeline.pipelines import at_rough_align_pipeline, at_stitching_pipeline,
 from atpipeline import __version__
 
 def parseArguments(parser):
-    parser.add_argument('--config_folder',
+    parser.add_argument('--configfolder',
         metavar="PATH",
         help='Path to config folder',
         default=None)
 
-    parser.add_argument('--config_file_name',
+    parser.add_argument('--configfilename',
         metavar="PATH",
         help='Name of config file, may include the path',
         default="at-system-config.ini")
 
-    parser.add_argument('--dataroot',
+    parser.add_argument('--data',
         metavar="PATH",
         help='Full path to data folder for project data to process',
         required=True)
 
-    parser.add_argument('--pipeline',
-        help='Specify the pipeline to use',
-        choices={'stitch', 'roughalign', 'finealign', 'register_sessions'},
+    parser.add_argument('--projectname',
+        help='Set project name. Default: name of input datas basefolder',
         required=False)
 
-    parser.add_argument('--project_name',
-        help='Set project name. Defualt: name of input datas basefolder',
+    parser.add_argument('--pipeline',
+        help='Specify the pipeline to use',
+        choices={'stitch', 'roughalign', 'finealign', 'register'},
         required=False)
 
     parser.add_argument('--renderprojectowner',
@@ -80,8 +80,8 @@ def main():
     args = parser.parse_args()
 
     try:
-        if args.config_folder:
-            configFolder = args.config_folder
+        if args.configfolder:
+            configFolder = args.configfolder
         elif 'AT_SYSTEM_CONFIG_FOLDER' in os.environ:
             configFolder = os.environ['AT_SYSTEM_CONFIG_FOLDER']
         elif os.name == 'posix':
@@ -89,22 +89,24 @@ def main():
         else:
             raise Exception("No default configFolder folder defined for %s. Set environment variable 'AT_SYSTEM_CONFIG_FOLDER' to the folder where the file 'at-system-config.ini' exists." % os.name)
 
-        if os.path.exists(args.config_file_name):
-            system_parameters = at_system_config.ATSystemConfig(args.config_file_name)
+        if os.path.exists(args.configfilename):
+            args.configfilename = os.path.abspath(args.configfilename)
+            system_parameters = at_system_config.ATSystemConfig(args.configfilename)
         else:
-        	system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, args.config_file_name),
+        	system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, args.configfilename),
                                 cmdFlags=args.define)
 
         logger.setLevel(getattr(logging, args.loglevel))
 
         #What project to process?
-        if args.dataroot:
-            system_parameters.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = os.path.abspath(args.dataroot)
+        if args.data:
+            args.data = os.path.abspath(args.data)
+            system_parameters.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = os.path.abspath(args.data)
 
-        if args.dataroot and not args.pipeline:
+        if args.data and not args.pipeline:
             lvl = logger.getEffectiveLevel()
             lvlName = logging.getLevelName(lvl)
-            cmd = 'docker exec atcore atcli --json --dataroot ' + system_parameters.toMount(args.dataroot)
+            cmd = 'docker exec atcore atcli --json --dataroot ' + system_parameters.toMount(args.data)
             lines = u.runShellCMD(cmd, True)
             for line in lines:
                 print (line.rstrip())
@@ -112,7 +114,7 @@ def main():
             return
 
         #Query atcore for any data processing information we may need to setup, such as Ribbon, session and section information
-        cmd = 'docker exec atcore atcli --json --dataroot ' + system_parameters.toMount(args.dataroot)
+        cmd = 'docker exec atcore atcli --json --dataroot ' + system_parameters.toMount(args.data)
         dataInfo = json.loads(u.getJSON(cmd))
 
         #All parameters are now well defined, copy them (and do some parsing) to a file where output data is written
@@ -137,7 +139,7 @@ def main():
         elif system_parameters.pipeline == 'finealign':
             aPipeline = at_fine_align_pipeline.FineAlign(system_parameters)
 
-        elif system_parameters.pipeline == 'register_sessions':
+        elif system_parameters.pipeline == 'register':
             aPipeline = at_registration_pipeline.RegisterSessions(system_parameters)
 
         else:

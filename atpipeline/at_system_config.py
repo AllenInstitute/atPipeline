@@ -160,8 +160,8 @@ class ATSystemConfig:
         self.projectDataFolder                        = os.path.abspath(self.DATA_INPUT['PROJECT_DATA_FOLDER'])
 
         #Process parameters
-        if args.project_name != None:
-            self.project_name                          = args.project_name
+        if args.projectname != None:
+            self.project_name                          = args.projectname
         else:
             self.project_name                          = os.path.basename(self.projectDataFolder)
 
@@ -184,6 +184,8 @@ class ATSystemConfig:
             self.ribbons                             = args.ribbons
         else:
             self.ribbons                             = list(dataInfo['RibbonFolders'].split(','))
+
+        self.ribbons.sort()
 
         if args.sessions  != None:
             self.sessions                            = list(args.sessions.split(','))

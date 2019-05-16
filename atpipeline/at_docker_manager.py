@@ -105,7 +105,8 @@ class DockerManager:
         if ctrName == "atcore":
             #This will do nothing, forever
             cmd = "tail -f /dev/null"
-            ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcore_image_tag, volumes=self.atCoreMounts, command=cmd, cap_add=["SYS_ADMIN"], privileged=True, name=ctrName, detach=True)
+            #ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcore_image_tag, volumes=self.atCoreMounts, command=cmd, cap_add=["SYS_ADMIN"], privileged=True, name=ctrName, detach=True)
+            ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcore_image_tag, volumes=self.atCoreMounts, command=cmd, name=ctrName, detach=True)
 
 
             if ctr == None:
@@ -171,6 +172,7 @@ class DockerManager:
 
     def startRenderBackend(self):
 
+        #cmd = "docker-compose -p default -f " + str(self.composeFile)
         cmd = "docker-compose -p default -f " + str(self.composeFile)
         cmd = cmd + " up -d "
         logger.info("Running: " + cmd)

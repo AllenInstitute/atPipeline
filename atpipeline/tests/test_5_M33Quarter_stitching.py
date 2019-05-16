@@ -30,7 +30,7 @@ def test_meta_data(test_data_folder, test_data_set):
     from atpipeline import at_utils as u
 
     data_root = os.path.join(test_data_folder, 'input', test_data_set)
-    cmd = 'atcore --dataroot ' + data_root
+    cmd = 'atcore --data ' + data_root
     out = u.getJSON(cmd)
     data = json.loads(out)
 
@@ -57,7 +57,7 @@ def test_data_creation(test_data_folder, test_data_set):
         shutil.rmtree(data_output_folder)
 
     #Remove all data that exists in render
-    cmd = r'atcore --dataroot ' + data_input_root + ' --pipeline stitch --renderprojectowner PyTest --project_name ' + PROJECT_NAME + ' --config_file_name ' + data_ini_file
+    cmd = r'atcore --data ' + data_input_root + ' --pipeline stitch --renderprojectowner PyTest --projectname ' + PROJECT_NAME + ' --configfilename ' + data_ini_file
 
     #This will take about 15 minutes
     try:
