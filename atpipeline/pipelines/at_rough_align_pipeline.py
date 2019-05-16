@@ -37,7 +37,9 @@ class RoughAlign(atp.ATPipeline):
         for process in self.pipeline_processes:
 
             if process.check_if_done() == False:
-                process.run()
+                result = process.run()
+                if result == False:
+                    raise ValueError
 
                 #Validate the result of the run
                 res = process.validate()
@@ -88,7 +90,11 @@ class CreateLowResStacks(atpp.PipelineProcess):
                     os.mkdir(downsample_dir)
 
                 # stacks
-                input_stack  = "S%d_Stitched_Dropped"   %(sessionNR)
+                if p.singletiledata == True:
+                    input_stack  = "S%d_FlatFielded"   %(sessionNR)
+                else:
+                    input_stack  = "S%d_Stitched_Dropped"   %(sessionNR)
+
                 output_stack = "S%d_LowRes" %(sessionNR)
 
                 rp = p.renderProject
@@ -132,10 +138,6 @@ class CreateLowResTilePairs(atpp.PipelineProcess):
     def run(self):
         super().run()
         p = self.paras
-
-        firstRibbon = int (p.ribbons[0][6:])
-        lastRibbon = int(p.ribbons[-1][6:])
-
 
         for session in p.sessions:
             sessionNR = int(session[7:])
@@ -267,6 +269,10 @@ class CreateRoughAlignedStacks(atpp.PipelineProcess):
 
         	#point match collections
             lowresPmCollection = "%s_lowres_round"%rp.project_name
+
+
+            #Check for Pointmatch collection.. if not found bail...
+
 
             with open(p.alignment_template) as json_data:
                ra = json.load(json_data)

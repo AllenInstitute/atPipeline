@@ -37,10 +37,10 @@ def create_logger(name):
 
     return logger
 
-def addLoggingToFile(loggerName, logPath, logFileName):
-    logger = logging.getLogger(loggerName)
+def add_logging_to_file(logger_name, logfilename):
+    logger = logging.getLogger(logger_name)
 
-    fileHandler = logging.FileHandler(os.path.join(logPath, logFileName))
+    fileHandler = logging.FileHandler(logfilename)
     logFormatter = logging.Formatter('%(asctime)s - %(levelname)s - %(module)s - %(message)s', "%H:%M:%S")
 
     fileHandler.setFormatter(logFormatter)

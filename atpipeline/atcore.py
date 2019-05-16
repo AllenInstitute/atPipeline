@@ -62,10 +62,18 @@ def parseArguments(parser):
         help='Overwrite any already processed data',
         action='store_true')
 
+    parser.add_argument('--singletiledata',
+        help='Set this one if sections only contain one tile',
+        action='store_true')
+
     parser.add_argument('--loglevel',
         choices={'INFO', 'DEBUG', 'WARNING', 'ERROR'},
         help='Set program loglevel',
         default='INFO')
+
+    parser.add_argument('--logtofile',
+        help='Log messages to file. The logfile is written to the output datafolder and named "projectname".log',
+        action='store_true')
 
     parser.add_argument('--define', '-D',
         action='append',
@@ -125,9 +133,12 @@ def main():
         if os.path.isdir(system_parameters.absoluteDataOutputFolder) == False:
             os.makedirs(system_parameters.absoluteDataOutputFolder)
 
-
         #Save current config values to the data output folder
         system_parameters.write(os.path.join(system_parameters.absoluteDataOutputFolder, system_parameters.project_name + '.ini'))
+
+        if args.logtofile == True:
+            logfilename = os.path.join(system_parameters.absoluteDataOutputFolder, system_parameters.project_name + '.log')
+            at_logging.add_logging_to_file('atPipeline', logfilename)
 
         #Check which pipeline to run
         if system_parameters.pipeline == 'stitch':
