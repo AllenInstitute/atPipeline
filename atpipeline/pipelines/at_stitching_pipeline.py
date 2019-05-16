@@ -13,35 +13,31 @@ class Stitch(atp.ATPipeline):
         super().__init__(_paras)
 
         #Define the pipeline
-        self.create_state_tables              = CreateStateTables(_paras)
-        self.create_raw_data_render_stacks    = CreateRawDataRenderStacks(_paras)
-        self.create_median_files              = CreateMedianFiles(_paras)
-        self.create_flatfield_corrected_data  = CreateFlatFieldCorrectedData(_paras)
-        self.create_stitched_sections         = CreateStitchedSections(_paras)
-        self.drop_stitching_mistakes          = DropStitchingMistakes(_paras)
-
-        #We could store these in an array and pop them off one by one
+        self.append_pipeline_process(CreateStateTables(_paras))
+        self.append_pipeline_process(CreateRawDataRenderStacks(_paras))
+        self.append_pipeline_process(CreateMedianFiles(_paras))
+        self.append_pipeline_process(CreateFlatFieldCorrectedData(_paras))
+        self.append_pipeline_process(CreateStitchedSections(_paras))
+        self.append_pipeline_process(DropStitchingMistakes(_paras))
 
     def run(self):
         atp.ATPipeline.run(self)
 
-        self.create_state_tables.run()
-        logger.newline()
+        #Iterate through the pipeline
+        for process in self.pipeline_processes:
 
-        self.create_raw_data_render_stacks.run()
-        logger.newline()
+            if process.check_if_done() == False:
+                process.run()
 
-        self.create_median_files.run()
-        logger.newline()
+                #Validate the result of the run
+                res = process.validate()
 
-        self.create_flatfield_corrected_data.run()
-        logger.newline()
+                if res == False:
+                    logger.info("Failed in pipelinestep" + process.get_name())
+                    return False
+            else:
+                logger.info("Skipping pipeline step: " + process.get_name())
 
-        self.create_stitched_sections.run()
-        logger.newline()
-
-        self.drop_stitching_mistakes.run()
-        logger.newline()
 
         return True
 
@@ -54,12 +50,15 @@ class CreateStateTables(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateStateTables")
 
-    def checkIfDone(self):
+    #def check_if_done(self):
         #Query render for stack metadata for each session
         #If stacks exists, then don't create new ones, unless overwrite data is True
         #Optionally, check existence of raw data as well
         #for sessionFolder in self.sessionFolders:
-        pass
+    #    pass
+
+    #def validate(self):
+    #    pass
 
     def run(self):
         super().run()
@@ -94,19 +93,18 @@ class CreateStateTables(atpp.PipelineProcess):
 
     		        #Run ====================
                     self.submit(cmd)
-        self.validate()
 
 class CreateRawDataRenderStacks(atpp.PipelineProcess):
 
     def __init__(self, _paras):
         super().__init__(_paras, "CreateRawDataRenderStacks")
 
-    def checkIfDone(self):
+    #def check_if_done(self):
         #Query render for stack metadata for each session
         #If stacks exists, then don't create new ones, unless overwrite data is True
         #Optionally, check existence of raw data as well
         #for sessionFolder in self.sessionFolders:
-        pass
+    #    pass
 
 
     def run(self):
@@ -134,7 +132,7 @@ class CreateRawDataRenderStacks(atpp.PipelineProcess):
                 cmd = cmd + " /opt/conda/bin/python -m renderapps.dataimport.create_fast_stacks_multi"
                 cmd = cmd + " --render.host %s"           %rp.host
                 cmd = cmd + " --render.owner %s "         %rp.owner
-                cmd = cmd + " --render.project %s"        %rp.projectName
+                cmd = cmd + " --render.project %s"        %rp.project_name
                 cmd = cmd + " --render.client_scripts %s" %rp.clientScripts
                 cmd = cmd + " --render.port %d"           %rp.hostPort
                 cmd = cmd + " --render.memGB %s"          %rp.memGB
@@ -194,6 +192,9 @@ class CreateMedianFiles(atpp.PipelineProcess):
             #Run =============
             self.submit(cmd)
 
+    #def check_if_done(self):
+    #    pass
+
 class CreateFlatFieldCorrectedData(atpp.PipelineProcess):
 
     def __init__(self, _paras):
@@ -232,7 +233,7 @@ class CreateFlatFieldCorrectedData(atpp.PipelineProcess):
                 with open(p.flatfield_template) as json_data:
                      ff = json.load(json_data)
 
-                flatfield_json = os.path.join(flatfield_dir, "flatfield_%s_%s_%s_%d.json"%(renderProject.projectName, ribbon, session, sectnum))
+                flatfield_json = os.path.join(flatfield_dir, "flatfield_%s_%s_%s_%d.json"%(renderProject.project_name, ribbon, session, sectnum))
 
                 z = ribbon*100 + sectnum
 
@@ -244,6 +245,9 @@ class CreateFlatFieldCorrectedData(atpp.PipelineProcess):
 
                 #Run =============
                 self.submit(cmd)
+
+    #def check_if_done(self):
+    #    pass
 
 class CreateStitchedSections(atpp.PipelineProcess):
     def __init__(self, _paras):
@@ -293,6 +297,9 @@ class CreateStitchedSections(atpp.PipelineProcess):
                 #Run =============
                 self.submit(cmd)
 
+    #def check_if_done(self):
+    #    pass
+
 class DropStitchingMistakes(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "DropStitchingMistakes")
@@ -324,7 +331,7 @@ class DropStitchingMistakes(atpp.PipelineProcess):
             cmd = cmd + " /opt/conda/bin/python -m renderapps.stitching.detect_and_drop_stitching_mistakes"
             cmd = cmd + " --render.owner %s"                        %(rp.owner)
             cmd = cmd + " --render.host %s"                         %(rp.host)
-            cmd = cmd + " --render.project %s"                      %(rp.projectName)
+            cmd = cmd + " --render.project %s"                      %(rp.project_name)
             cmd = cmd + " --render.client_scripts %s"               %(rp.clientScripts)
             cmd = cmd + " --render.port %d"                         %(rp.hostPort)
             cmd = cmd + " --render.memGB %s"                        %(rp.memGB)
@@ -333,9 +340,13 @@ class DropStitchingMistakes(atpp.PipelineProcess):
             cmd = cmd + " --poststitchedStack %s"                   %(stitched_dapi_Stack)
             cmd = cmd + " --outputStack %s"                         %(dropped_dapi_Stack)
             cmd = cmd + " --jsonDirectory %s"                       %(p.toMount(dropped_dir))
-            cmd = cmd + " --edge_threshold %d"                      %(p.edgeThreshold)
-            cmd = cmd + " --pool_size %d"                           %(p.atCoreThreads)
-            cmd = cmd + " --distance_threshold %d"                  %(p.distance)
+
+            cmd = cmd + " --edge_threshold %s"                      %(p.DROP_STITCHING_MISTAKES['EDGE_THRESHOLD'])
+            cmd = cmd + " --pool_size %s"                           %(p.DROP_STITCHING_MISTAKES['POOL_SIZE'])
+            cmd = cmd + " --distance_threshold %s"                  %(p.DROP_STITCHING_MISTAKES['DISTANCE_THRESHOLD'])
 
             # Run =============
             self.submit(cmd)
+
+    #def check_if_done(self):
+    #    pass

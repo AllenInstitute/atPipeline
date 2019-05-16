@@ -26,15 +26,21 @@ class ATSystemConfig:
             else:
                 raise Exception("Unable to config override: %s" % flag)
 
-        self.general                                       = self.config['GENERAL']
-        self.deconv                                        = self.config['DECONV']
-        self.align                                         = self.config['ALIGN']
-        self.tp_client                                     = self.config['TILE_PAIR_CLIENT']
-        self.SPARK_SEC                                     = self.config['SPARK']
+        self.GENERAL                                       = self.config['GENERAL']
+
+        #SPARK stuff
+        self.SPARK                                         = self.config['SPARK']
+        self.CREATE_LOWRES_STACKS                          = self.config['CREATE_LOWRES_STACKS']
+        self.LOWRES_TILE_PAIR_CLIENT                       = self.config['LOWRES_TILE_PAIR_CLIENT']
         self.LOWRES_POINTMATCHES                           = self.config['LOWRES_POINTMATCHES']
+        self.CREATE_2D_POINTMATCHES                        = self.config['CREATE_2D_POINTMATCHES']
+        self.CREATE_HR_TILEPAIRS                           = self.config['CREATE_HR_TILEPAIRS']
+        self.CREATE_HR_POINTMATCHES                        = self.config['CREATE_HR_POINTMATCHES']
+        self.DROP_STITCHING_MISTAKES                       = self.config['DROP_STITCHING_MISTAKES']
+
         self.DATA_INPUT                                    = self.config['DATA_INPUT']
 
-        self.mounts                                        = ast.literal_eval(self.general['DATA_ROOTS'])
+        self.mounts                                        = ast.literal_eval(self.GENERAL['DATA_ROOTS'])
         self.createCommonReferences()
 
     def getNrOfSectionsInRibbon(self, ribbon):
@@ -92,20 +98,20 @@ class ATSystemConfig:
             self.createReferencesForBackend(args)
 
     def createCommonReferences(self):
-        self.atCoreContainer                          = self.general['AT_CORE_DOCKER_CONTAINER']
-        self.atCoreThreads                            = int(self.general['AT_CORE_THREADS'])
-        self.downSampleScale                          = self.general['DOWN_SAMPLE_SCALE']
-        self.dataOutputFolder                         = self.general['PROCESSED_DATA_FOLDER']
-        self.renderHost                               = self.general['RENDER_HOST']
-        self.renderHostPort                           = int(self.general['RENDER_HOST_PORT'])
-        self.logLevel                                 = self.general['LOG_LEVEL']
-        self.clientScripts                            = self.general['CLIENT_SCRIPTS']
-        self.memGB                                    = self.general['MEM_GB']
+        self.atCoreContainer                          = self.GENERAL['AT_CORE_DOCKER_CONTAINER_NAME']
+        self.dataOutputFolder                         = self.GENERAL['PROCESSED_DATA_FOLDER']
+        self.renderHost                               = self.GENERAL['RENDER_HOST']
+        self.renderHostPort                           = int(self.GENERAL['RENDER_HOST_PORT'])
+        self.logLevel                                 = self.GENERAL['LOG_LEVEL']
+        self.clientScripts                            = self.GENERAL['CLIENT_SCRIPTS']
+        self.render_mem_GB                            = self.GENERAL['RENDER_MEM_GB']
+        #self.atCoreThreads                            = int(self.GENERAL['AT_CORE_THREADS'])
+        #self.downSampleScale                          = self.GENERAL['DOWN_SAMPLE_SCALE']
 
-        self.renderProjectOwner                       = self.general['RENDER_PROJECT_OWNER']
+        self.renderProjectOwner                       = self.GENERAL['RENDER_PROJECT_OWNER']
 
-        self.referenceChannelRegistration             = self.general['REFERENCE_CHANNEL_REGISTRATION']
-        self.JSONTemplatesFolder                      = self.general['JSON_TEMPLATES_FOLDER']
+        self.referenceChannelRegistration             = self.GENERAL['REFERENCE_CHANNEL_REGISTRATION']
+        self.JSONTemplatesFolder                      = self.GENERAL['JSON_TEMPLATES_FOLDER']
 
         #JSON Templates
         self.median_template                          = os.path.join(self.JSONTemplatesFolder, "median.json")
@@ -114,55 +120,58 @@ class ATSystemConfig:
         self.deconvolution_template                   = os.path.join(self.JSONTemplatesFolder, "deconvolution.json")
         self.alignment_template                       = os.path.join(self.JSONTemplatesFolder, "roughalign.json")
         self.fine_alignment_template                  = os.path.join(self.JSONTemplatesFolder, "fine_align.json")
-        self.registrationTemplate                     = os.path.join(self.JSONTemplatesFolder, "registration.json")
+        self.registration_template                    = os.path.join(self.JSONTemplatesFolder, "registration.json")
 
         #Deconvolution parameters
-        self.channels                                 = ast.literal_eval(self.deconv['CHANNELS'])
-        self.bgrdSize                                 = ast.literal_eval(self.deconv['BGRD_SIZE'])
-        self.scaleFactor                              = ast.literal_eval(self.deconv['SCALE_FACTOR'])
-        self.numIter                                  = int(self.deconv['NUM_ITER'])
+##        self.channels                                 = ast.literal_eval(self.deconv['CHANNELS'])
+##        self.bgrdSize                                 = ast.literal_eval(self.deconv['BGRD_SIZE'])
+##        self.scaleFactor                              = ast.literal_eval(self.deconv['SCALE_FACTOR'])
+##        self.numIter                                  = int(self.deconv['NUM_ITER'])
+##        self.ch405                                    = self.config['DECONV_405']
+##        self.ch488                                    = self.config['DECONV_488']
+##        self.ch594                                    = self.config['DECONV_594']
+##        self.ch647                                    = self.config['DECONV_647']
 
-        #Alignment parameters
-        self.poolSize                                 = int(self.align['POOL_SIZE'])
-        self.edgeThreshold                            = int(self.align['EDGE_THRESHOLD'])
-        self.scale                                    = float(self.align['SCALE'])
-        self.distance                                 = int(self.align['DISTANCE'])
-        self.siftMin                                  = float(self.align['SIFTMIN'])
-        self.siftMax                                  = float(self.align['SIFTMAX'])
-        self.siftSteps                                = int(self.align['SIFTSTEPS'])
-        self.renderScale                              = float(self.align['RENDERSCALE'])
+##        #Alignment parameters
+##        self.poolSize                                 = int(self.align['POOL_SIZE'])
+##        self.edgeThreshold                            = int(self.align['EDGE_THRESHOLD'])
+##        self.scale                                    = float(self.align['SCALE'])
+##        self.distance                                 = int(self.align['DISTANCE'])
+##        self.siftMin                                  = float(self.align['SIFTMIN'])
+##        self.siftMax                                  = float(self.align['SIFTMAX'])
+##        self.siftSteps                                = int(self.align['SIFTSTEPS'])
+##        self.renderScale                              = float(self.align['RENDERSCALE'])
 
-        #SPARK stuff
-        self.SPARK = {}
-        self.SPARK['driverMemory']                    = self.SPARK_SEC['DRIVER_MEMORY']
-        self.SPARK['executorMemory']                  = self.SPARK_SEC['EXECUTOR_MEMORY']
-        self.SPARK['executorCores']                   = self.SPARK_SEC['EXECUTOR_CORES']
-        self.SPARK['maxFeatureCacheGb']               = self.SPARK_SEC['MAX_FEATURE_CACHE_GB']
 
-        self.ch405                                    = self.config['DECONV_405']
-        self.ch488                                    = self.config['DECONV_488']
-        self.ch594                                    = self.config['DECONV_594']
-        self.ch647                                    = self.config['DECONV_647']
 
-        #Tilepair client
-        self.excludeCornerNeighbors                   = u.toBool(self.tp_client['EXCLUDE_CORNER_NEIGHBOURS'])
-        self.excludeSameSectionNeighbors              = u.toBool(self.tp_client['EXCLUDE_SAME_SECTION_NEIGHBOR'])
-        self.zNeighborDistance                        = int(self.tp_client['Z_NEIGHBOR_DISTANCE'])
-        self.xyNeighborFactor                         = float(self.tp_client['XY_NEIGHBOR_FACTOR'])
+##        #Tilepair client
+##        self.excludeCornerNeighbors                   = u.toBool(self.tp_client['EXCLUDE_CORNER_NEIGHBOURS'])
+##        self.excludeSameSectionNeighbors              = u.toBool(self.tp_client['EXCLUDE_SAME_SECTION_NEIGHBOR'])
+##        self.zNeighborDistance                        = int(self.tp_client['Z_NEIGHBOR_DISTANCE'])
+##        self.xyNeighborFactor                         = float(self.tp_client['XY_NEIGHBOR_FACTOR'])
 
     def createReferencesForBackend(self, args = None):
-        self.mountRenderPythonApps                    = u.toBool(self.general['MOUNT_RENDER_PYTHON_APPS'])
-        self.mountRenderModules                       = u.toBool(self.general['MOUNT_RENDER_MODULES'])
+        self.mountRenderPythonApps                    = u.toBool(self.GENERAL['MOUNT_RENDER_PYTHON_APPS'])
+        self.mountRenderModules                       = u.toBool(self.GENERAL['MOUNT_RENDER_MODULES'])
 
     def createReferencesForPipeline(self, args = None, dataInfo = None):
-        self.dataRootFolder                           = self.DATA_INPUT['DATA_ROOT_FOLDER']
-        self.projectDataFolder                        = self.DATA_INPUT['PROJECT_DATA_FOLDER']
+        self.dataRootFolder                           = os.path.abspath(self.DATA_INPUT['DATA_ROOT_FOLDER'])
+
+        self.projectDataFolder                        = os.path.abspath(self.DATA_INPUT['PROJECT_DATA_FOLDER'])
 
         #Process parameters
-        self.projectName                              = os.path.basename(self.projectDataFolder)
-        self.DATA_INPUT['PROJECT_NAME']               = self.projectName
-        self.dataOutputFolder                         = os.path.join(self.dataOutputFolder, self.projectName)
+        if args.projectname != None:
+            self.project_name                          = args.projectname
+        else:
+            self.project_name                          = os.path.basename(self.projectDataFolder)
+
+        self.DATA_INPUT['PROJECT_NAME']               = self.project_name
+        self.dataOutputFolder                         = os.path.join(self.dataOutputFolder, self.project_name)
         self.absoluteDataOutputFolder                 = os.path.join(self.projectDataFolder, self.dataOutputFolder)
+
+
+        self.singletiledata                           = args.singletiledata
+
 
         #Over write any default values with any argument/values from the command line
         if args.firstsection != None:
@@ -176,15 +185,18 @@ class ATSystemConfig:
             self.lastSection                         = int(dataInfo['NumberOfSections']) - 1
 
         if args.ribbons  != None:
-            self.ribbons                             = args.ribbons
+            self.ribbons                             = list(args.ribbons.split(','))
         else:
             self.ribbons                             = list(dataInfo['RibbonFolders'].split(','))
+
+        self.ribbons.sort()
 
         if args.sessions  != None:
             self.sessions                            = list(args.sessions.split(','))
         else:
             self.sessions                            = list(dataInfo['SessionFolders'].split(','))
-
+        
+        self.sessions.sort()
         self.pipeline                                = args.pipeline
         self.overwritedata                           = args.overwritedata
 
@@ -205,7 +217,7 @@ class ATSystemConfig:
 
         #When used for input data
         #Create a "renderProject" to make things easier
-        self.renderProject = rp.RenderProject(self.renderProjectOwner, self.projectName, self.renderHost, self.renderHostPort, self.clientScripts, self.memGB, self.logLevel)
+        self.renderProject = rp.RenderProject(self.renderProjectOwner, self.project_name, self.renderHost, self.renderHostPort, self.clientScripts, self.render_mem_GB, self.logLevel)
 
     def getStateTableFileName(self, ribbon, session, sectnum):
         return os.path.join(self.absoluteDataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))
@@ -236,8 +248,10 @@ class ATSystemConfig:
         for index in range(nrOfMounts):
             theMount = self.mounts[index][0]
 
+            aPathLowerCase = aPath.lower()
+            theMountLowerCase = theMount.lower()
             #Remove root part from aPath
-            if aPath.startswith(theMount):
+            if aPathLowerCase.startswith(theMountLowerCase):
                 aPath = aPath[len(theMount):]
                 found = True
                 break

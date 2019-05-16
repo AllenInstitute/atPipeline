@@ -30,8 +30,7 @@ Suggest tag use:
 * _latest_: (default tag) Latest version of (probably) stable builds.
 * _dev_: Current development images; may be unstable.
 * _dev-YYMMDD_: Tag with specific date of dev build.
-* _stable_: A known good & test configuration.
-
+* _X.Y.Z_: Tag with the current version of the code (from VERSION.txt).
 
 ```console
 docker push atpipeline/render-ws:dev
@@ -64,7 +63,7 @@ docker push atpipeline/vizrelay:dev-`date +"%y%m%d"`
 ...or to push with the version number:
 ```console
 docker tag atpipeline/render-ws:dev atpipeline/render-ws:`cat VERSION.txt`
-docker tag atpipeline/atcore:dev atpipeline/atcore:dev-`cat VERSION.txt`
+docker tag atpipeline/atcore:dev atpipeline/atcore:`cat VERSION.txt`
 docker tag atpipeline/vizrelay:dev atpipeline/vizrelay:`cat VERSION.txt`
 
 docker push atpipeline/render-ws:`cat VERSION.txt`

@@ -9,7 +9,7 @@ def run(p : u.ATDataIni, sessionFolder):
     logger.info("Processing session folder: " + sessionFolder)
     [projectRoot, ribbon, session] = u.parse_session_folder(sessionFolder)
 
-    renderProject     = u.RenderProject(p.renderProjectOwner, p.projectName, p.sys.renderHost)
+    renderProject     = u.RenderProject(p.renderProjectOwner, p.project_name, p.sys.renderHost)
     jsonOutputFolder  = os.path.join(projectRoot, p.dataOutputFolder, "registration")
 
     # Make sure that the output folder exist
@@ -32,7 +32,7 @@ def run(p : u.ATDataIni, sessionFolder):
         t = json.load(json_data)
 
     z = ribbon*100+sectnum
-    u.saveRegistrationJSON(t, inputJSON, p.renderHost, renderProject.owner, renderProject.projectName, stitched_stack, reference_stack, outputStack, z)
+    u.saveRegistrationJSON(t, inputJSON, p.renderHost, renderProject.owner, renderProject.project_name, stitched_stack, reference_stack, outputStack, z)
 
     #run
     if session > 1:
