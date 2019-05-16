@@ -181,7 +181,7 @@ class ATSystemConfig:
             self.lastSection                         = int(dataInfo['NumberOfSections']) - 1
 
         if args.ribbons  != None:
-            self.ribbons                             = args.ribbons
+            self.ribbons                             = list(args.ribbons.split(','))
         else:
             self.ribbons                             = list(dataInfo['RibbonFolders'].split(','))
 
@@ -191,7 +191,8 @@ class ATSystemConfig:
             self.sessions                            = list(args.sessions.split(','))
         else:
             self.sessions                            = list(dataInfo['SessionFolders'].split(','))
-
+        
+        self.sessions.sort()
         self.pipeline                                = args.pipeline
         self.overwritedata                           = args.overwritedata
 
