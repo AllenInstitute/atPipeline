@@ -64,7 +64,10 @@ def test_data_creation(test_data_folder, test_data_set):
 
     #This will take about 15 minutes
     try:
+        print (cmd)
         out = u.runShellCMD(cmd)
+
+        assert True
     except Exception:
         assert False
 

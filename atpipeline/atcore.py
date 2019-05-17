@@ -140,18 +140,19 @@ def main():
             return
 
 
-        if args.deleterenderproject and (args.renderprojectowner is None):
-            parser.error("--deleterenderproject flag requires --renderprojectowner to be set")
-        else:
-            r = rapi.RenderAPI(system_config)
-            count = r.delete_stacks(args.renderprojectowner, args.deleterenderproject)
-            print ("Deleted " + str(count) + " stacks")
+        if args.deleterenderproject:
+            if args.renderprojectowner is None:
+                parser.error("--deleterenderproject flag requires --renderprojectowner to be set")
+            else:
+                r = rapi.RenderAPI(system_config)
+                count = r.delete_stacks(args.renderprojectowner, args.deleterenderproject)
+                print ("Deleted " + str(count) + " stacks")
 
-            matchContexts =[args.deleterenderproject + "_HR_2D", args.deleterenderproject + "_HR_3D", args.deleterenderproject + "_lowres_round"]
-            for c in matchContexts:
-                response = r.delete_match_context(args.renderprojectowner, c)
-                print('Delete match context reponse: ' + str(response))
-            return
+                matchContexts =[args.deleterenderproject + "_HR_2D", args.deleterenderproject + "_HR_3D", args.deleterenderproject + "_lowres_round"]
+                for c in matchContexts:
+                    response = r.delete_match_context(args.renderprojectowner, c)
+                    print('Delete match context reponse: ' + str(response))
+                return
 
         #Query atcore for any data processing information we may need to setup, such as Ribbon, session and section information
         cmd = 'docker exec atcore atcli --json --data ' + system_config.toMount(args.data)
