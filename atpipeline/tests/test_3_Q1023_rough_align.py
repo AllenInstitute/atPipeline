@@ -40,7 +40,7 @@ def test_rough_aligning(test_data_folder, test_data_set):
         assert False
 
 def test_stacks(render_client):
-    stacks= renderapi.render.get_stacks_by_owner_project(owner='PyTest', project=PROJECT_NAME, render = render_client)
+    stacks = renderapi.render.get_stacks_by_owner_project(owner='PyTest', project=PROJECT_NAME, render = render_client)
     assert 'S2_RoughAligned_LowRes'     in stacks
     assert 'S2_RoughAligned'            in stacks
     assert 'S2_LowRes'                  in stacks
