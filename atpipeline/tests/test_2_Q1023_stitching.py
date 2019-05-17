@@ -60,8 +60,6 @@ def test_data_creation(test_data_folder, test_data_set):
         shutil.rmtree(data_output_folder)
 
     #Remove all data that exists in render
-
-
     cmd = r'atcore --data ' + data_input_root + ' --pipeline stitch --renderprojectowner PyTest --projectname ' + PROJECT_NAME + ' --configfilename ' + data_ini_file
 
     #This will take about 15 minutes

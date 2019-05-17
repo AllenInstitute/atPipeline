@@ -15,7 +15,7 @@ import difflib
 import renderapi
 import shutil
 
-AT_SYSTEM_CONFIG_FOLDER_NAME    = 'AT_SYSTEM_CONFIG_FOLDER'
+AT_SYSTEM_CONFIG_FOLDER_NAME    = 'AT_SYSTEM_CONFIG_FOLDER_NAME'
 AT_SYSTEM_CONFIG_FILE_NAME      = 'at-system-config.ini'
 
 
