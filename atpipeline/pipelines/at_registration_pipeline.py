@@ -116,6 +116,9 @@ class RegisterSessionsProcessJava(atpp.PipelineProcess):
                         cmd = cmd + " --output_dir %s"                  %(output_dir)
                         cmd = cmd + " --grossRefStack %s"               %("tempGrossStack1")
                         cmd = cmd + " --grossStack %s"                  %("tempGrossStack2")
+                        cmd = cmd + " --filter %d"                      %(1)
+                        cmd = cmd + " --matchcollection %s"             %("S1_S%d_matches" % session)
+                        cmd = cmd + " --pool_size %d"                   %(1)
                         # Run =============
                         self.submit(cmd)
             return False
