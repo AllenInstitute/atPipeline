@@ -67,10 +67,6 @@ def parseArguments(parser):
         help='Overwrite any already processed data',
         action='store_true')
 
-    parser.add_argument('--singletiledata',
-        help='Set this one if sections only contain one tile',
-        action='store_true')
-
     parser.add_argument('--loglevel',
         choices={'INFO', 'DEBUG', 'WARNING', 'ERROR'},
         help='Set program loglevel',

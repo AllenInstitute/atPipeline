@@ -169,10 +169,6 @@ class ATSystemConfig:
         self.dataOutputFolder                         = os.path.join(self.dataOutputFolder, self.project_name)
         self.absoluteDataOutputFolder                 = os.path.join(self.projectDataFolder, self.dataOutputFolder)
 
-
-        self.singletiledata                           = args.singletiledata
-
-
         #Over write any default values with any argument/values from the command line
         if args.firstsection != None:
             self.firstSection                         = args.firstsection
