@@ -13,7 +13,7 @@ from atpipeline import at_utils as u
 from atpipeline.render_classes import at_renderapi as rapi
 
 logger = at_logging.create_logger('atPipeline')
-from atpipeline.pipelines import at_rough_align_pipeline, at_stitching_pipeline, at_fine_align_pipeline, at_registration_pipeline
+from atpipeline.pipelines import at_rough_align_pipeline, at_stitching_pipeline, at_fine_align_pipeline, at_registration_pipeline, at_single_tile_data_pipeline
 from atpipeline import __version__
 
 def parseArguments(parser):
@@ -38,7 +38,7 @@ def parseArguments(parser):
 
     parser.add_argument('--pipeline',
         help='Specify the pipeline to use',
-        choices={'stitch', 'roughalign', 'finealign', 'register'},
+        choices={'stitch', 'roughalign', 'finealign', 'register', 'singletile'},
         required=False)
 
     parser.add_argument('--renderprojectowner',
@@ -65,10 +65,6 @@ def parseArguments(parser):
 
     parser.add_argument('--overwritedata',
         help='Overwrite any already processed data',
-        action='store_true')
-
-    parser.add_argument('--singletiledata',
-        help='Set this one if sections only contain one tile',
         action='store_true')
 
     parser.add_argument('--loglevel',
@@ -139,7 +135,6 @@ def main():
 
             return
 
-
         if args.deleterenderproject:
             if args.renderprojectowner is None:
                 parser.error("--deleterenderproject flag requires --renderprojectowner to be set")
@@ -186,6 +181,8 @@ def main():
         elif system_config.pipeline == 'register':
             aPipeline = at_registration_pipeline.RegisterSessions(system_config)
 
+        elif system_config.pipeline == 'singletile':
+            aPipeline = at_single_tile_data_pipeline.SingleTileData(system_config)
         else:
             logger.error('No such pipeline: "' + system_config.pipeline + '"')
             raise Exception('No such pipeline')

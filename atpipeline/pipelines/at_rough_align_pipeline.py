@@ -37,9 +37,7 @@ class RoughAlign(atp.ATPipeline):
         for process in self.pipeline_processes:
 
             if process.check_if_done() == False:
-                result = process.run()
-                if result == False:
-                    raise ValueError
+                process.run()
 
                 #Validate the result of the run
                 res = process.validate()
@@ -71,59 +69,51 @@ class CreateLowResStacks(atpp.PipelineProcess):
 
     def run(self):
         super().run()
-        try:
-            p = self.paras
+        p = self.paras
 
-            for session in p.sessions:
-                sessionNR = int(session[7:])
-                logger.info("Processing session: " + str(sessionNR))
+        for session in p.sessions:
+            sessionNR = int(session[7:])
+            logger.info("Processing session: " + str(sessionNR))
 
-                firstRibbon = int (p.ribbons[0][6:])
-                lastRibbon = int(p.ribbons[-1][6:])
+            firstRibbon = int (p.ribbons[0][6:])
+            lastRibbon = int(p.ribbons[-1][6:])
 
-                # output directories
-                downsample_dir   = os.path.join(p.absoluteDataOutputFolder, "low_res")
-                numsections_file = os.path.join(downsample_dir,             "numsections-%s"%(sessionNR))
+            # output directories
+            downsample_dir   = os.path.join(p.absoluteDataOutputFolder, "low_res")
+            numsections_file = os.path.join(downsample_dir,             "numsections-%s"%(sessionNR))
 
-                # Make sure output folder exist
-                if os.path.isdir(downsample_dir) == False:
-                    os.mkdir(downsample_dir)
+            # Make sure output folder exist
+            if os.path.isdir(downsample_dir) == False:
+                os.mkdir(downsample_dir)
 
-                # stacks
-                if p.singletiledata == True:
-                    input_stack  = "S%d_FlatFielded"   %(sessionNR)
-                else:
-                    input_stack  = "S%d_Stitched_Dropped"   %(sessionNR)
+            # stacks
+            input_stack  = "S%d_Stitched_Dropped"   %(sessionNR)
 
-                output_stack = "S%d_LowRes" %(sessionNR)
+            output_stack = "S%d_LowRes" %(sessionNR)
 
-                rp = p.renderProject
+            rp = p.renderProject
 
-                # docker commands
-                cmd = "docker exec " + p.atCoreContainer
-                cmd = cmd + " /opt/conda/bin/python -m renderapps.materialize.make_downsample_image_stack"
-                cmd = cmd + " --render.host %s"                                %(rp.host)
-                cmd = cmd + " --render.project %s"                             %(rp.project_name)
-                cmd = cmd + " --render.owner %s"                               %(rp.owner)
-                cmd = cmd + " --render.client_scripts %s"                      %(rp.clientScripts)
-                cmd = cmd + " --render.memGB %s"                               %(rp.memGB)
-                cmd = cmd + " --render.port %s"                                %(rp.hostPort)
-                cmd = cmd + " --log_level %s"                                  %(rp.logLevel)
-                cmd = cmd + " --input_stack %s"                                %(input_stack)
-                cmd = cmd + " --output_stack %s"                               %(output_stack)
-                cmd = cmd + " --image_directory %s"                            %(p.toMount(downsample_dir))
-                cmd = cmd + " --pool_size %s"                                  %(p.GENERAL['AT_CORE_THREADS'])
-                cmd = cmd + " --scale %s"                                      %(p.CREATE_LOWRES_STACKS['SCALE'])
-                cmd = cmd + " --minZ %s"                                       %(firstRibbon*100)
-                cmd = cmd + " --maxZ %s"                                       %((lastRibbon + 1)*100 - 1)
-                cmd = cmd + " --numsectionsfile %s"                            %(p.toMount(numsections_file))
+            # docker commands
+            cmd = "docker exec " + p.atCoreContainer
+            cmd = cmd + " /opt/conda/bin/python -m renderapps.materialize.make_downsample_image_stack"
+            cmd = cmd + " --render.host %s"                                %(rp.host)
+            cmd = cmd + " --render.project %s"                             %(rp.project_name)
+            cmd = cmd + " --render.owner %s"                               %(rp.owner)
+            cmd = cmd + " --render.client_scripts %s"                      %(rp.clientScripts)
+            cmd = cmd + " --render.memGB %s"                               %(rp.memGB)
+            cmd = cmd + " --render.port %s"                                %(rp.hostPort)
+            cmd = cmd + " --log_level %s"                                  %(rp.logLevel)
+            cmd = cmd + " --input_stack %s"                                %(input_stack)
+            cmd = cmd + " --output_stack %s"                               %(output_stack)
+            cmd = cmd + " --image_directory %s"                            %(p.toMount(downsample_dir))
+            cmd = cmd + " --pool_size %s"                                  %(p.GENERAL['AT_CORE_THREADS'])
+            cmd = cmd + " --scale %s"                                      %(p.CREATE_LOWRES_STACKS['SCALE'])
+            cmd = cmd + " --minZ %s"                                       %(firstRibbon*100)
+            cmd = cmd + " --maxZ %s"                                       %((lastRibbon + 1)*100 - 1)
+            cmd = cmd + " --numsectionsfile %s"                            %(p.toMount(numsections_file))
 
-                # Run =============
-                self.submit(cmd)
-
-            return True
-        except:
-            return False
+            # Run =============
+            self.submit(cmd)
 
 
 #Note, this seem to require at least two sections to work which makes sense, so tell the user that

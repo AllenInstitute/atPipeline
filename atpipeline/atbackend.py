@@ -14,19 +14,20 @@ def setupArguments(parser):
     cmdgroup.add_argument('--startall',            help='Start the whole AT backend',          action='store_true')
     cmdgroup.add_argument('--startrenderbackend',  help='Start the Render backend',            action='store_true')
     cmdgroup.add_argument('--killall', '--stopall', help='Stop the AT backend',                 action='store_true')
-    cmdgroup.add_argument('--prune_all',           help='Prune the AT backend',                action='store_true')
-    cmdgroup.add_argument('--prune_containers',    help='Prune the AT backend',                action='store_true')
-    cmdgroup.add_argument('--prune_images',        help='Prune the AT backend',                action='store_true')
+    cmdgroup.add_argument('--pruneall',            help='Prune the AT backend',                action='store_true')
+    cmdgroup.add_argument('--prunecontainers',     help='Prune the AT backend',                action='store_true')
+    cmdgroup.add_argument('--pruneimages',         help='Prune the AT backend',                action='store_true')
     cmdgroup.add_argument('--restartall',          help='Restart all AT backend container',    action='store_true' )
     cmdgroup.add_argument('--status',              help='Get backend status',                  action='store_true' )
 
+    #Container by container (not all implemented)
     cmdgroup.add_argument('-s', '--start',         help='Start a specific backend container, e.g. atcore',     nargs='?',const='atcore', type=str)
-    cmdgroup.add_argument('-k', '--kill',          help='Stop a specific backend cointainer',                  nargs='?',const='atcore', type=str)
+    cmdgroup.add_argument('-k', '--kill',          help='Stop a specific backend container',                  nargs='?',const='atcore', type=str)
     cmdgroup.add_argument('-r', '--restart',       help='Restart a specific backend container, e.g. atcore',   nargs='?',const='atcore', type=str)
 
     # Flags to alter behaviour
-    parser.add_argument('--atcore_image_tag', help='atcore image tag to use', default=None)
-    parser.add_argument('--config_folder', help='Path to config folder', default=None)
+    parser.add_argument('--atcore_image_tag',       help='atcore image tag to use', default=None)
+    parser.add_argument('--config_folder',          help='Path to config folder', default=None)
 
     parser.add_argument('--define', '-D',
         action='append',
@@ -78,13 +79,13 @@ def main():
         elif args.restartall:
             dManager.reStartAll()
 
-        elif args.prune_images:
+        elif args.pruneimages:
             dManager.prune_images()
 
-        elif args.prune_containers:
+        elif args.prunecontainers:
             dManager.prune_containers()
 
-        elif args.prune_all:
+        elif args.pruneall:
             dManager.prune_all()
 
         elif args.status:

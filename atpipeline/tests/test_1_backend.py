@@ -15,7 +15,7 @@ import difflib
 import renderapi
 import shutil
 
-AT_SYSTEM_CONFIG_FOLDER_NAME    = 'AT_SYSTEM_CONFIG_FOLDER_NAME'
+AT_SYSTEM_CONFIG_FOLDER    = 'AT_SYSTEM_CONFIG_FOLDER'
 AT_SYSTEM_CONFIG_FILE_NAME      = 'at-system-config.ini'
 
 
@@ -23,12 +23,12 @@ AT_SYSTEM_CONFIG_FILE_NAME      = 'at-system-config.ini'
 
 #Test to check if environment variable is setup
 def test_config_file_environment_variable():
-    res = (AT_SYSTEM_CONFIG_FOLDER_NAME in os.environ)
+    res = (AT_SYSTEM_CONFIG_FOLDER in os.environ)
     assert res == True
 
 #Test to check if the system config file exists
 def test_system_config_file_exists():
-    config_file = os.path.join(os.environ.get(AT_SYSTEM_CONFIG_FOLDER_NAME), AT_SYSTEM_CONFIG_FILE_NAME)
+    config_file = os.path.join(os.environ.get(AT_SYSTEM_CONFIG_FOLDER), AT_SYSTEM_CONFIG_FILE_NAME)
     res = os.path.exists(config_file)
     assert res == True
 
