@@ -5,8 +5,13 @@ import pathlib
 import docker
 import argparse
 import logging
+import sys
+import renderapi
+
 from atpipeline import at_logging, at_system_config, at_pipeline, at_docker_manager
 from atpipeline import at_utils as u
+from atpipeline.render_classes import at_renderapi as rapi
+
 logger = at_logging.create_logger('atPipeline')
 from atpipeline.pipelines import at_rough_align_pipeline, at_stitching_pipeline, at_fine_align_pipeline, at_registration_pipeline
 from atpipeline import __version__
@@ -25,7 +30,7 @@ def parseArguments(parser):
     parser.add_argument('--data',
         metavar="PATH",
         help='Full path to data folder for project data to process',
-        required=True)
+        required=False)
 
     parser.add_argument('--projectname',
         help='Set project name. Default: name of input datas basefolder',
@@ -55,8 +60,8 @@ def parseArguments(parser):
         type=int)
 
     parser.add_argument('--lastsection', metavar='N',
-    help='Specify end section',
-    type=int)
+        help='Specify end section',
+        type=int)
 
     parser.add_argument('--overwritedata',
         help='Overwrite any already processed data',
@@ -80,12 +85,25 @@ def parseArguments(parser):
         default=[],
         help="Override a value in the config file (-D section.item=value)")
 
-    parser.add_argument('--version', '-v', action='version', version=('%%(prog)s %s' % __version__))
+    parser.add_argument('--deleterenderproject',
+        help="Delete a render project (including its stacks and match collections) for a specific owner, --renderprojectowner",
+        #required='--renderprojectowner' in sys.argv,
+        type=str,
+        nargs='?'
+        )
+
+    parser.add_argument('--version', '-v',
+        action='version',
+        version=('%%(prog)s %s' % __version__))
 
 def main():
     parser = argparse.ArgumentParser()
     parseArguments(parser)
     args = parser.parse_args()
+
+    if len(sys.argv)==1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
     try:
         if args.configfolder:
@@ -99,9 +117,9 @@ def main():
 
         if os.path.exists(args.configfilename):
             args.configfilename = os.path.abspath(args.configfilename)
-            system_parameters = at_system_config.ATSystemConfig(args.configfilename)
+            system_config = at_system_config.ATSystemConfig(args.configfilename)
         else:
-        	system_parameters = at_system_config.ATSystemConfig(os.path.join(configFolder, args.configfilename),
+        	system_config = at_system_config.ATSystemConfig(os.path.join(configFolder, args.configfilename),
                                 cmdFlags=args.define)
 
         logger.setLevel(getattr(logging, args.loglevel))
@@ -109,52 +127,67 @@ def main():
         #What project to process?
         if args.data:
             args.data = os.path.abspath(args.data)
-            system_parameters.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = os.path.abspath(args.data)
+            system_config.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = os.path.abspath(args.data)
 
         if args.data and not args.pipeline:
             lvl = logger.getEffectiveLevel()
             lvlName = logging.getLevelName(lvl)
-            cmd = 'docker exec atcore atcli --json --data ' + system_parameters.toMount(args.data)
+            cmd = 'docker exec atcore atcli --json --data ' + system_config.toMount(args.data)
             lines = u.runShellCMD(cmd, True)
             for line in lines:
                 print (line.rstrip())
 
             return
 
+
+        if args.deleterenderproject:
+            if args.renderprojectowner is None:
+                parser.error("--deleterenderproject flag requires --renderprojectowner to be set")
+            else:
+                r = rapi.RenderAPI(system_config)
+                count = r.delete_stacks(args.renderprojectowner, args.deleterenderproject)
+                print ("Deleted " + str(count) + " stacks")
+
+                matchContexts =[args.deleterenderproject + "_HR_2D", args.deleterenderproject + "_HR_3D", args.deleterenderproject + "_lowres_round"]
+                for c in matchContexts:
+                    response = r.delete_match_context(args.renderprojectowner, c)
+                    print('Delete match context reponse: ' + str(response))
+                return
+
         #Query atcore for any data processing information we may need to setup, such as Ribbon, session and section information
-        cmd = 'docker exec atcore atcli --json --data ' + system_parameters.toMount(args.data)
+        cmd = 'docker exec atcore atcli --json --data ' + system_config.toMount(args.data)
         dataInfo = json.loads(u.getJSON(cmd))
 
         #All parameters are now well defined, copy them (and do some parsing) to a file where output data is written
         #The create references functions appends and overrides various arguments
-        system_parameters.createReferences(args, "pipeline", dataInfo)
+        system_config.createReferences(args, "pipeline", dataInfo)
 
         #Create data outputfolder and write processing parametrs to output folder
-        if os.path.isdir(system_parameters.absoluteDataOutputFolder) == False:
-            os.makedirs(system_parameters.absoluteDataOutputFolder)
+        if os.path.isdir(system_config.absoluteDataOutputFolder) == False:
+            os.makedirs(system_config.absoluteDataOutputFolder)
 
         #Save current config values to the data output folder
-        system_parameters.write(os.path.join(system_parameters.absoluteDataOutputFolder, system_parameters.project_name + '.ini'))
+        system_config.write(os.path.join(system_config.absoluteDataOutputFolder, system_config.project_name + '.ini'))
 
         if args.logtofile == True:
-            logfilename = os.path.join(system_parameters.absoluteDataOutputFolder, system_parameters.project_name + '.log')
+            logfilename = os.path.join(system_config.absoluteDataOutputFolder, system_config.project_name + '.log')
             at_logging.add_logging_to_file('atPipeline', logfilename)
 
         #Check which pipeline to run
-        if system_parameters.pipeline == 'stitch':
-            aPipeline = at_stitching_pipeline.Stitch(system_parameters)
+        if system_config.pipeline == 'stitch':
+            aPipeline = at_stitching_pipeline.Stitch(system_config)
 
-        elif system_parameters.pipeline == 'roughalign':
-            aPipeline = at_rough_align_pipeline.RoughAlign(system_parameters)
+        elif system_config.pipeline == 'roughalign':
+            aPipeline = at_rough_align_pipeline.RoughAlign(system_config)
 
-        elif system_parameters.pipeline == 'finealign':
-            aPipeline = at_fine_align_pipeline.FineAlign(system_parameters)
+        elif system_config.pipeline == 'finealign':
+            aPipeline = at_fine_align_pipeline.FineAlign(system_config)
 
-        elif system_parameters.pipeline == 'register':
-            aPipeline = at_registration_pipeline.RegisterSessions(system_parameters)
+        elif system_config.pipeline == 'register':
+            aPipeline = at_registration_pipeline.RegisterSessions(system_config)
 
         else:
-            logger.error('No such pipeline: "' + system_parameters.pipeline + '"')
+            logger.error('No such pipeline: "' + system_config.pipeline + '"')
             raise Exception('No such pipeline')
 
         #Run the pipeline
