@@ -48,9 +48,8 @@ class RegisterSessionsProcessJava(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "RegisterSessionsProcess")
 
-##    def validate(self):
-##        super().validate()
-##        pass
+    def validate(self):
+        super().validate()
 
     def run(self):
         super().run()
@@ -69,37 +68,57 @@ class RegisterSessionsProcessJava(atpp.PipelineProcess):
 
 
             #stacks
-            session = 2
-            reference_stack     = "S1_Stitched"
-            stitched_stack      = "S%d_Stitched"%(int(session))
-            outputStack         = "S%d_Registered"%(int(session))
+            #session = 2
+            #reference_stack     = "S1_Stitched"
+            #stitched_stack      = "S%d_Stitched"%(int(session))
+            #outputStack         = "S%d_Registered"%(int(session))
 
             #Loop over sections?
-            sectnum = 0
-            ribbon = 4
-            z = ribbon*100+sectnum
+            #sectnum = 0
+            #ribbon = 4
+            #z = ribbon*100+sectnum
 
             #This is the registration input (json) file
-            inputJSON = os.path.join(jsonOutputFolder, "registration_%s_%s_%d.json"%(ribbon, session, sectnum))
+            #inputJSON = os.path.join(jsonOutputFolder, "registration_%s_%s_%d.json"%(ribbon, session, sectnum))
 
             #create input file for registration
-            with open(p.registration_template) as json_data:
-                t = json.load(json_data)
+            #with open(p.registration_template) as json_data:
+            #    t = json.load(json_data)
 
-            u.saveRegistrationJSON(t, inputJSON, rp.host, rp.owner, rp.project_name, stitched_stack, reference_stack, outputStack, z)
+            #u.saveRegistrationJSON(t, inputJSON, rp.host, rp.owner, rp.project_name, stitched_stack, reference_stack, outputStack, z)
 
-            #run
-            if session > 1:
-                cmd = "docker exec " + p.atCoreContainer
-                cmd = cmd + " java -cp /shared/at_modules/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar"
-                cmd = cmd + " at_modules.Register"
-                cmd = cmd + " --input_json %s"%inputJSON
 
-                # Run =============
-                self.submit(cmd)
-            return True
-        except:
+            output_dir = os.path.join(p.absoluteDataOutputFolder, "registration")
+            for sessionDir in p.sessions:
+                session = int(sessionDir[7:])
+                logger.info("Processing session: " + str(session))
+
+                reference_stack     = "S1_FineAligned"
+                stitched_stack      = "S%d_FineAligned"%(int(session))
+                outputStack         = "S%d_FineAligned_registered"%(int(session))
+
+                if session == 1:
+                    logger.info("Skipping session %d (reference session)" % session)
+                if session > 1:
+                    for section in range(p.firstSection, p.lastSection + 1):
+                        cmd = "docker exec " + p.atCoreContainer
+                        cmd = cmd + " /opt/conda/bin/python -m renderapps.registration.calc_registration"
+                        cmd = cmd + " --render.host %s"                 %(rp.host)
+                        cmd = cmd + " --render.owner %s "               %(rp.owner)
+                        cmd = cmd + " --render.project %s"              %(rp.project_name)
+                        cmd = cmd + " --render.client_scripts %s"       %(rp.clientScripts)
+                        cmd = cmd + " --render.port %d"                 %(rp.hostPort)
+                        cmd = cmd + " --render.memGB %s"                %(rp.memGB)
+                        cmd = cmd + " --stack %s"                       %(stitched_stack)
+                        cmd = cmd + " --referenceStack %s"              %(reference_stack)
+                        cmd = cmd + " --outputStack %s"     		    %(outputStack)
+                        cmd = cmd + " --section %d"                     %(section)
+                        cmd = cmd + " --output_dir %s"                  %(output_dir)
+                        # Run =============
+                        self.submit(cmd)
             return False
+        except:
+            raise
 
 
 
