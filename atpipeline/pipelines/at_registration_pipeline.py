@@ -114,11 +114,12 @@ class RegisterSessionsProcessJava(atpp.PipelineProcess):
                         cmd = cmd + " --outputStack %s"     		    %(outputStack)
                         cmd = cmd + " --section %d"                     %(section)
                         cmd = cmd + " --output_dir %s"                  %(output_dir)
+                        cmd = cmd + " --grossRefStack %s"               %("tempGrossStack1")
+                        cmd = cmd + " --grossStack %s"                  %("tempGrossStack2")
                         # Run =============
                         self.submit(cmd)
             return False
         except:
             raise
-
 
 
