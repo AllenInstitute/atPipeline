@@ -26,8 +26,8 @@ def setupArguments(parser):
     cmdgroup.add_argument('-r', '--restart',       help='Restart a specific backend container, e.g. atcore',   nargs='?',const='atcore', type=str)
 
     # Flags to alter behaviour
-    parser.add_argument('--atcore_image_tag',       help='atcore image tag to use', default=None)
-    parser.add_argument('--config_folder',          help='Path to config folder', default=None)
+    parser.add_argument('--atcoreimagetag',       help='atcore image tag to use', default=None)
+    parser.add_argument('--configfolder',          help='Path to config folder', default=None)
 
     parser.add_argument('--define', '-D',
         action='append',
@@ -45,8 +45,8 @@ def main():
         setupArguments(parser)
         args = parser.parse_args()
 
-        dManager = at_docker_manager.DockerManager(configFolder=args.config_folder,
-                        atcore_image_tag=args.atcore_image_tag,
+        dManager = at_docker_manager.DockerManager(configFolder=args.configfolder,
+                        atcore_image_tag=args.atcoreimagetag,
                         cmdFlags=args.define)
 
         #Keep arguments in main module for visibility

@@ -51,7 +51,6 @@ def test_meta_data(test_data_folder, test_data_set):
 def test_data_deletion(test_data_folder, test_data_set):
     from atpipeline import at_utils as u
     data_input_root = os.path.join(test_data_folder, 'input', test_data_set)
-    data_ini_file = os.path.join(test_data_folder, PROJECT_INI)
 
     #remove any output data
     data_output_folder = os.path.join(data_input_root, 'processed', PROJECT_NAME)
@@ -73,7 +72,7 @@ def test_data_deletion(test_data_folder, test_data_set):
 def test_data_creation(test_data_folder, test_data_set):
     from atpipeline import at_utils as u
     data_input_root = os.path.join(test_data_folder, 'input', test_data_set)
-    data_ini_file = os.path.join(test_data_folder, PROJECT_INI)
+    data_ini_file = os.path.join(test_data_folder, 'input', PROJECT_INI)
 
     #remove any output data
     data_output_folder = os.path.join(data_input_root, 'processed', PROJECT_NAME)

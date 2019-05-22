@@ -16,81 +16,6 @@ logger = at_logging.create_logger('atPipeline')
 from atpipeline.pipelines import at_rough_align_pipeline, at_stitching_pipeline, at_fine_align_pipeline, at_registration_pipeline, at_single_tile_data_pipeline
 from atpipeline import __version__
 
-def parseArguments(parser):
-    parser.add_argument('--configfolder',
-        metavar="PATH",
-        help='Path to config folder',
-        default=None)
-
-    parser.add_argument('--configfilename',
-        metavar="PATH",
-        help='Name of config file, may include the path',
-        default="at-system-config.ini")
-
-    parser.add_argument('--data',
-        metavar="PATH",
-        help='Full path to data folder for project data to process',
-        required=False)
-
-    parser.add_argument('--projectname',
-        help='Set project name. Default: name of input datas basefolder',
-        required=False)
-
-    parser.add_argument('--pipeline',
-        help='Specify the pipeline to use',
-        choices={'stitch', 'roughalign', 'finealign', 'register', 'singletile'},
-        required=False)
-
-    parser.add_argument('--renderprojectowner',
-        help='Specify a RenderProject owner',
-        metavar="OWNER",
-        type=str,
-        nargs='?')
-
-    parser.add_argument('--sessions',
-        help='Specify sessions to process',
-        type=str)
-
-    parser.add_argument('--ribbons',
-        help='Specify ribbons  to process',
-        type=str)
-
-    parser.add_argument('--firstsection', metavar='N',
-        help='Specify start section (e.g. \'1\' to start with a datasets first section)',
-        type=int)
-
-    parser.add_argument('--lastsection', metavar='N',
-        help='Specify end section',
-        type=int)
-
-    parser.add_argument('--overwritedata',
-        help='Overwrite any already processed data',
-        action='store_true')
-
-    parser.add_argument('--loglevel',
-        choices={'INFO', 'DEBUG', 'WARNING', 'ERROR'},
-        help='Set program loglevel',
-        default='INFO')
-
-    parser.add_argument('--logtofile',
-        help='Log messages to file. The logfile is written to the output datafolder and named "projectname".log',
-        action='store_true')
-
-    parser.add_argument('--define', '-D',
-        action='append',
-        default=[],
-        help="Override a value in the config file (-D section.item=value)")
-
-    parser.add_argument('--deleterenderproject',
-        help="Delete a render project (including its stacks and match collections) for a specific owner, --renderprojectowner",
-        #required='--renderprojectowner' in sys.argv,
-        type=str,
-        nargs='?'
-        )
-
-    parser.add_argument('--version', '-v',
-        action='version',
-        version=('%%(prog)s %s' % __version__))
 
 def main():
     parser = argparse.ArgumentParser()
@@ -200,3 +125,79 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+def parseArguments(parser):
+    parser.add_argument('--configfolder',
+        metavar="PATH",
+        help='Path to config folder',
+        default=None)
+
+    parser.add_argument('--configfilename',
+        metavar="PATH",
+        help='Name of config file, may include the path',
+        default="at-system-config.ini")
+
+    parser.add_argument('--data',
+        metavar="PATH",
+        help='Full path to data folder for project data to process',
+        required=False)
+
+    parser.add_argument('--projectname',
+        help='Set project name. Default: name of input datas basefolder',
+        required=False)
+
+    parser.add_argument('--pipeline',
+        help='Specify the pipeline to use',
+        choices={'stitch', 'roughalign', 'finealign', 'register', 'singletile'},
+        required=False)
+
+    parser.add_argument('--renderprojectowner',
+        help='Specify a RenderProject owner',
+        metavar="OWNER",
+        type=str,
+        nargs='?')
+
+    parser.add_argument('--sessions',
+        help='Specify sessions to process',
+        type=str)
+
+    parser.add_argument('--ribbons',
+        help='Specify ribbons  to process',
+        type=str)
+
+    parser.add_argument('--firstsection', metavar='N',
+        help='Specify first section (e.g. \'0\' to start with a datasets first section)',
+        type=int)
+
+    parser.add_argument('--lastsection', metavar='N',
+        help='Specify last section',
+        type=int)
+
+    parser.add_argument('--overwritedata',
+        help='Overwrite any already processed data',
+        action='store_true')
+
+    parser.add_argument('--loglevel',
+        choices={'INFO', 'DEBUG', 'WARNING', 'ERROR'},
+        help='Set program loglevel',
+        default='INFO')
+
+    parser.add_argument('--logtofile',
+        help='Log messages to file. The logfile is written to the output datafolder and named "projectname".log',
+        action='store_true')
+
+    parser.add_argument('--define', '-D',
+        action='append',
+        default=[],
+        help="Override a value in the config file (-D section.item=value)")
+
+    parser.add_argument('--deleterenderproject',
+        help="Delete a render project (including its stacks and match collections) for a specific owner, --renderprojectowner",
+        #required='--renderprojectowner' in sys.argv,
+        type=str,
+        nargs='?'
+        )
+
+    parser.add_argument('--version', '-v',
+        action='version',
+        version=('%%(prog)s %s' % __version__))
