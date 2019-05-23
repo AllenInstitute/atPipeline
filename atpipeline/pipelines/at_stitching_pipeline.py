@@ -270,10 +270,8 @@ class CreateStitchedSections(atpp.PipelineProcess):
                os.mkdir(stitching_dir)
 
             #stacks
-            flatfield_stack  = "S%d_FlatFielded"%(session)
-            stitched_stack   = "S%d_Stitched"%(session)
-
-            renderProject     = p.renderProject
+            input_stack  = "S%d_FlatFielded"%(session)
+            output_stack   = "S%d_Stitched"%(session)
 
             #Check which ribbon we are processing, and adjust section numbers accordingly
             current_ribbon = u.getRibbonLabelFromSessionFolder(sessionFolder)
@@ -288,7 +286,7 @@ class CreateStitchedSections(atpp.PipelineProcess):
                 stitching_json = os.path.join(stitching_dir, "stitched""_%s_%s_%d.json"%(ribbon, session, sectnum))
                 z = ribbon*100 + sectnum
 
-                u.savestitchingjson(stitching_template, stitching_json, renderProject, flatfield_stack, stitched_stack, z)
+                u.savestitchingjson(stitching_template, stitching_json, p.renderProject, input_stack, output_stack, z)
 
                 cmd = "docker exec " + p.atCoreContainer
                 cmd = cmd + " java -cp /shared/at_modules/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"

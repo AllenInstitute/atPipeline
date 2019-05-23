@@ -43,7 +43,6 @@ def test_stacks(render_client):
     assert 'S2_RoughAligned_Consolidated'     in stacks
     assert 'S2_FineAligned'                  in stacks
 
-
 def test_highres_tilepairs_jsons(test_data_folder, test_data_set):
     sub_dir = 'high_res_tilepairfiles'
     ref_folder = os.path.join(test_data_folder, 'validation-data', PROJECT_NAME, sub_dir)
