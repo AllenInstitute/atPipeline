@@ -7,6 +7,7 @@ from .. import at_pipeline as atp
 from .. import at_pipeline_process as atpp
 from . import at_rough_align_pipeline
 from .. import at_utils as u
+from .. import at_spark
 
 
 logger = logging.getLogger('atPipeline')
@@ -201,17 +202,20 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
             jsonInputFolder = os.path.join(p.absoluteDataOutputFolder, "high_res_tilepairfiles")
             jsonInput       = os.path.join(jsonInputFolder, "tilepairs-%s-%s-%d-%d-nostitch-EDIT.json"     %(sessionNR, p.CREATE_HR_TILEPAIRS['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
 
+            data_info = []
+            spark = at_spark.Spark(p.config['GENERAL']['HOST_MEMORY'], p.config['GENERAL']['HOST_NUMBER_OF_CORES'], data_info)
+
             #SIFT Point Match Client
             cmd = "docker exec " + p.atCoreContainer
             cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
-            cmd = cmd + " --conf spark.default.parallelism=%s"      %(p.SPARK['SPARK_DEFAULT_PARALLELISM'])
-            cmd = cmd + " --driver-memory %s"                       %(p.SPARK['DRIVER_MEMORY'])
-            cmd = cmd + " --executor-memory %s"                     %(p.SPARK['EXECUTOR_MEMORY'])
-            cmd = cmd + " --executor-cores %s"                      %(p.SPARK['EXECUTOR_CORES'])
+            cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism)    #%(p.SPARK['SPARK_DEFAULT_PARALLELISM'])
+            cmd = cmd + " --driver-memory %s"                       %(spark.driver_memory)          #%(p.SPARK['DRIVER_MEMORY'])
+            cmd = cmd + " --executor-memory %s"                     %(spark.executor_memory)        #%(p.SPARK['EXECUTOR_MEMORY'])
+            cmd = cmd + " --executor-cores %s"                      %(spark.executor_cores)          #%(p.SPARK['EXECUTOR_CORES'])
 
             cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
             cmd = cmd + " --name PointMatchFull"
-            cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"
+            cmd = cmd + " --master local[%s] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"%(p.config['GENERAL']['SPARK_WORKER_THREADS'])
             cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(rp.host, rp.hostPort)
             cmd = cmd + " --owner %s"                               %(rp.owner)
             cmd = cmd + " --collection %s"                          %("%s_HR_3D"%(rp.project_name))

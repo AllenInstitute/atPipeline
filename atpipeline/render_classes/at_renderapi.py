@@ -16,6 +16,7 @@ from atpipeline import at_logging, at_system_config
 
 logger = logging.getLogger('atPipeline')
 
+#Simple wrapper class for renderapi
 class RenderAPI:
 
     def __init__(self, sys_config : at_system_config.ATSystemConfig, owner = None):

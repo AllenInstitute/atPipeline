@@ -69,50 +69,9 @@ class ATSystemConfig:
         self.mounts                                        = ast.literal_eval(self.GENERAL['DATA_ROOTS'])
         self.createCommonReferences()
 
-    def getNrOfSectionsInRibbon(self, ribbon):
-        #Get ribbon index
-        ribbonIndex = self.ribbons.index(ribbon)
+        if client == 'atbackend':
+            self.createReferencesForBackend(args)
 
-        #get number in dataInfo structure for index
-        secsInRibbons = self.dataInfo['SectionsInRibbons']
-        return secsInRibbons[ribbonIndex]
-
-    def convertGlobalSectionIndexesToCurrentRibbon(self, _ribbon):
-        #The ribbons are consecutive, with various number of sections
-        #The user will supply a start, end section to process. That range may span
-        #multiple ribbons and are numbered 1-N ("global" indexes).
-        #When a ribbon is being processed, a "local" section index is used, starting at 0 for each
-        #ribbon
-        sectionIndices = []
-        sectionIndicesArray = []
-
-        #First create a "ribbon indices" arrays, holding global and local indices
-        for i in range(self.dataInfo['NumberOfSections']):
-            sectionIndices = {'global' : i, 'local' : -1, 'ribbon' : ''} #Simple dict helping with book keeping
-            sectionIndicesArray.append(sectionIndices)
-
-        #Populate 'local' indices, i.e. section index per ribbon. These starts at 0
-        globalIndex = 0
-        for ribbon in self.ribbons:
-            nrOfSectionsInRibbon = self.getNrOfSectionsInRibbon(ribbon)
-            for i in range(nrOfSectionsInRibbon):
-                indices = sectionIndicesArray[globalIndex]
-                indices['local'] = i
-                indices['ribbon'] = ribbon
-                globalIndex = globalIndex + 1
-
-        #Now loop over first to last, and capture 'indices' falling on current input ribbon
-        #First section starts at '1' (not zero)
-        wantedIndices = []
-        for i in range(self.firstSection, self.lastSection + 1):
-            indices = sectionIndicesArray[i]
-            if indices['ribbon'] == _ribbon:
-                wantedIndices.append(indices)
-
-        length = len (wantedIndices)
-        if length == 0:
-            return -1, -1
-        return wantedIndices[0]['local'], wantedIndices[length - 1]['local']
 
     #The arguments passed here are captured from the commandline and will over ride any option
     #present in the system config file
@@ -128,15 +87,13 @@ class ATSystemConfig:
 
     def createCommonReferences(self):
         self.atCoreContainer                          = self.GENERAL['AT_CORE_DOCKER_CONTAINER_NAME']
+        self.atCoreContainer                          = self.GENERAL['AT_CORE_DOCKER_CONTAINER_NAME']
         self.dataOutputFolder                         = self.GENERAL['PROCESSED_DATA_FOLDER']
         self.renderHost                               = self.GENERAL['RENDER_HOST']
         self.renderHostPort                           = int(self.GENERAL['RENDER_HOST_PORT'])
         self.logLevel                                 = self.GENERAL['LOG_LEVEL']
         self.clientScripts                            = self.GENERAL['CLIENT_SCRIPTS']
         self.render_mem_GB                            = self.GENERAL['RENDER_MEM_GB']
-        #self.atCoreThreads                            = int(self.GENERAL['AT_CORE_THREADS'])
-        #self.downSampleScale                          = self.GENERAL['DOWN_SAMPLE_SCALE']
-
         self.renderProjectOwner                       = self.GENERAL['RENDER_PROJECT_OWNER']
 
         self.referenceChannelRegistration             = self.GENERAL['REFERENCE_CHANNEL_REGISTRATION']
@@ -151,40 +108,18 @@ class ATSystemConfig:
         self.fine_alignment_template                  = os.path.join(self.JSONTemplatesFolder, "fine_align.json")
         self.registration_template                    = os.path.join(self.JSONTemplatesFolder, "registration.json")
 
-        #Deconvolution parameters
-##        self.channels                                 = ast.literal_eval(self.deconv['CHANNELS'])
-##        self.bgrdSize                                 = ast.literal_eval(self.deconv['BGRD_SIZE'])
-##        self.scaleFactor                              = ast.literal_eval(self.deconv['SCALE_FACTOR'])
-##        self.numIter                                  = int(self.deconv['NUM_ITER'])
-##        self.ch405                                    = self.config['DECONV_405']
-##        self.ch488                                    = self.config['DECONV_488']
-##        self.ch594                                    = self.config['DECONV_594']
-##        self.ch647                                    = self.config['DECONV_647']
-
-##        #Alignment parameters
-##        self.poolSize                                 = int(self.align['POOL_SIZE'])
-##        self.edgeThreshold                            = int(self.align['EDGE_THRESHOLD'])
-##        self.scale                                    = float(self.align['SCALE'])
-##        self.distance                                 = int(self.align['DISTANCE'])
-##        self.siftMin                                  = float(self.align['SIFTMIN'])
-##        self.siftMax                                  = float(self.align['SIFTMAX'])
-##        self.siftSteps                                = int(self.align['SIFTSTEPS'])
-##        self.renderScale                              = float(self.align['RENDERSCALE'])
-
-##        #Tilepair client
-##        self.excludeCornerNeighbors                   = u.toBool(self.tp_client['EXCLUDE_CORNER_NEIGHBOURS'])
-##        self.excludeSameSectionNeighbors              = u.toBool(self.tp_client['EXCLUDE_SAME_SECTION_NEIGHBOR'])
-##        self.zNeighborDistance                        = int(self.tp_client['Z_NEIGHBOR_DISTANCE'])
-##        self.xyNeighborFactor                         = float(self.tp_client['XY_NEIGHBOR_FACTOR'])
 
     def createReferencesForBackend(self, args = None):
+        if args.atcoreimagetag == None:
+            args.atcoreimagetag                         = self.GENERAL['AT_CORE_DOCKER_IMAGE_TAG']
+
         self.mountRenderPythonApps                    = u.toBool(self.GENERAL['MOUNT_RENDER_PYTHON_APPS'])
         self.mountRenderModules                       = u.toBool(self.GENERAL['MOUNT_RENDER_MODULES'])
 
     def createReferencesForPipeline(self, args = None, dataInfo = None):
 
         #SPARK stuff
-        self.SPARK                                         = self.config['SPARK']
+        #self.SPARK                                         = self.config['SPARK']
         self.CREATE_LOWRES_STACKS                          = self.config['CREATE_LOWRES_STACKS']
         self.LOWRES_TILE_PAIR_CLIENT                       = self.config['LOWRES_TILE_PAIR_CLIENT']
         self.LOWRES_POINTMATCHES                           = self.config['LOWRES_POINTMATCHES']
@@ -254,6 +189,77 @@ class ATSystemConfig:
         #When used for input data
         #Create a "renderProject" to make things easier
         self.renderProject = rp.RenderProject(self.renderProjectOwner, self.project_name, self.renderHost, self.renderHostPort, self.clientScripts, self.render_mem_GB, self.logLevel)
+
+        #Deconvolution parameters
+##        self.channels                                 = ast.literal_eval(self.deconv['CHANNELS'])
+##        self.bgrdSize                                 = ast.literal_eval(self.deconv['BGRD_SIZE'])
+##        self.scaleFactor                              = ast.literal_eval(self.deconv['SCALE_FACTOR'])
+##        self.numIter                                  = int(self.deconv['NUM_ITER'])
+##        self.ch405                                    = self.config['DECONV_405']
+##        self.ch488                                    = self.config['DECONV_488']
+##        self.ch594                                    = self.config['DECONV_594']
+##        self.ch647                                    = self.config['DECONV_647']
+
+##        #Alignment parameters
+##        self.poolSize                                 = int(self.align['POOL_SIZE'])
+##        self.edgeThreshold                            = int(self.align['EDGE_THRESHOLD'])
+##        self.scale                                    = float(self.align['SCALE'])
+##        self.distance                                 = int(self.align['DISTANCE'])
+##        self.siftMin                                  = float(self.align['SIFTMIN'])
+##        self.siftMax                                  = float(self.align['SIFTMAX'])
+##        self.siftSteps                                = int(self.align['SIFTSTEPS'])
+##        self.renderScale                              = float(self.align['RENDERSCALE'])
+
+##        #Tilepair client
+##        self.excludeCornerNeighbors                   = u.toBool(self.tp_client['EXCLUDE_CORNER_NEIGHBOURS'])
+##        self.excludeSameSectionNeighbors              = u.toBool(self.tp_client['EXCLUDE_SAME_SECTION_NEIGHBOR'])
+##        self.zNeighborDistance                        = int(self.tp_client['Z_NEIGHBOR_DISTANCE'])
+##        self.xyNeighborFactor                         = float(self.tp_client['XY_NEIGHBOR_FACTOR'])
+
+    def getNrOfSectionsInRibbon(self, ribbon):
+        #Get ribbon index
+        ribbonIndex = self.ribbons.index(ribbon)
+
+        #get number in dataInfo structure for index
+        secsInRibbons = self.dataInfo['SectionsInRibbons']
+        return secsInRibbons[ribbonIndex]
+
+    def convertGlobalSectionIndexesToCurrentRibbon(self, _ribbon):
+        #The ribbons are consecutive, with various number of sections
+        #The user will supply a start, end section to process. That range may span
+        #multiple ribbons and are numbered 1-N ("global" indexes).
+        #When a ribbon is being processed, a "local" section index is used, starting at 0 for each
+        #ribbon
+        sectionIndices = []
+        sectionIndicesArray = []
+
+        #First create a "ribbon indices" arrays, holding global and local indices
+        for i in range(self.dataInfo['NumberOfSections']):
+            sectionIndices = {'global' : i, 'local' : -1, 'ribbon' : ''} #Simple dict helping with book keeping
+            sectionIndicesArray.append(sectionIndices)
+
+        #Populate 'local' indices, i.e. section index per ribbon. These starts at 0
+        globalIndex = 0
+        for ribbon in self.ribbons:
+            nrOfSectionsInRibbon = self.getNrOfSectionsInRibbon(ribbon)
+            for i in range(nrOfSectionsInRibbon):
+                indices = sectionIndicesArray[globalIndex]
+                indices['local'] = i
+                indices['ribbon'] = ribbon
+                globalIndex = globalIndex + 1
+
+        #Now loop over first to last, and capture 'indices' falling on current input ribbon
+        #First section starts at '1' (not zero)
+        wantedIndices = []
+        for i in range(self.firstSection, self.lastSection + 1):
+            indices = sectionIndicesArray[i]
+            if indices['ribbon'] == _ribbon:
+                wantedIndices.append(indices)
+
+        length = len (wantedIndices)
+        if length == 0:
+            return -1, -1
+        return wantedIndices[0]['local'], wantedIndices[length - 1]['local']
 
     def getStateTableFileName(self, ribbon, session, sectnum):
         return os.path.join(self.absoluteDataOutputFolder, "statetables", "statetable_ribbon_%d_session_%d_section_%d"%(ribbon, session, sectnum))

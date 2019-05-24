@@ -19,7 +19,7 @@ class DockerManager:
 
         self.setComposeFile(os.path.join(self.paras.args.configfolder, 'at-docker-compose.yml'))
         self.setupMounts()
-        self.atcore_image_tag = self.paras.args.atcoreimagetag
+        self.atcoreimagetag = self.paras.args.atcoreimagetag
 
 
     def prune_containers(self):
@@ -89,7 +89,7 @@ class DockerManager:
             #This will do nothing, forever
             cmd = "tail -f /dev/null"
             #ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcore_image_tag, user=17632, volumes=self.atCoreMounts, command=cmd, name=ctrName, detach=True)
-            ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcore_image_tag, volumes=self.atCoreMounts, command=cmd, name=ctrName, detach=True)
+            ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcoreimagetag, volumes=self.atCoreMounts, command=cmd, name=ctrName, detach=True)
 
 
             if ctr == None:
@@ -98,7 +98,7 @@ class DockerManager:
             if ctr.status != "running" and ctr.status != "created":
                 #Failing starting a container is considered a showstopper. Raise an exception
                 raise Exception("Failed starting container: " + ctrName)
-            logger.info("Started the " + ctrName + " container using image tag: " + self.atcore_image_tag)
+            logger.info("Started the " + ctrName + " container using image tag: " + self.atcoreimagetag)
 
         else:
                 raise Exception("The ATBackend don't manage the container: \"" + ctrName + "\"")

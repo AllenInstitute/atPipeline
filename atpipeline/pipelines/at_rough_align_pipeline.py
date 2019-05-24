@@ -1,14 +1,15 @@
 import os
 import logging
 import json
+import fileinput
+from shutil import copyfile
+import posixpath
 from .. import at_pipeline as atp
 from .. import at_pipeline_process as atpp
 from . import at_stitching_pipeline
 from .. import at_utils as u
 from .. import at_system_config
-import fileinput
-from shutil import copyfile
-import posixpath
+from .. import at_spark
 
 logger = logging.getLogger('atPipeline')
 
@@ -25,7 +26,6 @@ class RoughAlign(atp.ATPipeline):
         self.append_pipeline_process(CreateLowResPointMatches(_paras))
         self.append_pipeline_process(CreateRoughAlignedStacks(_paras))
         self.append_pipeline_process(ApplyLowResToHighRes(_paras))
-
 
     def run(self):
         atp.ATPipeline.run(self)
@@ -186,7 +186,11 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
 
             logger.info("Processing session: " + str(sessionNR))
 
-            rp     = p.renderProject
+            #Optimize spark parameters
+            data_info = []
+
+
+            spark = at_spark.Spark(p.config['GENERAL']['HOST_MEMORY'], p.config['GENERAL']['HOST_NUMBER_OF_CORES'], data_info)
 
             #output directories
             downsample_dir   = os.path.join(p.absoluteDataOutputFolder, "low_res")
@@ -194,18 +198,20 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             jsondir  = os.path.join(p.absoluteDataOutputFolder, "lowres_tilepairfiles")
             jsonfile = os.path.join(jsondir, "tilepairs-%d-%s-%d-%d-nostitch-EDIT.json"     %(sessionNR, p.LOWRES_TILE_PAIR_CLIENT['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
 
+            rp     = p.renderProject
+
             #SIFT Point Match Client
             cmd = "docker exec " + p.atCoreContainer
             cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
 
-            cmd = cmd + " --conf spark.default.parallelism=%s"      %(p.LOWRES_POINTMATCHES['SPARK_DEFAULT_PARALLELISM'])
-            cmd = cmd + " --driver-memory %s"                       %(p.LOWRES_POINTMATCHES['SPARK_DRIVER_MEMORY'])
-            cmd = cmd + " --executor-memory %s"                     %(p.LOWRES_POINTMATCHES['SPARK_EXECUTOR_MEMORY'])
-            cmd = cmd + " --executor-cores %s"                      %(p.LOWRES_POINTMATCHES['SPARK_EXECUTOR_CORES'])
+            cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism) #p.LOWRES_POINTMATCHES['SPARK_DEFAULT_PARALLELISM'])
+            cmd = cmd + " --driver-memory %s"                       %(spark.driver_memory)       #p.LOWRES_POINTMATCHES['SPARK_DRIVER_MEMORY'])
+            cmd = cmd + " --executor-memory %s"                     %(spark.executor_memory)     #p.LOWRES_POINTMATCHES['SPARK_EXECUTOR_MEMORY'])
+            cmd = cmd + " --executor-cores %s"                      %(spark.executor_cores)       #p.LOWRES_POINTMATCHES['SPARK_EXECUTOR_CORES'])
 
             cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
             cmd = cmd + " --name PointMatchFull"
-            cmd = cmd + " --master local[*] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"
+            cmd = cmd + " --master local[%s] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"%(p.config['GENERAL']['SPARK_WORKER_THREADS'])
             cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(rp.host, rp.hostPort)
             cmd = cmd + " --collection %s_lowres_round"             %(rp.project_name)
             cmd = cmd + " --owner %s"                               %(rp.owner)
