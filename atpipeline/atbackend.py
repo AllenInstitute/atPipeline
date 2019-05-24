@@ -7,51 +7,20 @@ import traceback
 from atpipeline import at_logging, at_docker_manager, at_system_config
 logger = at_logging.create_logger('atPipeline')
 from atpipeline import __version__
-
-def setupArguments(parser):
-    #Get processing parameters
-    cmdgroup = parser.add_mutually_exclusive_group()
-    cmdgroup.add_argument('--startall',            help='Start the whole AT backend',          action='store_true')
-    cmdgroup.add_argument('--startrenderbackend',  help='Start the Render backend',            action='store_true')
-    cmdgroup.add_argument('--killall', '--stopall', help='Stop the AT backend',                 action='store_true')
-    cmdgroup.add_argument('--pruneall',            help='Prune the AT backend',                action='store_true')
-    cmdgroup.add_argument('--prunecontainers',     help='Prune the AT backend',                action='store_true')
-    cmdgroup.add_argument('--pruneimages',         help='Prune the AT backend',                action='store_true')
-    cmdgroup.add_argument('--restartall',          help='Restart all AT backend container',    action='store_true' )
-    cmdgroup.add_argument('--status',              help='Get backend status',                  action='store_true' )
-
-    #Container by container (not all implemented)
-    cmdgroup.add_argument('-s', '--start',         help='Start a specific backend container, e.g. atcore',     nargs='?',const='atcore', type=str)
-    cmdgroup.add_argument('-k', '--kill',          help='Stop a specific backend container',                  nargs='?',const='atcore', type=str)
-    cmdgroup.add_argument('-r', '--restart',       help='Restart a specific backend container, e.g. atcore',   nargs='?',const='atcore', type=str)
-
-    # Flags to alter behaviour
-    parser.add_argument('--atcoreimagetag',       help='atcore image tag to use', default=None)
-    parser.add_argument('--configfolder',          help='Path to config folder', default=None)
-
-    parser.add_argument('--define', '-D',
-        action='append',
-        default=[],
-        help="Override a value in the config file (-D section.item=value)")
-
-    parser.add_argument('--version', '-v', action='version', version=('%%(prog)s %s' % __version__))
+from atpipeline import at_backend_arguments
 
 def main():
 
     try:
         logger.info('============ Managing the atBackend =============')
 
-        parser = argparse.ArgumentParser()
-        setupArguments(parser)
+        parser = argparse.ArgumentParser('atbackend')
+        at_backend_arguments.add_arguments(parser)
         args = parser.parse_args()
 
-        dManager = at_docker_manager.DockerManager(configFolder=args.configfolder,
-                        atcore_image_tag=args.atcoreimagetag,
-                        cmdFlags=args.define)
+        system_config = at_system_config.ATSystemConfig(args, client = 'atbackend')
 
-        #Keep arguments in main module for visibility
-        #setupArguments(dManager.argparser)
-        #args = dManager.parseCommandLineArguments()
+        dManager = at_docker_manager.DockerManager(system_config)
 
         if args.restart:
             dManager.reStartContainer(args.restart)

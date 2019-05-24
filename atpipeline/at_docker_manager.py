@@ -3,41 +3,24 @@ import logging
 import os
 import subprocess
 import pathlib
-from . import at_system_config
 import argparse
+from . import at_system_config
+from atpipeline import at_backend_arguments
 logger = logging.getLogger('atPipeline')
 
 #A simple docker manager, wrapping some of the DockerSDK
 class DockerManager:
-    def __init__(self, configFolder=None, atcore_image_tag=None, cmdFlags=[]):
+    def __init__(self, system_paras : at_system_config.ATSystemConfig):
 
-        logger = logging.getLogger('atPipeline')
-        self.argparser = argparse.ArgumentParser('backend_management')
+        self.paras = system_paras
         self.dClient = docker.from_env()
-
         self.atCoreMounts = {}
         self.composeFile = ""
 
-        if configFolder:
-            self.configFolder = configFolder
-        elif 'AT_SYSTEM_CONFIG_FOLDER' in os.environ:
-            self.configFolder = os.environ['AT_SYSTEM_CONFIG_FOLDER']
-        elif os.name == 'posix':
-            self.configFolder = '/usr/local/etc/'
-        else:
-            raise Exception("No default configFolder folder defined for %s. Set environment variable 'AT_SYSTEM_CONFIG_FOLDER' to the folder where the file 'at-system-config.ini' exists." % os.name)
-
-        self.paras = at_system_config.ATSystemConfig(os.path.join(self.configFolder, 'at-system-config.ini'),
-            cmdFlags=cmdFlags)
-
-        self.paras.createReferences(caller="backend_management")
-        self.setComposeFile(os.path.join(self.configFolder, 'at-docker-compose.yml'))
+        self.setComposeFile(os.path.join(self.paras.args.configfolder, 'at-docker-compose.yml'))
         self.setupMounts()
+        self.atcore_image_tag = self.paras.args.atcoreimagetag
 
-        if atcore_image_tag:
-            self.atcore_image_tag = atcore_image_tag
-        else:
-            self.atcore_image_tag = self.paras.GENERAL['AT_CORE_DOCKER_IMAGE_TAG']
 
     def prune_containers(self):
         val = self.dClient.containers.prune()

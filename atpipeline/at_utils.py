@@ -133,31 +133,7 @@ def getChannelNamesInSessionFolder(directory):
 
 def dump_json(data, fileName):
     with open(fileName, 'w') as outfile:
-         json.dump(data, outfile, indent=4)
-
-def savemedianjson(template, outFile, render_project, acq_stack, median_stack, median_dir, minz, maxz, close_stack):
-    template['render']['host']    = render_project.host
-    template['render']['owner']   = render_project.owner
-    template['render']['project'] = render_project.project_name
-    template['input_stack']       = acq_stack
-    template['output_stack']      = median_stack
-    template['minZ']              = minz
-    template['maxZ']              = maxz
-    template['output_directory']  = median_dir
-    template['close_stack']       = close_stack
-    dump_json(template, outFile)
-
-def saveflatfieldjson(template, outFile, render_project, acq_stack, median_stack, flatfield_stack, flatfield_dir, sectnum, close_stack):
-    template['render']['host']    = render_project.host
-    template['render']['owner']   = render_project.owner
-    template['render']['project'] = render_project.project_name
-    template['input_stack']       = acq_stack
-    template['correction_stack']  = median_stack
-    template['output_stack']      = flatfield_stack
-    template['z_index']           = sectnum
-    template['output_directory']  = flatfield_dir
-    template['close_stack']       = close_stack
-    dump_json(template, outFile)
+        json.dump(data, outfile, indent=4)
 
 def savedeconvjson(template,outFile, owner, project, flatfield_stack,deconv_stack,deconv_dir,sectnum,psf_file, num_iter,bgrd_size,scale_factor,close_stack):
     template['render']['owner']   = owner
@@ -171,89 +147,6 @@ def savedeconvjson(template,outFile, owner, project, flatfield_stack,deconv_stac
     template['output_directory']  = deconv_dir
     template['scale_factor']      = scale_factor
     template['close_stack']       = close_stack
-    dump_json(template, outFile)
-
-def savestitchingjson(template, outfile, render_project, flatfield_stack, stitched_stack, sectnum):
-    template['baseDataUrl']            = "http://%s/render-ws/v1"%(render_project.host)
-    template['owner']                  = render_project.owner
-    template['project']                = render_project.project_name
-    template['stack']                  = flatfield_stack
-    template['outputStack']            = stitched_stack
-    template['section']                = sectnum
-    dump_json(template, outfile)
-
-def saveRoughAlignJSON(template, outFile, renderProject, input_stack, output_stack, lowresPmCollection, nFirst, nLast, dataOutputFolder):
-    template['regularization']['log_level']                  = renderProject.logLevel
-    template['matrix_assembly']['log_level']                 = renderProject.logLevel
-
-    template['output_stack']['client_scripts']               = renderProject.clientScripts
-    template['output_stack']['owner']                        = renderProject.owner
-    template['output_stack']['log_level']                    = renderProject.logLevel
-    template['output_stack']['project']                      = renderProject.project_name
-    template['output_stack']['port']                         = renderProject.hostPort
-    template['output_stack']['host']                         = renderProject.host
-    template['output_stack']['name']                         = output_stack
-
-    template['input_stack']['client_scripts']                = renderProject.clientScripts
-    template['input_stack']['owner']                         = renderProject.owner
-    template['input_stack']['log_level']                     = renderProject.logLevel
-    template['input_stack']['project']                       = renderProject.project_name
-    template['input_stack']['port']                          = renderProject.hostPort
-    template['input_stack']['host']                          = renderProject.host
-    template['input_stack']['name']                          = input_stack
-
-    template['pointmatch']['client_scripts']                 = renderProject.clientScripts
-    template['pointmatch']['owner']                          = renderProject.owner
-    template['pointmatch']['log_level']                      = renderProject.logLevel
-    template['pointmatch']['project']                        = renderProject.project_name
-    template['pointmatch']['name']                           = lowresPmCollection
-    template['pointmatch']['port']                           = renderProject.hostPort
-    template['pointmatch']['host']                           = renderProject.host
-
-    template['hdf5_options']['log_level']                    = renderProject.logLevel
-    template['hdf5_options']['output_dir']                   = dataOutputFolder
-
-    template['first_section']                                = nFirst
-    template['last_section']                                 = nLast
-    template['log_level']                                    = "INFO"
-    dump_json(template, outFile)
-
-
-
-def saveFineAlignJSON(template, outFile, renderHost, port, owner, project, input_stack, output_stack, collection_2D, collection_3D, clientScripts, logLevel, nFirst, nLast, dataOutputFolder):
-    template['regularization']['log_level']                  = logLevel
-    template['matrix_assembly']['log_level']                 = logLevel
-
-    template['output_stack']['client_scripts']               = clientScripts
-    template['output_stack']['owner']                        = owner
-    template['output_stack']['log_level']                    = logLevel
-    template['output_stack']['project']                      = project
-    template['output_stack']['name']                         = output_stack
-    template['output_stack']['port']                         = port
-    template['output_stack']['host']                         = renderHost
-
-    template['input_stack']['client_scripts']                = clientScripts
-    template['input_stack']['owner']                         = owner
-    template['input_stack']['log_level']                     = logLevel
-    template['input_stack']['project']                       = project
-    template['input_stack']['port']                          = port
-    template['input_stack']['host']                          = renderHost
-    template['input_stack']['name']                          = input_stack
-
-    template['pointmatch']['client_scripts']                 = clientScripts
-    template['pointmatch']['owner']                          = owner
-    template['pointmatch']['log_level']                      = logLevel
-    template['pointmatch']['project']                        = project
-    template['pointmatch']['name']                           = [collection_2D, collection_3D]
-    template['pointmatch']['port']                           = port
-    template['pointmatch']['host']                           = renderHost
-
-    template['hdf5_options']['log_level']                    = logLevel
-    template['hdf5_options']['output_dir']                   = dataOutputFolder
-
-    template['last_section']                                 = nLast
-    template['first_section']                                = nFirst
-    template['log_level']                                    = "INFO"
     dump_json(template, outFile)
 
 def saveRegistrationJSON(t, outFileName, renderHost, owner, project, stack, referenceStack, outputStack, section):
