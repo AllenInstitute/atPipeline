@@ -6,17 +6,55 @@ import posixpath
 from . import at_render_project as rp
 import re
 
+
+#Class that carries system and other parameters for the AT pipeline.
+#Two 'clients' are using this class, the atbackend and the atcore.
+#When used by the atcore, data processing flags are being populated, while that's not needed by
+#the backend client
+
 class ATSystemConfig:
-    def __init__(self, iniFile, cmdFlags=[]):
+
+    def __init__(self, args, client = 'atbackend'):
+
+        #For convenience..
+        self.args = args
+
+        #Setup input parameters
+        if args.configfolder:
+            pass
+        elif 'AT_SYSTEM_CONFIG_FOLDER' in os.environ:
+            args.configfolder = os.environ['AT_SYSTEM_CONFIG_FOLDER']
+        elif os.name == 'posix':
+            args.configfolder = '/usr/local/etc/'
+        else:
+            raise Exception("No default config folder folder defined for %s. Set environment variable 'AT_SYSTEM_CONFIG_FOLDER' to the folder where the file 'at-system-config.ini' exists." % os.name)
+
+        args.system_config_file = os.path.join(args.configfolder, 'at-system-config.ini')
+
+        if client == 'atcore':
+            if os.path.exists(args.configfile):
+                args.configfile = os.path.abspath(args.configfile)
+            else:
+                args.configfile = os.path.join(args.configfolder, args.configfile)
+
+            if os.path.isfile(args.configfile) == False:
+                raise Exception("The data processing config file: " + args.configfile + " don't exist..")
+
+        #Create the parser
         self.config = configparser.ConfigParser()
 
         #Check that file exists, otherwise raise an error
-        if os.path.isfile(iniFile) == False:
-            raise Exception("The file: " + iniFile + " don't exist..")
+        if os.path.isfile(args.system_config_file) == False:
+            raise Exception("The system config file: " + args.system_config_file + " don't exist..")
 
-        self.config.read(iniFile)
+        #Read config files
+        if client == 'atcore':
+            self.config.read([args.system_config_file, args.configfile])
+        else:
+            self.config.read([args.system_config_file])
 
-        for flag in cmdFlags:
+        #Check for over rides
+        for flag in args.define:
             # Overrides from the command line in the form <section>.<setting>=<value>
             result = re.fullmatch(r'(.*?)\.(.*?)=(.*)', flag)
             if result:
@@ -27,18 +65,6 @@ class ATSystemConfig:
                 raise Exception("Unable to config override: %s" % flag)
 
         self.GENERAL                                       = self.config['GENERAL']
-
-        #SPARK stuff
-        self.SPARK                                         = self.config['SPARK']
-        self.CREATE_LOWRES_STACKS                          = self.config['CREATE_LOWRES_STACKS']
-        self.LOWRES_TILE_PAIR_CLIENT                       = self.config['LOWRES_TILE_PAIR_CLIENT']
-        self.LOWRES_POINTMATCHES                           = self.config['LOWRES_POINTMATCHES']
-        self.CREATE_2D_POINTMATCHES                        = self.config['CREATE_2D_POINTMATCHES']
-        self.CREATE_HR_TILEPAIRS                           = self.config['CREATE_HR_TILEPAIRS']
-        self.CREATE_HR_POINTMATCHES                        = self.config['CREATE_HR_POINTMATCHES']
-        self.DROP_STITCHING_MISTAKES                       = self.config['DROP_STITCHING_MISTAKES']
-
-        self.DATA_INPUT                                    = self.config['DATA_INPUT']
 
         self.mounts                                        = ast.literal_eval(self.GENERAL['DATA_ROOTS'])
         self.createCommonReferences()
@@ -90,12 +116,15 @@ class ATSystemConfig:
 
     #The arguments passed here are captured from the commandline and will over ride any option
     #present in the system config file
-    def createReferences(self, args = None, caller = None, dataInfo = None):
-        self.dataInfo                                 = dataInfo
-        if caller == "pipeline":
-            self.createReferencesForPipeline(args, dataInfo)
-        elif caller == "backend_management":
+    def createReferences(self, args = None, client = None, data_info = None):
+
+        if client == "atcore":
+            self.dataInfo = data_info
+            self.createReferencesForPipeline(args, data_info)
+        elif client == "atbackend":
             self.createReferencesForBackend(args)
+        else:
+            raise ValueError("No client set in the createreferences function..")
 
     def createCommonReferences(self):
         self.atCoreContainer                          = self.GENERAL['AT_CORE_DOCKER_CONTAINER_NAME']
@@ -142,8 +171,6 @@ class ATSystemConfig:
 ##        self.siftSteps                                = int(self.align['SIFTSTEPS'])
 ##        self.renderScale                              = float(self.align['RENDERSCALE'])
 
-
-
 ##        #Tilepair client
 ##        self.excludeCornerNeighbors                   = u.toBool(self.tp_client['EXCLUDE_CORNER_NEIGHBOURS'])
 ##        self.excludeSameSectionNeighbors              = u.toBool(self.tp_client['EXCLUDE_SAME_SECTION_NEIGHBOR'])
@@ -155,6 +182,19 @@ class ATSystemConfig:
         self.mountRenderModules                       = u.toBool(self.GENERAL['MOUNT_RENDER_MODULES'])
 
     def createReferencesForPipeline(self, args = None, dataInfo = None):
+
+        #SPARK stuff
+        self.SPARK                                         = self.config['SPARK']
+        self.CREATE_LOWRES_STACKS                          = self.config['CREATE_LOWRES_STACKS']
+        self.LOWRES_TILE_PAIR_CLIENT                       = self.config['LOWRES_TILE_PAIR_CLIENT']
+        self.LOWRES_POINTMATCHES                           = self.config['LOWRES_POINTMATCHES']
+        self.CREATE_2D_POINTMATCHES                        = self.config['CREATE_2D_POINTMATCHES']
+        self.CREATE_HR_TILEPAIRS                           = self.config['CREATE_HR_TILEPAIRS']
+        self.CREATE_HR_POINTMATCHES                        = self.config['CREATE_HR_POINTMATCHES']
+        self.DROP_STITCHING_MISTAKES                       = self.config['DROP_STITCHING_MISTAKES']
+
+        self.DATA_INPUT                                    = self.config['DATA_INPUT']
+
         self.dataRootFolder                           = os.path.abspath(self.DATA_INPUT['DATA_ROOT_FOLDER'])
 
         self.projectDataFolder                        = os.path.abspath(self.DATA_INPUT['PROJECT_DATA_FOLDER'])
@@ -191,7 +231,7 @@ class ATSystemConfig:
             self.sessions                            = list(args.sessions.split(','))
         else:
             self.sessions                            = list(dataInfo['SessionFolders'].split(','))
-        
+
         self.sessions.sort()
         self.pipeline                                = args.pipeline
         self.overwritedata                           = args.overwritedata

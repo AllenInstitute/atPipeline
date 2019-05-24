@@ -152,6 +152,18 @@ class CreateMedianFiles(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateMedianFiles")
 
+    def savemedianjson(self, template, outFile, render_project, acq_stack, median_stack, median_dir, minz, maxz, close_stack):
+        template['render']['host']    = render_project.host
+        template['render']['owner']   = render_project.owner
+        template['render']['project'] = render_project.project_name
+        template['input_stack']       = acq_stack
+        template['output_stack']      = median_stack
+        template['minZ']              = minz
+        template['maxZ']              = maxz
+        template['output_directory']  = median_dir
+        template['close_stack']       = close_stack
+        u.dump_json(template, outFile)
+
     def run(self):
         super().run()
         p = self.paras
@@ -182,7 +194,7 @@ class CreateMedianFiles(atpp.PipelineProcess):
             with open(p.median_template) as json_data:
                 med = json.load(json_data)
 
-            u.savemedianjson(med, median_json, rp, acq_stack, median_stack, self.paras.toMount(median_dir), ribbon*100 + firstSection, ribbon*100 + lastSection, True)
+            self.savemedianjson(med, median_json, rp, acq_stack, median_stack, self.paras.toMount(median_dir), ribbon*100 + firstSection, ribbon*100 + lastSection, True)
 
             cmd = "docker exec " + p.atCoreContainer
             cmd = cmd + " /opt/conda/bin/python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
@@ -199,6 +211,19 @@ class CreateFlatFieldCorrectedData(atpp.PipelineProcess):
 
     def __init__(self, _paras):
         super().__init__(_paras, "CreateFlatFieldCorrectedData")
+
+    def saveflatfieldjson(self, template, outFile, render_project, acq_stack, median_stack, flatfield_stack, flatfield_dir, sectnum, close_stack):
+        template['render']['host']    = render_project.host
+        template['render']['owner']   = render_project.owner
+        template['render']['project'] = render_project.project_name
+        template['input_stack']       = acq_stack
+        template['correction_stack']  = median_stack
+        template['output_stack']      = flatfield_stack
+        template['z_index']           = sectnum
+        template['output_directory']  = flatfield_dir
+        template['close_stack']       = close_stack
+        u.dump_json(template, outFile)
+
 
     def run(self):
         super().run()
@@ -237,7 +262,7 @@ class CreateFlatFieldCorrectedData(atpp.PipelineProcess):
 
                 z = ribbon*100 + sectnum
 
-                u.saveflatfieldjson(ff, flatfield_json, renderProject, acq_stack, median_stack, flatfield_stack, p.toMount(flatfield_dir), z, True)
+                self.saveflatfieldjson(ff, flatfield_json, renderProject, acq_stack, median_stack, flatfield_stack, p.toMount(flatfield_dir), z, True)
                 cmd = "docker exec " + p.atCoreContainer
                 cmd = cmd + " /opt/conda/bin/python -m rendermodules.intensity_correction.apply_multiplicative_correction"
                 cmd = cmd + " --render.port %d"           % renderProject.hostPort
@@ -252,6 +277,15 @@ class CreateFlatFieldCorrectedData(atpp.PipelineProcess):
 class CreateStitchedSections(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "CreateStitchedSections")
+
+    def savestitchingjson(self, template, outfile, render_project, flatfield_stack, stitched_stack, sectnum):
+        template['baseDataUrl']            = "http://%s/render-ws/v1"%(render_project.host)
+        template['owner']                  = render_project.owner
+        template['project']                = render_project.project_name
+        template['stack']                  = flatfield_stack
+        template['outputStack']            = stitched_stack
+        template['section']                = sectnum
+        u.dump_json(template, outfile)
 
     def run(self):
         super().run()
@@ -270,10 +304,8 @@ class CreateStitchedSections(atpp.PipelineProcess):
                os.mkdir(stitching_dir)
 
             #stacks
-            flatfield_stack  = "S%d_FlatFielded"%(session)
-            stitched_stack   = "S%d_Stitched"%(session)
-
-            renderProject     = p.renderProject
+            input_stack  = "S%d_FlatFielded"%(session)
+            output_stack   = "S%d_Stitched"%(session)
 
             #Check which ribbon we are processing, and adjust section numbers accordingly
             current_ribbon = u.getRibbonLabelFromSessionFolder(sessionFolder)
@@ -288,7 +320,7 @@ class CreateStitchedSections(atpp.PipelineProcess):
                 stitching_json = os.path.join(stitching_dir, "stitched""_%s_%s_%d.json"%(ribbon, session, sectnum))
                 z = ribbon*100 + sectnum
 
-                u.savestitchingjson(stitching_template, stitching_json, renderProject, flatfield_stack, stitched_stack, z)
+                self.savestitchingjson(stitching_template, stitching_json, p.renderProject, input_stack, output_stack, z)
 
                 cmd = "docker exec " + p.atCoreContainer
                 cmd = cmd + " java -cp /shared/at_modules/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"

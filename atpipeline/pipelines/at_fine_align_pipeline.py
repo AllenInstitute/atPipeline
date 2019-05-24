@@ -236,6 +236,43 @@ class Create_fine_aligned_stacks(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "Create_fine_aligned_stacks")
 
+    def saveFineAlignJSON(self, template, outFile, renderHost, port, owner, project, input_stack, output_stack, collection_2D, collection_3D, clientScripts, logLevel, nFirst, nLast, dataOutputFolder):
+        template['regularization']['log_level']                  = logLevel
+        template['matrix_assembly']['log_level']                 = logLevel
+
+        template['output_stack']['client_scripts']               = clientScripts
+        template['output_stack']['owner']                        = owner
+        template['output_stack']['log_level']                    = logLevel
+        template['output_stack']['project']                      = project
+        template['output_stack']['name']                         = output_stack
+        template['output_stack']['port']                         = port
+        template['output_stack']['host']                         = renderHost
+
+        template['input_stack']['client_scripts']                = clientScripts
+        template['input_stack']['owner']                         = owner
+        template['input_stack']['log_level']                     = logLevel
+        template['input_stack']['project']                       = project
+        template['input_stack']['port']                          = port
+        template['input_stack']['host']                          = renderHost
+        template['input_stack']['name']                          = input_stack
+
+        template['pointmatch']['client_scripts']                 = clientScripts
+        template['pointmatch']['owner']                          = owner
+        template['pointmatch']['log_level']                      = logLevel
+        template['pointmatch']['project']                        = project
+        template['pointmatch']['name']                           = [collection_2D, collection_3D]
+        template['pointmatch']['port']                           = port
+        template['pointmatch']['host']                           = renderHost
+
+        template['hdf5_options']['log_level']                    = logLevel
+        template['hdf5_options']['output_dir']                   = dataOutputFolder
+
+        template['last_section']                                 = nLast
+        template['first_section']                                = nFirst
+        template['log_level']                                    = "INFO"
+        u.dump_json(template, outFile)
+
+
     def run(self):
         super().run()
         p = self.paras
@@ -270,7 +307,7 @@ class Create_fine_aligned_stacks(atpp.PipelineProcess):
                ra = json.load(json_data)
 
 
-            u.saveFineAlignJSON(ra, input_json, rp.host, rp.hostPort, rp.owner, rp.project_name,
+            self.saveFineAlignJSON(ra, input_json, rp.host, rp.hostPort, rp.owner, rp.project_name,
                                     input_stack, output_stack, pm_collection2D, pm_collection3D,
                                     rp.clientScripts, rp.logLevel, p.firstSection, p.lastSection, p.toMount(dataOutputFolder))
 

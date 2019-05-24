@@ -1,7 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        test-stitching
-# Purpose:     test integrity of input/output data, up to stitching
-#              These are tests for the Q1023 TestDataset
+# Name:        test-backend
 #
 # Author:      matsk
 #
@@ -16,8 +14,7 @@ import renderapi
 import shutil
 
 AT_SYSTEM_CONFIG_FOLDER    = 'AT_SYSTEM_CONFIG_FOLDER'
-AT_SYSTEM_CONFIG_FILE_NAME      = 'at-system-config.ini'
-
+AT_SYSTEM_CONFIG_FILE_NAME = 'at-system-config.ini'
 
 #----------------------------------------------------------------------------------------------------------
 

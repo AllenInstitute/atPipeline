@@ -88,7 +88,6 @@ class CreateLowResStacks(atpp.PipelineProcess):
 
             # stacks
             input_stack  = "S%d_Stitched_Dropped"   %(sessionNR)
-
             output_stack = "S%d_LowRes" %(sessionNR)
 
             rp = p.renderProject
@@ -131,13 +130,11 @@ class CreateLowResTilePairs(atpp.PipelineProcess):
 
         for session in p.sessions:
             sessionNR = int(session[7:])
-
             logger.info("Processing session: " + str(sessionNR))
 
-            inputStack = "S%d_LowRes"%(sessionNR)
-
-            rp      = p.renderProject
-            jsondir = os.path.join(p.absoluteDataOutputFolder, "lowres_tilepairfiles")
+            inputStack  = "S%d_LowRes"%(sessionNR)
+            rp          = p.renderProject
+            jsondir     = os.path.join(p.absoluteDataOutputFolder, "lowres_tilepairfiles")
 
             # Make sure output folder exist
             if os.path.isdir(jsondir) == False:
@@ -238,6 +235,41 @@ class CreateRoughAlignedStacks(atpp.PipelineProcess):
 
     #def check_if_done(self):
     #    pass
+    def saveRoughAlignJSON(self, template, outFile, renderProject, input_stack, output_stack, lowresPmCollection, nFirst, nLast, dataOutputFolder):
+        template['regularization']['log_level']                  = renderProject.logLevel
+        template['matrix_assembly']['log_level']                 = renderProject.logLevel
+
+        template['output_stack']['client_scripts']               = renderProject.clientScripts
+        template['output_stack']['owner']                        = renderProject.owner
+        template['output_stack']['log_level']                    = renderProject.logLevel
+        template['output_stack']['project']                      = renderProject.project_name
+        template['output_stack']['port']                         = renderProject.hostPort
+        template['output_stack']['host']                         = renderProject.host
+        template['output_stack']['name']                         = output_stack
+
+        template['input_stack']['client_scripts']                = renderProject.clientScripts
+        template['input_stack']['owner']                         = renderProject.owner
+        template['input_stack']['log_level']                     = renderProject.logLevel
+        template['input_stack']['project']                       = renderProject.project_name
+        template['input_stack']['port']                          = renderProject.hostPort
+        template['input_stack']['host']                          = renderProject.host
+        template['input_stack']['name']                          = input_stack
+
+        template['pointmatch']['client_scripts']                 = renderProject.clientScripts
+        template['pointmatch']['owner']                          = renderProject.owner
+        template['pointmatch']['log_level']                      = renderProject.logLevel
+        template['pointmatch']['project']                        = renderProject.project_name
+        template['pointmatch']['name']                           = lowresPmCollection
+        template['pointmatch']['port']                           = renderProject.hostPort
+        template['pointmatch']['host']                           = renderProject.host
+
+        template['hdf5_options']['log_level']                    = renderProject.logLevel
+        template['hdf5_options']['output_dir']                   = dataOutputFolder
+
+        template['first_section']                                = nFirst
+        template['last_section']                                 = nLast
+        template['log_level']                                    = "INFO"
+        u.dump_json(template, outFile)
 
     def run(self):
         super().run()
@@ -260,9 +292,7 @@ class CreateRoughAlignedStacks(atpp.PipelineProcess):
         	#point match collections
             lowresPmCollection = "%s_lowres_round"%rp.project_name
 
-
             #Check for Pointmatch collection.. if not found bail...
-
 
             with open(p.alignment_template) as json_data:
                ra = json.load(json_data)
@@ -271,7 +301,7 @@ class CreateRoughAlignedStacks(atpp.PipelineProcess):
             if os.path.isdir(dataOutputFolder) == False:
                 os.mkdir(dataOutputFolder)
 
-            u.saveRoughAlignJSON(ra, input_json, rp, inputStack, outputStack, lowresPmCollection, p.firstSection, p.lastSection, p.toMount(dataOutputFolder))
+            self.saveRoughAlignJSON(ra, input_json, rp, inputStack, outputStack, lowresPmCollection, p.firstSection, p.lastSection, p.toMount(dataOutputFolder))
 
             #Run docker command
             cmd = "docker exec " + p.atCoreContainer
