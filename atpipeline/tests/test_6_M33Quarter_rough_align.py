@@ -29,8 +29,8 @@ def test_data_set():
 def test_rough_aligning(test_data_folder, test_data_set):
     from atpipeline import at_utils as u
     data_root = os.path.join(test_data_folder, 'input', test_data_set)
-    data_ini_file = os.path.join(test_data_folder, 'input', PROJECT_INI)
-    cmd = r'atcore --data ' + data_root + ' --pipeline roughalign --overwritedata --renderprojectowner PyTest --configfile ' + data_ini_file + ' --projectname ' + PROJECT_NAME + ' --logtofile'
+    data_ini_file = os.path.join(test_data_folder, 'input',  PROJECT_INI)
+    cmd = r'atcore --data ' + data_root + ' --pipeline roughalign --overwritedata --renderprojectowner PyTest --configfilename ' + data_ini_file + ' --projectname ' + PROJECT_NAME + ' --logtofile'
 
     #This will take about 15 minutes ===============
     print (cmd)
@@ -95,4 +95,4 @@ def test_rough_aligned_tilespecs(test_data_folder, test_data_set):
     for f in files:
         #assert tu.compare_file_in_folders(f, test_folder, ref_folder) == True
         #Just make sure the file exists.. Currently we get diffs in the decimals
-        assert os.path.exists(os.path.join(test_folder, f))
+        assert os.path.exists(os.path.join(test_folder, f))  
