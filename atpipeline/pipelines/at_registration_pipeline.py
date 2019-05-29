@@ -17,11 +17,14 @@ class RegisterSessions(atp.ATPipeline):
         super().__init__(_paras)
 
         #Define the pipeline
+        self.roughAlignPipeline = at_rough_align_pipeline.RoughAlign(_paras)
         self.append_pipeline_process(RegisterSessionsProcess(_paras))
 
     def run(self):
         atp.ATPipeline.run(self)
 
+        #Run any pre pipeline(s)
+        self.roughAlignPipeline.run()
 
         #Iterate through the pipeline
         for process in self.pipeline_processes:
@@ -111,5 +114,5 @@ class RegisterSessionsProcess(atpp.PipelineProcess):
                         self.submit(cmd)
             except:
                 raise
-        return False
+        return True
 
