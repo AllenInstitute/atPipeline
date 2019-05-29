@@ -91,7 +91,6 @@ class DockerManager:
             #ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcore_image_tag, user=17632, volumes=self.atCoreMounts, command=cmd, name=ctrName, detach=True)
             ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcoreimagetag, volumes=self.atCoreMounts, command=cmd, name=ctrName, detach=True)
 
-
             if ctr == None:
                return False
 
