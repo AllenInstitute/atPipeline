@@ -58,5 +58,52 @@ class FineAlignRegistrationProcess(atpp.PipelineProcess):
     def run(self):
         super().run()
         p = self.paras
+
+        rp = p.renderProject
+
+        reference_session = 1
+        output_dir = os.path.join(p.absoluteDataOutputFolder, "fine_registration")
+        if os.path.isdir(output_dir) == False:
+            os.mkdir(output_dir)
+
+        print(self.sessionFolders)
+        for sessionFolder in self.sessionFolders:
+            try:
+                logger.info("=========== Working on fine registration for: " + sessionFolder + " ===============")
+
+                #Check which ribbon we are processing, and adjust section numbers accordingly
+                ribbon = u.getRibbonLabelFromSessionFolder(sessionFolder)
+                firstSection, lastSection = p.convertGlobalSectionIndexesToCurrentRibbon(ribbon)
+                [project_root, ribbon, session] = u.parse_session_folder(sessionFolder)
+
+                if session == reference_session:
+                    logger.info("Skipping session %d (reference session)" % session)
+                    continue
+                else:
+                    logger.info("Processing session: " + str(session))
+                    prealigned_stack = "S1_Stitched"
+                    postaligned_stack = "S1_FineAligned"
+                    source_stack = "S%d_Stitched" %(int(session))
+                    output_stack = "S%d_FineAligned_Registered"%(int(session))
+
+                    cmd = "docker exec " + p.atCoreContainer
+                    cmd = cmd + " /opt/conda/bin/python -m renderapps.registration.apply_alignment_transform_from_registered_stack"
+                    cmd = cmd + " --render.host %s"                 %(rp.host)
+                    cmd = cmd + " --render.owner %s "               %(rp.owner)
+                    cmd = cmd + " --render.project %s"              %(rp.project_name)
+                    cmd = cmd + " --render.client_scripts %s"       %(rp.clientScripts)
+                    cmd = cmd + " --render.port %d"                 %(rp.hostPort)
+                    cmd = cmd + " --render.memGB %s"                %(rp.memGB)
+
+                    cmd = cmd + " --prealigned_stack %s"            %(prealigned_stack)
+                    cmd = cmd + " --postaligned_stack %s"           %(postaligned_stack)
+                    cmd = cmd + " --source_stack %s"                %(source_stack)
+                    cmd = cmd + " --output_stack %s"                %(output_stack)
+                    cmd = cmd + " --pool_size %d"                   %(4)
+
+                    self.submit(cmd)
+            except:
+                raise
+
         return False
 

@@ -79,8 +79,7 @@ class RegisterSessionsProcess(atpp.PipelineProcess):
                 if session == reference_session:
                     logger.info("Skipping session %d (reference session)" % session)
                     continue
-
-                if session > 1:
+                else:
                     logger.info("Processing session: " + str(session))
                     reference_stack     = "S1_Stitched"
                     reference_stack_channel   = "DAPI_1"
