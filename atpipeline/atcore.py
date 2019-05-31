@@ -37,8 +37,13 @@ def main():
             if os.path.exists(args.data) == False:
                 raise ValueError("The folderpath: %s don't exist"%(args.data))
             system_config.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = os.path.abspath(args.data)
+
             #Query atcore for any data processing information we may need to setup, such as Ribbon, session and section information
-            cmd = 'docker exec atcore atcli --json --data ' + system_config.toMount(args.data)
+            if args.datasummary:
+                cmd = 'docker exec atcore atcli --datasummary --data ' + system_config.toMount(args.data)
+            else:
+                cmd = 'docker exec atcore atcli --data ' + system_config.toMount(args.data)
+
             dataInfo = json.loads(u.getJSON(cmd))
 
             if args.pipeline == None:

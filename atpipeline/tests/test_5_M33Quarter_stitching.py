@@ -35,13 +35,13 @@ def test_meta_data(test_data_folder, test_data_set):
     data = json.loads(out)
 
     #Values for the Q1023 dataset
-    assert data['TotalNumberOfRibbons']     == 1
-    assert data['TotalNumberOfSections']    == 2
-    assert data['TotalNumberOfTiles']       == 60
-    assert data['TotalNumberOfSessions']    == 2
-    assert data['TotalNumberOfChannels']    == 4
-    assert data['RibbonFolders']            == ["Ribbon0004"]
-    assert data['SessionFolders']           == ["session01","session02"]
+    assert data['atdata']['TotalNumberOfRibbons']     == 1
+    assert data['atdata']['TotalNumberOfSections']    == 2
+    assert data['atdata']['TotalNumberOfTiles']       == 60
+    assert data['atdata']['TotalNumberOfSessions']    == 2
+    assert data['atdata']['TotalNumberOfChannels']    == 4
+    assert data['atdata']['RibbonFolders']            == ["Ribbon0004"]
+    assert data['atdata']['SessionFolders']           == ["session01","session02"]
 
 #Create output data and compare output
 def test_data_creation(test_data_folder, test_data_set):
