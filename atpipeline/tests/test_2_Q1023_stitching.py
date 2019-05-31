@@ -37,15 +37,14 @@ def test_meta_data(test_data_folder, test_data_set):
     data = json.loads(out)
 
     #Values for the Q1023 dataset
-    assert data['NumberOfRibbons']      == 2
-    assert data['NumberOfSections']     == 10
-    assert data['NumberOfTiles']        == 180
-    assert data['NumberOfSessions']     == 1
-    assert data['NumberOfChannels']     == 2
-    assert data['RibbonFolders']        == 'Ribbon0010,Ribbon0011'
-    assert data['SessionFolders']       == 'session02'
-    assert data['SectionsInRibbons'][0] ==  6
-    assert data['SectionsInRibbons'][1] ==  4
+    assert data['atdata']['TotalNumberOfRibbons']      == 2
+    assert data['atdata']['TotalNumberOfSections']     == 10
+    assert data['atdata']['TotalNumberOfTiles']        == 180
+    assert data['atdata']['TotalNumberOfSessions']     == 1
+    assert data['atdata']['TotalNumberOfChannels']     == 2
+    assert data['atdata']['RibbonFolders']        == ["Ribbon0010","Ribbon0011"]
+    assert data['atdata']['SessionFolders']       == ["session02"]
+
 
 #delete any previous data for the tests below
 def test_data_deletion(test_data_folder, test_data_set):
