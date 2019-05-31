@@ -42,8 +42,9 @@ def main():
             dataInfo = json.loads(u.getJSON(cmd))
 
             if args.pipeline == None:
-                print(json.dumps(dataInfo, indent=2, sort_keys=False))
-                print('\nPlease supply a valid pipeline to option "--pipeline" in order to process data.')
+                #print(json.dumps(dataInfo, indent=2, sort_keys=False))
+                print (json.dumps(dataInfo, sort_keys=False))
+                #print('\nPlease supply a valid pipeline to option "--pipeline" in order to process data.')
                 return
 
         if args.deleterenderproject:
@@ -75,8 +76,6 @@ def main():
             logfilename = os.path.join(system_config.absoluteDataOutputFolder, system_config.project_name + '.log')
             at_logging.add_logging_to_file('atPipeline', logfilename)
 
-        secs = system_config.getNrOfSectionsInRibbon("Ribbon0004")
-        print("Sections in ribbon: " + str(secs))
         #Check which pipeline to run
         if system_config.pipeline == 'stitch':
             aPipeline = at_stitching_pipeline.Stitch(system_config)
