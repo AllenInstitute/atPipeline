@@ -15,7 +15,7 @@ class ATPipeline:
         self.parameters = parameters
 
         dockerClient = docker.from_env()
-        atcore = dockerClient.containers.get("atcore")
+        atcore = dockerClient.containers.get(self.parameters.atcore_ctr_name)
         render = dockerClient.containers.get("default_render_1")
 
         if render.status != "running":

@@ -20,6 +20,7 @@ def main():
     try:
         parser = argparse.ArgumentParser()
         at_atcore_arguments.add_arguments(parser)
+
         args = parser.parse_args()
 
         #If no arguments are supplied, show help and quit
@@ -40,9 +41,9 @@ def main():
 
             #Query atcore for any data processing information we may need to setup, such as Ribbon, session and section information
             if args.datasummary:
-                cmd = 'docker exec atcore atcli --datasummary --data ' + system_config.toMount(args.data)
+                cmd = 'docker exec ' + system_config.atcore_ctr_name + ' atcli --datasummary --data ' + system_config.toMount(args.data)
             else:
-                cmd = 'docker exec atcore atcli --data ' + system_config.toMount(args.data)
+                cmd = 'docker exec ' + system_config.atcore_ctr_name + ' atcli --data ' + system_config.toMount(args.data)
 
             dataInfo = json.loads(u.getJSON(cmd))
 
@@ -67,7 +68,7 @@ def main():
                 return
 
         #All parameters are now well defined, copy them (and do some parsing) to a file where output data is written
-        #The create references functions appends and overrides various arguments
+        #The create rexieferences functions appends and overrides various arguments
         system_config.createReferences(args, data_info = dataInfo, client = "atcore")
 
         #Create data outputfolder and write processing parametrs to output folder

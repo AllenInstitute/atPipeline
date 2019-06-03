@@ -30,7 +30,7 @@ def test_meta_data(test_data_folder, test_data_set):
     from atpipeline import at_utils as u
 
     data_root = os.path.join(test_data_folder, 'input', test_data_set)
-    cmd = 'atcore --data ' + data_root
+    cmd = 'atcore --datasummary --data ' + data_root
     out = u.getJSON(cmd)
     data = json.loads(out)
 

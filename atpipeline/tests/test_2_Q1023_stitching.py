@@ -75,7 +75,7 @@ def test_data_creation(test_data_folder, test_data_set):
     #remove any output data
     data_output_folder = os.path.join(data_input_root, 'processed', PROJECT_NAME)
     cmd = r'atcore --data ' + data_input_root + ' --pipeline stitch --renderprojectowner PyTest --projectname ' + PROJECT_NAME + ' --configfile ' + data_ini_file
-
+    print (cmd)
     #This will take about 15 minutes
     try:
         print (cmd)

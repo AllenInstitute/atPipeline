@@ -93,7 +93,7 @@ class CreateLowResStacks(atpp.PipelineProcess):
             rp = p.renderProject
 
             # docker commands
-            cmd = "docker exec " + p.atCoreContainer
+            cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " /opt/conda/bin/python -m renderapps.materialize.make_downsample_image_stack"
             cmd = cmd + " --render.host %s"                                %(rp.host)
             cmd = cmd + " --render.project %s"                             %(rp.project_name)
@@ -143,7 +143,7 @@ class CreateLowResTilePairs(atpp.PipelineProcess):
             jsonfile = os.path.join(jsondir, "tilepairs-%d-%s-%d-%d-nostitch.json"     %(sessionNR, p.LOWRES_TILE_PAIR_CLIENT['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
 
             #Run the TilePairClient
-            cmd = "docker exec " + p.atCoreContainer
+            cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " java -cp /shared/render/render-ws-java-client/target/render-ws-java-client-2.1.0-SNAPSHOT-standalone.jar"
             cmd = cmd + " org.janelia.render.client.TilePairClient"
             cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(rp.host, rp.hostPort)
@@ -201,7 +201,7 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             rp     = p.renderProject
 
             #SIFT Point Match Client
-            cmd = "docker exec " + p.atCoreContainer
+            cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
 
             cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism) #p.LOWRES_POINTMATCHES['SPARK_DEFAULT_PARALLELISM'])
@@ -310,7 +310,7 @@ class CreateRoughAlignedStacks(atpp.PipelineProcess):
             self.saveRoughAlignJSON(ra, input_json, rp, inputStack, outputStack, lowresPmCollection, p.firstSection, p.lastSection, p.toMount(dataOutputFolder))
 
             #Run docker command
-            cmd = "docker exec " + p.atCoreContainer
+            cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " /opt/conda/bin/python -m rendermodules.solver.solve"
             cmd = cmd + " --input_json %s" %(p.toMount(input_json))
             cmd = cmd + " --output_json %s"%(p.toMount(output_json))
@@ -347,7 +347,7 @@ class ApplyLowResToHighRes(atpp.PipelineProcess):
                 os.mkdir(roughalign_ts_dir)
 
             #Run docker command
-            cmd = "docker exec " + p.atCoreContainer
+            cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " /opt/conda/bin/python -m renderapps.rough_align.ApplyLowRes2HighRes"
             cmd = cmd + " --render.host %s"                %(rp.host)
             cmd = cmd + " --render.owner %s "              %(rp.owner)
