@@ -24,7 +24,8 @@ PROJECT_INI                     = 'M33Quarter.ini'
 def test_data_set():
     return 'M33Quarter'
 
-##============ Tests below
+#----------------------------------------------------------------------------------------------------------
+
 #Test integrity of input data.
 def test_meta_data(test_data_folder, test_data_set):
     from atpipeline import at_utils as u
@@ -43,6 +44,27 @@ def test_meta_data(test_data_folder, test_data_set):
     assert data['atdata']['RibbonFolders']            == ["Ribbon0004"]
     assert data['atdata']['SessionFolders']           == ["session01","session02"]
 
+
+#delete any previous data for the tests below
+def test_data_deletion(test_data_folder, test_data_set):
+    from atpipeline import at_utils as u
+    data_input_root = os.path.join(test_data_folder, 'input', test_data_set)
+
+    #remove any output data
+    data_output_folder = os.path.join(data_input_root, 'processed', PROJECT_NAME)
+
+    #Remove all data that exists in render
+    try:
+        if os.path.exists(data_output_folder):
+            shutil.rmtree(data_output_folder)
+
+        cmd = r'atcore --renderprojectowner PyTest --deleterenderproject ' + PROJECT_NAME
+        print (cmd)
+        out = u.runShellCMD(cmd)
+        assert True
+    except Exception:
+        assert False
+
 #Create output data and compare output
 def test_data_creation(test_data_folder, test_data_set):
     from atpipeline import at_utils as u
@@ -51,16 +73,13 @@ def test_data_creation(test_data_folder, test_data_set):
 
     #remove any output data
     data_output_folder = os.path.join(data_input_root, 'processed', PROJECT_NAME)
-
-    if os.path.exists(data_output_folder):
-        shutil.rmtree(data_output_folder)
-
-    #Remove all data that exists in render
-    cmd = r'atcore --data ' + data_input_root + ' --pipeline stitch --renderprojectowner PyTest --projectname ' + PROJECT_NAME + ' --configfile ' + data_ini_file + ' --logtofile'
-
+    cmd = r'atcore --data ' + data_input_root + ' --pipeline stitch --renderprojectowner PyTest --projectname ' + PROJECT_NAME + ' --configfile ' + data_ini_file
+    print (cmd)
     #This will take about 15 minutes
     try:
+        print (cmd)
         out = u.runShellCMD(cmd)
+        assert True
     except Exception:
         assert False
 
