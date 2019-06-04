@@ -90,7 +90,7 @@ class RegisterSessionsProcessJava(atpp.PipelineProcess):
 
             #run
             if session > 1:
-                cmd = "docker exec " + p.atCoreContainer
+                cmd = "docker exec " + p.atcore_ctr_name
                 cmd = cmd + " java -cp /shared/at_modules/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar"
                 cmd = cmd + " at_modules.Register"
                 cmd = cmd + " --input_json %s"%inputJSON

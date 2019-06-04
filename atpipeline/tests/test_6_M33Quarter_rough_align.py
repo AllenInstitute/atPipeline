@@ -1,7 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        test_rough_align
 # Purpose:     test integrity of input/output data, from stitching to rough align
-#              These are tests for the Q1023 TestDataset
 #
 # Author:      matsk
 #
@@ -36,6 +35,7 @@ def test_rough_aligning(test_data_folder, test_data_set):
     print (cmd)
     try:
         out = u.runShellCMD(cmd)
+        assert True
     except Exception:
         assert False
 

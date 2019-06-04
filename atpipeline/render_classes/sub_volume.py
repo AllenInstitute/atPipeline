@@ -39,7 +39,7 @@ class SubVolume(Resource):
         #Create output data folder
         output_data_folder = os.path.join(self.system_config.DATA_INPUT['DATA_ROOT_FOLDER'], ostack.project_name, "processed", ostack.project_name, "subvolumes", ostack.stack_name)
         #upload acquisition stacks
-        cmd = "docker exec atcore python -m renderapps.stack.create_subvolume_stack"
+        cmd = "docker exec " + sc.atcore_ctr_name + " python -m renderapps.stack.create_subvolume_stack"
         cmd = cmd + " --render.memGB 5G"
         cmd = cmd + " --log_level INFO"
 
