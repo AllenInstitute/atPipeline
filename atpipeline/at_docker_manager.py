@@ -14,7 +14,7 @@ class DockerManager:
 
         self.paras = system_paras
         self.dClient = docker.from_env()
-        self.atCoreMounts = {}
+        self.mounts = {}
         self.composeFile = ""
         self.setComposeFile(os.path.join(self.paras.args.configfolder, 'at-docker-compose.yml'))
         self.setupMounts()
@@ -55,17 +55,17 @@ class DockerManager:
         mountCount = 1
         for mount in self.paras.mounts:
             mountValue  = {'bind' : mount[1] , 'mode' : 'rw'}
-            self.atCoreMounts[mount[0]] = mountValue
+            self.mounts[mount[0]] = mountValue
             mountCount = mountCount + 1
 
         #if mountRenderPythonApps == True:
-        #    self.atCoreMounts[os.path.join(cwd, 'docker', 'render-python-apps')] = {'bind': '/shared/render-python-apps'}
+        #    self.mounts[os.path.join(cwd, 'docker', 'render-python-apps')] = {'bind': '/shared/render-python-apps'}
 
         #if mountRenderModules == True:
-        #    self.atCoreMounts[os.path.join(cwd, 'docker', 'render-modules')] = {'bind': '/shared/render-modules'}
+        #    self.mounts[os.path.join(cwd, 'docker', 'render-modules')] = {'bind': '/shared/render-modules'}
 
         #Mount pipeline
-        #self.atCoreMounts['/local2/atpipeline/pipeline'] = {'bind' : '/pipeline', 'mode' : 'ro'}
+        #self.mounts['/local2/atpipeline/pipeline'] = {'bind' : '/pipeline', 'mode' : 'ro'}
 
     def reStartContainer(self, ctrName):
         logger.info("Restarting the container: " + ctrName)
@@ -90,8 +90,8 @@ class DockerManager:
             #This will do nothing, forever
             cmd = "tail -f /dev/null"
 
-            #ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcore_image_tag, user=17632, volumes=self.atCoreMounts, command=cmd, name=ctrName, detach=True)
-            ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcoreimagetag, volumes=self.atCoreMounts, command=cmd, name=ctrName, detach=True)
+            #ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcore_image_tag, user=17632, volumes=self.mounts, command=cmd, name=ctrName, detach=True)
+            ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcoreimagetag, volumes=self.mounts, command=cmd, name=ctrName, detach=True)
 
             if ctr == None:
                return False
