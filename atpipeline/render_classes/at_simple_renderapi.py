@@ -17,7 +17,7 @@ from atpipeline import at_logging, at_system_config
 logger = logging.getLogger('atPipeline')
 
 #Simple wrapper class for renderapi
-class RenderAPI:
+class SimpleRenderAPI:
 
     def __init__(self, sys_config : at_system_config.ATSystemConfig, owner = None):
         self.sys_config = sys_config
@@ -30,6 +30,13 @@ class RenderAPI:
                 'project': "",
                 'client_scripts': sys_config.clientScripts
             }
+
+    def get_stacks_by_owner_project(self, owner, project):
+        self.render_args['owner'] = owner
+        self.render_args['project'] = project
+        rc = renderapi.render.connect(**self.render_args)
+
+        return renderapi.render.get_stacks_by_owner_project(render = rc)
 
     def delete_stacks(self, owner, project):
         print ("Deleting stacks in project: " + project + " for owner " + owner)
