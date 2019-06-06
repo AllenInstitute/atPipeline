@@ -23,7 +23,6 @@ PROJECT_INI                     = 'M33Quarter.ini'
 def test_data_set():
     return 'M33Quarter'
 
-
 #Create output data and compare output
 def test_rough_aligning(test_data_folder, test_data_set):
     from atpipeline import at_utils as u

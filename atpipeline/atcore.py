@@ -64,7 +64,7 @@ def main():
                 matchContexts =[args.deleterenderproject + "_HR_2D", args.deleterenderproject + "_HR_3D", args.deleterenderproject + "_lowres_round"]
                 for c in matchContexts:
                     response = r.delete_match_context(args.renderprojectowner, c)
-                    print('Delete match context reponse: ' + str(response))
+                    print('Delete match context response: ' + str(response))
                 return
 
         #All parameters are now well defined, copy them (and do some parsing) to a file where output data is written
