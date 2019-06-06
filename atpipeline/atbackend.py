@@ -32,7 +32,7 @@ def main():
             dManager.stopContainer(args.kill)
 
         elif args.killall:
-            dManager.killAllContainers()
+            dManager.killAllContainers(args.killall)
 
         elif args.startall:
             if dManager.startRenderBackend() == False:

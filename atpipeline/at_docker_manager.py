@@ -14,13 +14,12 @@ class DockerManager:
 
         self.paras = system_paras
         self.dClient = docker.from_env()
-        self.atCoreMounts = {}
+        self.mounts = {}
         self.composeFile = ""
-
         self.setComposeFile(os.path.join(self.paras.args.configfolder, 'at-docker-compose.yml'))
         self.setupMounts()
         self.atcoreimagetag = self.paras.args.atcoreimagetag
-
+        self.container_prefix = self.paras.config['GENERAL']['DOCKER_CONTAINER_PREFIX']
 
     def prune_containers(self):
         val = self.dClient.containers.prune()
@@ -56,17 +55,17 @@ class DockerManager:
         mountCount = 1
         for mount in self.paras.mounts:
             mountValue  = {'bind' : mount[1] , 'mode' : 'rw'}
-            self.atCoreMounts[mount[0]] = mountValue
+            self.mounts[mount[0]] = mountValue
             mountCount = mountCount + 1
 
         #if mountRenderPythonApps == True:
-        #    self.atCoreMounts[os.path.join(cwd, 'docker', 'render-python-apps')] = {'bind': '/shared/render-python-apps'}
+        #    self.mounts[os.path.join(cwd, 'docker', 'render-python-apps')] = {'bind': '/shared/render-python-apps'}
 
         #if mountRenderModules == True:
-        #    self.atCoreMounts[os.path.join(cwd, 'docker', 'render-modules')] = {'bind': '/shared/render-modules'}
+        #    self.mounts[os.path.join(cwd, 'docker', 'render-modules')] = {'bind': '/shared/render-modules'}
 
         #Mount pipeline
-        #self.atCoreMounts['/local2/atpipeline/pipeline'] = {'bind' : '/pipeline', 'mode' : 'ro'}
+        #self.mounts['/local2/atpipeline/pipeline'] = {'bind' : '/pipeline', 'mode' : 'ro'}
 
     def reStartContainer(self, ctrName):
         logger.info("Restarting the container: " + ctrName)
@@ -74,6 +73,8 @@ class DockerManager:
         return self.startContainer(ctrName)
 
     def startContainer(self, ctrName):
+
+        ctrName = self.container_prefix + '_' + ctrName
         try:
             ctrCheck = self.dClient.containers.get(ctrName)
             if ctrCheck.status == 'running':
@@ -85,11 +86,12 @@ class DockerManager:
         except docker.errors.NotFound:
             pass
 
-        if ctrName == "atcore":
+        if ctrName == self.paras.atcore_ctr_name:
             #This will do nothing, forever
             cmd = "tail -f /dev/null"
-            #ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcore_image_tag, user=17632, volumes=self.atCoreMounts, command=cmd, name=ctrName, detach=True)
-            ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcoreimagetag, volumes=self.atCoreMounts, command=cmd, name=ctrName, detach=True)
+
+            #ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcore_image_tag, user=17632, volumes=self.mounts, command=cmd, name=ctrName, detach=True)
+            ctr = self.dClient.containers.run("atpipeline/atcore:" + self.atcoreimagetag, volumes=self.mounts, command=cmd, name=ctrName, detach=True)
 
             if ctr == None:
                return False
@@ -126,12 +128,14 @@ class DockerManager:
         ctr.kill()
         return True
 
-    def killAllContainers(self):
+    #Kill all containers with prefix
+    def killAllContainers(self, prefix):
         containers = self.dClient.containers.list(all=True)
         for ctr in containers:
             if ctr.status == 'running':
-                logger.info("Killing container: " + ctr.name)
-                ctr.kill()
+                if ctr.name.startswith(prefix):
+                    logger.info("Killing container: " + ctr.name)
+                    ctr.kill()
 
         return True
 
@@ -153,9 +157,7 @@ class DockerManager:
         return False
 
     def startRenderBackend(self):
-
-        #cmd = "docker-compose -p default -f " + str(self.composeFile)
-        cmd = "docker-compose -p default -f " + str(self.composeFile)
+        cmd = "docker-compose -p " + self.container_prefix + " -f " + str(self.composeFile)
         cmd = cmd + " up -d "
         logger.info("Running: " + cmd)
 

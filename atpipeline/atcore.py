@@ -20,6 +20,7 @@ def main():
     try:
         parser = argparse.ArgumentParser()
         at_atcore_arguments.add_arguments(parser)
+
         args = parser.parse_args()
 
         #If no arguments are supplied, show help and quit
@@ -37,8 +38,13 @@ def main():
             if os.path.exists(args.data) == False:
                 raise ValueError("The folderpath: %s don't exist"%(args.data))
             system_config.config['DATA_INPUT']['PROJECT_DATA_FOLDER'] = os.path.abspath(args.data)
+
             #Query atcore for any data processing information we may need to setup, such as Ribbon, session and section information
-            cmd = 'docker exec atcore atcli --json --data ' + system_config.toMount(args.data)
+            if args.datasummary:
+                cmd = 'docker exec ' + system_config.atcore_ctr_name + ' atcli --datasummary --data ' + system_config.toMount(args.data)
+            else:
+                cmd = 'docker exec ' + system_config.atcore_ctr_name + ' atcli --data ' + system_config.toMount(args.data)
+
             dataInfo = json.loads(u.getJSON(cmd))
 
             if args.pipeline == None:
@@ -58,11 +64,11 @@ def main():
                 matchContexts =[args.deleterenderproject + "_HR_2D", args.deleterenderproject + "_HR_3D", args.deleterenderproject + "_lowres_round"]
                 for c in matchContexts:
                     response = r.delete_match_context(args.renderprojectowner, c)
-                    print('Delete match context reponse: ' + str(response))
+                    print('Delete match context response: ' + str(response))
                 return
 
         #All parameters are now well defined, copy them (and do some parsing) to a file where output data is written
-        #The create references functions appends and overrides various arguments
+        #The create rexieferences functions appends and overrides various arguments
         system_config.createReferences(args, data_info = dataInfo, client = "atcore")
 
         #Create data outputfolder and write processing parametrs to output folder

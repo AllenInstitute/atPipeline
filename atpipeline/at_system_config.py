@@ -64,7 +64,9 @@ class ATSystemConfig:
             else:
                 raise Exception("Unable to config override: %s" % flag)
 
+        #Setup some convenint names
         self.GENERAL                                       = self.config['GENERAL']
+        self.atcore_ctr_name                               = self.config['GENERAL']['DOCKER_CONTAINER_PREFIX'] + '_atcore'
 
         self.mounts                                        = ast.literal_eval(self.GENERAL['DATA_ROOTS'])
         self.createCommonReferences()
@@ -86,8 +88,6 @@ class ATSystemConfig:
             raise ValueError("No client set in the createreferences function..")
 
     def createCommonReferences(self):
-        self.atCoreContainer                          = self.GENERAL['AT_CORE_DOCKER_CONTAINER_NAME']
-        self.atCoreContainer                          = self.GENERAL['AT_CORE_DOCKER_CONTAINER_NAME']
         self.dataOutputFolder                         = self.GENERAL['PROCESSED_DATA_FOLDER']
         self.renderHost                               = self.GENERAL['RENDER_HOST']
         self.renderHostPort                           = int(self.GENERAL['RENDER_HOST_PORT'])

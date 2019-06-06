@@ -49,6 +49,12 @@ class RenderAPI:
 
         return stackcount
 
+    def get_projects_by_owner(self, owner):
+        self.render_args['owner'] = owner
+        rc = renderapi.render.connect(**self.render_args)
+
+        return renderapi.render.get_projects_by_owner(render = rc)
+
 
     def delete_match_context(self, owner, matchCollection):
         self.render_args['owner'] = owner

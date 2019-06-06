@@ -73,7 +73,7 @@ class ConsolidateRoughAlignedStackTransforms(atpp.PipelineProcess):
                 logger.info("Processing session: " + str(sessionNR))
 
 
-                cmd = "docker exec "+ p.atCoreContainer
+                cmd = "docker exec "+ p.atcore_ctr_name
                 cmd = cmd + " /opt/conda/bin/python -m rendermodules.stack.consolidate_transforms"
                 cmd = cmd + " --render.host %s"                             %(rp.host)
                 cmd = cmd + " --render.project %s"                          %(rp.project_name)
@@ -110,7 +110,7 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
 
             rp = p.renderProject
 
-            cmd = "docker exec " + p.atCoreContainer
+            cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " /opt/conda/bin/python -m renderapps.stitching.create_montage_pointmatches_in_place"
             cmd = cmd + " --render.host %s"                           %(rp.host)
             cmd = cmd + " --render.project %s"                        %(rp.project_name)
@@ -154,7 +154,7 @@ class Create_HR_tilepairs(atpp.PipelineProcess):
             jsonfile = os.path.join(jsonOutputFolder, "tilepairs-%s-%s-%s-%s-nostitch.json"     %(sessionNR, p.CREATE_HR_TILEPAIRS['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
 
             #Run the TilePairClient
-            cmd = "docker exec " + p.atCoreContainer
+            cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " java -cp /shared/render/render-ws-java-client/target/render-ws-java-client-2.1.0-SNAPSHOT-standalone.jar"
             cmd = cmd + " org.janelia.render.client.TilePairClient"
             cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(rp.host, rp.hostPort)
@@ -206,7 +206,7 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
             spark = at_spark.Spark(p.config['GENERAL']['HOST_MEMORY'], p.config['GENERAL']['HOST_NUMBER_OF_CORES'], data_info)
 
             #SIFT Point Match Client
-            cmd = "docker exec " + p.atCoreContainer
+            cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
             cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism)    #%(p.SPARK['SPARK_DEFAULT_PARALLELISM'])
             cmd = cmd + " --driver-memory %s"                       %(spark.driver_memory)          #%(p.SPARK['DRIVER_MEMORY'])
@@ -316,7 +316,7 @@ class Create_fine_aligned_stacks(atpp.PipelineProcess):
                                     rp.clientScripts, rp.logLevel, p.firstSection, p.lastSection, p.toMount(dataOutputFolder))
 
             #Run docker command
-            cmd = "docker exec " + p.atCoreContainer
+            cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " /opt/conda/bin/python -m rendermodules.solver.solve"
             cmd = cmd + " --input_json %s" %(p.toMount(input_json))
             cmd = cmd + " --output_json %s"%(p.toMount(output_json))
