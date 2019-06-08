@@ -100,6 +100,7 @@ class FineAlignRegistrationProcess(atpp.PipelineProcess):
                     cmd = cmd + " --source_stack %s"                %(source_stack)
                     cmd = cmd + " --output_stack %s"                %(output_stack)
                     cmd = cmd + " --pool_size %d"                   %(4)
+                    cmd = cmd + " --diffZ %s"                       %("True")
 
                     self.submit(cmd)
             except:
