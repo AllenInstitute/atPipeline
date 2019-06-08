@@ -6,6 +6,8 @@ from werkzeug.routing import Rule
 #from render import RenderStack
 
 from atpipeline import at_pipeline_api as atAPI
+from atpipeline.render_classes import sub_volume
+from atpipeline.render_classes import render_stack
 
 app = Flask(__name__)
 app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
@@ -57,7 +59,6 @@ class Version(Resource):
                     'ATCore Docker Container Version':'0.5.3'
                 }
 
-
 @backend_api.route('/',  methods=['GET'])
 class ATpipeline(Resource):
     def __init__(self, api=None, *args, **kwargs):
@@ -68,50 +69,49 @@ class ATpipeline(Resource):
         return {'':''}
 
 @backend_api.route('/status',  methods=['GET'])
-class Dummy(ATpipeline):
+class Status(ATpipeline):
     def get(self):
         """Get backend running status"""
         return {'status':self.backend.get_status()}
 
 @backend_api.route('/restart',  methods=['PUT'])
-class Dummy(ATpipeline):
+class Restart(ATpipeline):
     def put(self):
         """Restart the ATPipeline backend"""
         return {'status':self.backend.restart()}
 
 @backend_api.route('/stop',  methods=['PUT'])
-class Dummy(ATpipeline):
+class Stop(ATpipeline):
     def put(self):
         """Stop the ATPipeline backend"""
         ret_value = self.backend.stop()
         return {'status':ret_value}
 
 @backend_api.route('/start',  methods=['PUT'])
-class Dummy(ATpipeline):
+class Start(ATpipeline):
     def put(self):
         """Start the ATPipeline backend"""
         ret_value = self.backend.start()
         return {'status':ret_value}
 
 @backend_api.route('/hostmounts',  methods=['GET'])
-class Dummy(ATpipeline):
+class HostMounts(ATpipeline):
     def get(self):
         """Get host data mounts, that is, folders where AT Data may be retrieved and processed"""
         ret_value = self.backend.get_host_mounts()
         return ret_value
 
 #---------------------- CORE ----------------------------------------------------------------------
-
 #-------------- Server data related
 @server_data_api.route('/datasets/<mount>',  methods=['GET'])
-class Dummy(ATpipeline):
+class ServerDataset(ATpipeline):
     def get(self, mount):
         """Get datasets for a mount"""
         ret_value = self.core.get_data_sets(mount)
         return ret_value
 
 @server_data_api.route('/pipelines',  methods=['GET'])
-class Dummy(ATpipeline):
+class Pipelines(ATpipeline):
     def get(self):
         """Get valid processing pipelines"""
         ret_value = self.core.get_valid_pipelines()
@@ -119,20 +119,20 @@ class Dummy(ATpipeline):
 
 @server_data_api.route('/dataset/select/<datarootfolder>',  methods=['POST'])
 @server_data_api.route('/dataset/selected/',  methods=['GET'])
-class Dummy(ATpipeline):
+class Dataset(ATpipeline):
     def get(self):
         """Get selected dataset"""
         ret_value = self.core.get_selected_data_folder()
         return ret_value
 
     def post(self, datarootfolder):
-        """Select dataset"""
+        """Select dataset on the server. The selected dataset can be processed by data processing endpoints"""
         ret_value = self.core.select_data_folder(datarootfolder)
         return ret_value
 
 #---- Stacks data API's
 @stacks_data_api.route('/owner/<o>/project/<p>',  methods=['GET','DELETE'])
-class Dummy(ATpipeline):
+class Stacks(ATpipeline):
 
     def get(self, o, p):
         """Get stacks by owner and project"""
@@ -144,39 +144,51 @@ class Dummy(ATpipeline):
         ret_value = self.core.delete_stacks_by_owner_project(o, p)
         return ret_value
 
-##@stacks_data_api.route('/owner/<o>/project/<p>',  methods=['GET'])
-##class Dummy(ATpipeline):
-##
-##    def get(self, o, p):
-##        """Get stacks by owner and project"""
-##        ret_value = self.core.get_stacks_by_owner_project(o, p)
-##        return ret_value
+@stacks_data_api.route('/owner/<o>/project/<p>/stack<s>',  methods=['GET'])
+class Stack(ATpipeline):
+    def get(self, o, p, s):
+        """Get stack metadata for specified stack"""
+        ret_value = self.core.get_stack_by_owner_project(o, p, s)
+        return ret_value
+
+#Creation of a substack takes an input stack and an optional bounds parameter
+#If no parameter are supplied, the new stack is an exact clone of the source stack
+@stacks_data_api.route('/owner/<owner>/project/<project>/source_stack/<source_stack>/bounds/<string:bounds>',  methods=['PUT'])
+class CreateSubVolume(ATpipeline):
+    def put(self, owner, project, source_stack, bounds):
+        """Create a substack, cutout from an existsting stackk"""
+
+        input_stack = render_stack.RenderStack(owner = owner, project=project, stack_name = source_stack)
+        bounds = render_stack.RenderStackBounds(bounds)
+
+        ret_value = self.core.create_subvolume_stack(input_stack, bounds)
+        return ret_value
 
 #---- Projects API's
 @render_projects_api.route('/owner/<o>/projects',  methods=['GET'])
-class Dummy(ATpipeline):
+@render_projects_api.route('/owner/<o>/project/<p>',  methods=['DELETE'])
+class Projects(ATpipeline):
 
     def get(self, o):
         """Get renderprojects by owner"""
         ret_value = self.core.get_projects_by_owner(o)
         return ret_value
 
+    def delete(self, o, p):
+        """Delete render project with all its stacks and match collections"""
+        ret_value = self.core.delete_project_by_owner(o,p)
+        return ret_value
 
 #---- Stitching API's
 #---- Rough Align API's
 #---- Fine Align API's
 #---- Registration API's
 
-
-
-
 #@app.route('/subvolume/create/input_stack/<string:input_stack>/output_stack/<string:output_stack>/bounds/<string:bounds>')
 #def createsubvolume(_input_stack, _output_stack, _bounds):
-#    i = _input_stack.split(',')
-#    input_stack = RenderStack(owner = i[0], project_name = i[1], stack_name = i[2])
 #
 #    i = _output_stack.split(',')
-#    output_stack = RenderStack(owner = i[0], project_name = i[1], stack_name = i[2])
+
 #
 #    subv = SubVolume()
 #    subv.create(input_stack, output_stack, bounds)

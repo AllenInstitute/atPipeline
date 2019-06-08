@@ -84,7 +84,18 @@ def add_arguments(parser):
 
     parser.add_argument('--deleterenderproject',
         help="Delete a render project (including its stacks and match collections) for a specific owner, --renderprojectowner",
-        #required='--renderprojectowner' in sys.argv,
+        type=str,
+        nargs='?'
+        )
+
+    parser.add_argument('--getprojectsbyowner',
+        help="Get a list of projects by owner",
+        type=str,
+        nargs='?'
+        )
+
+    parser.add_argument('--getstacksforproject',
+        help="Get a list of projects stacks by owner",
         type=str,
         nargs='?'
         )
