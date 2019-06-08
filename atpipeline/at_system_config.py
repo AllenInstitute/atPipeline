@@ -64,7 +64,9 @@ class ATSystemConfig:
             else:
                 raise Exception("Unable to config override: %s" % flag)
 
+        #Setup some convenint names
         self.GENERAL                                       = self.config['GENERAL']
+        self.atcore_ctr_name                               = self.config['GENERAL']['DOCKER_CONTAINER_PREFIX'] + '_atcore'
 
         self.mounts                                        = ast.literal_eval(self.GENERAL['DATA_ROOTS'])
         self.createCommonReferences()
@@ -86,8 +88,6 @@ class ATSystemConfig:
             raise ValueError("No client set in the createreferences function..")
 
     def createCommonReferences(self):
-        self.atCoreContainer                          = self.GENERAL['AT_CORE_DOCKER_CONTAINER_NAME']
-        self.atCoreContainer                          = self.GENERAL['AT_CORE_DOCKER_CONTAINER_NAME']
         self.dataOutputFolder                         = self.GENERAL['PROCESSED_DATA_FOLDER']
         self.renderHost                               = self.GENERAL['RENDER_HOST']
         self.renderHostPort                           = int(self.GENERAL['RENDER_HOST_PORT'])
@@ -153,19 +153,19 @@ class ATSystemConfig:
         if args.lastsection != None:
             self.lastSection                         = args.lastsection
         else:
-            self.lastSection                         = int(dataInfo['NumberOfSections']) - 1
+            self.lastSection                         = int(dataInfo['atdata']['TotalNumberOfSections']) - 1
 
         if args.ribbons  != None:
             self.ribbons                             = list(args.ribbons.split(','))
         else:
-            self.ribbons                             = list(dataInfo['RibbonFolders'].split(','))
+            self.ribbons                             = dataInfo['atdata']['RibbonFolders']
 
         self.ribbons.sort()
 
         if args.sessions  != None:
             self.sessions                            = list(args.sessions.split(','))
         else:
-            self.sessions                            = list(dataInfo['SessionFolders'].split(','))
+            self.sessions                            = dataInfo['atdata']['SessionFolders']
 
         self.sessions.sort()
         self.pipeline                                = args.pipeline
@@ -218,11 +218,13 @@ class ATSystemConfig:
 
     def getNrOfSectionsInRibbon(self, ribbon):
         #Get ribbon index
-        ribbonIndex = self.ribbons.index(ribbon)
 
-        #get number in dataInfo structure for index
-        secsInRibbons = self.dataInfo['SectionsInRibbons']
-        return secsInRibbons[ribbonIndex]
+        for r in self.dataInfo['atdata']['Ribbons']:
+            if r['FolderName'] == ribbon:
+                return r['NumberOfSections']
+
+
+        raise ValueError('No such ribbon: %s in this dataset.'%(ribbon))
 
     def convertGlobalSectionIndexesToCurrentRibbon(self, _ribbon):
         #The ribbons are consecutive, with various number of sections
@@ -234,7 +236,7 @@ class ATSystemConfig:
         sectionIndicesArray = []
 
         #First create a "ribbon indices" arrays, holding global and local indices
-        for i in range(self.dataInfo['NumberOfSections']):
+        for i in range(self.dataInfo['atdata']['TotalNumberOfSections']):
             sectionIndices = {'global' : i, 'local' : -1, 'ribbon' : ''} #Simple dict helping with book keeping
             sectionIndicesArray.append(sectionIndices)
 

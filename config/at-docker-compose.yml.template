@@ -12,13 +12,14 @@ services:
            - MONGO_PORT=27017
            - NDVIZ_URL=${HOSTNAME}:5000
            - JAVA_OPTIONS=-Xms10g -Xmx10g -server -Djava.awt.headless=true
-           - WEB_SERVICE_MAX_TILE_SPECS_TO_RENDER=100  
+           - WEB_SERVICE_MAX_TILE_SPECS_TO_RENDER=100
        volumes:
 #           - c:\data:/data_input_mount_1
 #           - c:\data\processed:/data_output_mount_1
        logging:
            options:
                max-size: "5g"
+
     mongo:
        image: mongo:3.4.2
        ports:

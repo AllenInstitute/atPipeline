@@ -32,20 +32,19 @@ def test_meta_data(test_data_folder, test_data_set):
     from atpipeline import at_utils as u
 
     data_root = os.path.join(test_data_folder, 'input', test_data_set)
-    cmd = 'atcore --data ' + data_root
+    cmd = 'atcore --datasummary --data ' + data_root
     out = u.getJSON(cmd)
     data = json.loads(out)
 
     #Values for the Q1023 dataset
-    assert data['NumberOfRibbons']      == 2
-    assert data['NumberOfSections']     == 10
-    assert data['NumberOfTiles']        == 180
-    assert data['NumberOfSessions']     == 1
-    assert data['NumberOfChannels']     == 2
-    assert data['RibbonFolders']        == 'Ribbon0010,Ribbon0011'
-    assert data['SessionFolders']       == 'session02'
-    assert data['SectionsInRibbons'][0] ==  6
-    assert data['SectionsInRibbons'][1] ==  4
+    assert data['atdata']['TotalNumberOfRibbons']      == 2
+    assert data['atdata']['TotalNumberOfSections']     == 10
+    assert data['atdata']['TotalNumberOfTiles']        == 180
+    assert data['atdata']['TotalNumberOfSessions']     == 1
+    assert data['atdata']['TotalNumberOfChannels']     == 2
+    assert data['atdata']['RibbonFolders']        == ["Ribbon0010","Ribbon0011"]
+    assert data['atdata']['SessionFolders']       == ["session02"]
+
 
 #delete any previous data for the tests below
 def test_data_deletion(test_data_folder, test_data_set):
@@ -76,7 +75,7 @@ def test_data_creation(test_data_folder, test_data_set):
     #remove any output data
     data_output_folder = os.path.join(data_input_root, 'processed', PROJECT_NAME)
     cmd = r'atcore --data ' + data_input_root + ' --pipeline stitch --renderprojectowner PyTest --projectname ' + PROJECT_NAME + ' --configfile ' + data_ini_file
-
+    print (cmd)
     #This will take about 15 minutes
     try:
         print (cmd)

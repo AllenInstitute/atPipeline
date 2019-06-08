@@ -29,6 +29,10 @@ def add_arguments(parser):
         help='Full path to data folder for project data to process',
         required=False)
 
+    parser.add_argument('--datasummary',
+        help='Print data information summary',
+        action='store_true')
+
     parser.add_argument('--projectname',
         help='Set project name. Default: name of input datas basefolder',
         required=False)

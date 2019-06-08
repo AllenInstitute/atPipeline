@@ -82,7 +82,7 @@ class CreateStateTables(atpp.PipelineProcess):
                 if os.path.exists(statetablefile) and self.paras.overwritedata == False:
                    logger.info("The statetable: " + statetablefile + " already exists. Continuing..")
                 else:
-                    cmd = "docker exec " + self.paras.atCoreContainer
+                    cmd = "docker exec " + self.paras.atcore_ctr_name
                     cmd = cmd + " /opt/conda/bin/python /pipeline/make_state_table_ext_multi_pseudoz.py"
                     cmd = cmd + " --projectDirectory %s"        %(p.toMount(project_root))
                     cmd = cmd + " --outputFile %s"              %(p.toMount(statetablefile))
@@ -128,7 +128,7 @@ class CreateRawDataRenderStacks(atpp.PipelineProcess):
                 statetablefile = p.getStateTableFileName(ribbon, session, sectnum)
 
                 #upload acquisition stacks
-                cmd = "docker exec " + p.atCoreContainer
+                cmd = "docker exec " + p.atcore_ctr_name
                 cmd = cmd + " /opt/conda/bin/python -m renderapps.dataimport.create_fast_stacks_multi"
                 cmd = cmd + " --render.host %s"           %rp.host
                 cmd = cmd + " --render.owner %s "         %rp.owner
@@ -196,7 +196,7 @@ class CreateMedianFiles(atpp.PipelineProcess):
 
             self.savemedianjson(med, median_json, rp, acq_stack, median_stack, self.paras.toMount(median_dir), ribbon*100 + firstSection, ribbon*100 + lastSection, True)
 
-            cmd = "docker exec " + p.atCoreContainer
+            cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " /opt/conda/bin/python -m rendermodules.intensity_correction.calculate_multiplicative_correction"
             cmd = cmd + " --render.port %d"           %rp.hostPort
             cmd = cmd + " --input_json %s"%(self.paras.toMount(median_json))
@@ -263,7 +263,7 @@ class CreateFlatFieldCorrectedData(atpp.PipelineProcess):
                 z = ribbon*100 + sectnum
 
                 self.saveflatfieldjson(ff, flatfield_json, renderProject, acq_stack, median_stack, flatfield_stack, p.toMount(flatfield_dir), z, True)
-                cmd = "docker exec " + p.atCoreContainer
+                cmd = "docker exec " + p.atcore_ctr_name
                 cmd = cmd + " /opt/conda/bin/python -m rendermodules.intensity_correction.apply_multiplicative_correction"
                 cmd = cmd + " --render.port %d"           % renderProject.hostPort
                 cmd = cmd + " --input_json %s"%(p.toMount(flatfield_json))
@@ -322,7 +322,7 @@ class CreateStitchedSections(atpp.PipelineProcess):
 
                 self.savestitchingjson(stitching_template, stitching_json, p.renderProject, input_stack, output_stack, z)
 
-                cmd = "docker exec " + p.atCoreContainer
+                cmd = "docker exec " + p.atcore_ctr_name
                 cmd = cmd + " java -cp /shared/at_modules/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
                 cmd = cmd + " --input_json %s"%(p.toMount(stitching_json))
 
@@ -359,7 +359,7 @@ class DropStitchingMistakes(atpp.PipelineProcess):
             rp     = p.renderProject
 
             # command string
-            cmd = "docker exec " + p.atCoreContainer
+            cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " /opt/conda/bin/python -m renderapps.stitching.detect_and_drop_stitching_mistakes"
             cmd = cmd + " --render.owner %s"                        %(rp.owner)
             cmd = cmd + " --render.host %s"                         %(rp.host)
