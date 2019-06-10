@@ -89,7 +89,7 @@ class RegisterSessionsProcess(atpp.PipelineProcess):
                     for sectnum in range(firstSection, lastSection + 1):
                         z = ribbon*100+sectnum
 
-                        cmd = "docker exec " + p.atCoreContainer
+                        cmd = "docker exec " + p.atcore_ctr_name
                         cmd = cmd + " /opt/conda/bin/python -m renderapps.registration.calc_registration"
                         cmd = cmd + " --render.host %s"                 %(rp.host)
                         cmd = cmd + " --render.owner %s "               %(rp.owner)
