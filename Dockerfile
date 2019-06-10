@@ -86,7 +86,9 @@ RUN mvn install
 
 # Install render-python
 WORKDIR /shared/render-python
-RUN git clone --branch master --single-branch https://github.com/fcollman/render-python.git /shared/render-python && \
+#RUN git clone --branch master --single-branch https://github.com/fcollman/render-python.git /shared/render-python && \
+#    pip install -e /shared/render-python
+RUN git clone --branch pointmatch_channels --single-branch https://github.com/perlman/render-python /shared/render-python && \
     pip install -e /shared/render-python
 
 # Install render-modules
