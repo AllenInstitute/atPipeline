@@ -11,12 +11,7 @@ from atpipeline import at_atcore_arguments, at_logging, at_system_config, at_pip
 from atpipeline import at_utils as u
 from atpipeline.render_classes import at_renderapi as rapi
 logger = at_logging.create_logger('atPipeline')
-<<<<<<< HEAD
 from atpipeline.pipelines import at_rough_align_pipeline, at_stitching_pipeline, at_fine_align_pipeline, at_registration_pipeline, at_fine_registration_pipeline
-=======
-
-from atpipeline.pipelines import at_rough_align_pipeline, at_stitching_pipeline, at_fine_align_pipeline, at_registration_pipeline
->>>>>>> origin/develop
 from atpipeline import __version__
 
 def main():

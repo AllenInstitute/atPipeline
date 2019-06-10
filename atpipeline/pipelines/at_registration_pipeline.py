@@ -56,7 +56,6 @@ class RegisterSessionsProcess(atpp.PipelineProcess):
 
     def run(self):
         super().run()
-<<<<<<< HEAD
         p = self.paras
 
         rp = p.renderProject
@@ -115,54 +114,3 @@ class RegisterSessionsProcess(atpp.PipelineProcess):
             except:
                 raise
         return True
-=======
-
-        try:
-            p = self.paras
-            rp = p.renderProject
-            registrationtemplate = "templates/registration.json"
-
-
-            jsonOutputFolder  = os.path.join(p.absoluteDataOutputFolder, "registration")
-
-            # Make sure that the output folder exist
-            if os.path.isdir(jsonOutputFolder) == False:
-                os.mkdir(jsonOutputFolder)
-
-
-            #stacks
-            session = 2
-            reference_stack     = "S1_Stitched"
-            stitched_stack      = "S%d_Stitched"%(int(session))
-            outputStack         = "S%d_Registered"%(int(session))
-
-            #Loop over sections?
-            sectnum = 0
-            ribbon = 4
-            z = ribbon*100+sectnum
-
-            #This is the registration input (json) file
-            inputJSON = os.path.join(jsonOutputFolder, "registration_%s_%s_%d.json"%(ribbon, session, sectnum))
-
-            #create input file for registration
-            with open(p.registration_template) as json_data:
-                t = json.load(json_data)
-
-            u.saveRegistrationJSON(t, inputJSON, rp.host, rp.owner, rp.project_name, stitched_stack, reference_stack, outputStack, z)
-
-            #run
-            if session > 1:
-                cmd = "docker exec " + p.atcore_ctr_name
-                cmd = cmd + " java -cp /shared/at_modules/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar"
-                cmd = cmd + " at_modules.Register"
-                cmd = cmd + " --input_json %s"%inputJSON
-
-                # Run =============
-                self.submit(cmd)
-            return True
-        except:
-            return False
-
-
->>>>>>> origin/develop
-
