@@ -81,10 +81,10 @@ class RegisterSessionsProcess(atpp.PipelineProcess):
                     continue
                 else:
                     logger.info("Processing session: " + str(session))
-                    reference_stack     = "S1_Stitched"
-                    reference_stack_channel   = "DAPI_1"
+                    reference_stack     = "S%d_Stitched" % int(reference_session)
+                    reference_stack_channel   = "%s_%d" % (p.referenceChannelRegistration, int(reference_session))
                     stitched_stack      = "S%d_Stitched" %(int(session))
-                    stitched_stack_channel = "DAPI_%d" % (int(session))
+                    stitched_stack_channel = "%s_%d" % (p.referenceChannelRegistration, int(session))
                     outputStack         = "S%d_Registered"%(int(session))
                     for sectnum in range(firstSection, lastSection + 1):
                         z = ribbon*100+sectnum

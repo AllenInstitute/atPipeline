@@ -41,7 +41,7 @@ class ATSystemConfig:
                 raise Exception("The data processing config file: " + args.configfile + " don't exist..")
 
         #Create the parser
-        self.config = configparser.ConfigParser()
+        self.config = configparser.ConfigParser(allow_no_value=True, strict=False)
 
         #Check that file exists, otherwise raise an error
         if os.path.isfile(args.system_config_file) == False:
