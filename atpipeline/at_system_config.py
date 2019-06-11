@@ -88,15 +88,12 @@ class ATSystemConfig:
             raise ValueError("No client set in the createreferences function..")
 
     def createCommonReferences(self):
-        self.dataOutputFolder                         = self.GENERAL['PROCESSED_DATA_FOLDER']
         self.renderHost                               = self.GENERAL['RENDER_HOST']
         self.renderHostPort                           = int(self.GENERAL['RENDER_HOST_PORT'])
         self.logLevel                                 = self.GENERAL['LOG_LEVEL']
         self.clientScripts                            = self.GENERAL['CLIENT_SCRIPTS']
         self.render_mem_GB                            = self.GENERAL['RENDER_MEM_GB']
-        self.renderProjectOwner                       = self.GENERAL['RENDER_PROJECT_OWNER']
 
-        self.referenceChannelRegistration             = self.GENERAL['REFERENCE_CHANNEL_REGISTRATION']
         self.JSONTemplatesFolder                      = self.GENERAL['JSON_TEMPLATES_FOLDER']
 
         #JSON Templates
@@ -120,6 +117,9 @@ class ATSystemConfig:
 
         #SPARK stuff
         #self.SPARK                                         = self.config['SPARK']
+        self.dataOutputFolder                              = self.config['GENERAL']['PROCESSED_DATA_FOLDER']
+        self.referenceChannelRegistration                  = self.config['GENERAL']['REFERENCE_CHANNEL_REGISTRATION']
+        self.renderProjectOwner                            = self.config['GENERAL']['RENDER_PROJECT_OWNER']
         self.CREATE_LOWRES_STACKS                          = self.config['CREATE_LOWRES_STACKS']
         self.LOWRES_TILE_PAIR_CLIENT                       = self.config['LOWRES_TILE_PAIR_CLIENT']
         self.LOWRES_POINTMATCHES                           = self.config['LOWRES_POINTMATCHES']

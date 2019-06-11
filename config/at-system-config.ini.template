@@ -32,7 +32,6 @@ JSON_TEMPLATES_FOLDER=c:\\pDisk\\ATPipeline\\templates
 RENDER_HOST=W10DTMJ03EG6Z.corp.alleninstitute.org
 RENDER_HOST_PORT=80
 RENDER_MEM_GB=5G
-RENDER_PROJECT_OWNER=Testing
 CLIENT_SCRIPTS=/shared/render/render-ws-java-client/src/main/scripts
 LOG_LEVEL=INFO
 
