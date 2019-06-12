@@ -4,7 +4,7 @@ import os
 import subprocess
 import pathlib
 import argparse
-from . import at_system_config
+from atpipeline import at_system_config
 from atpipeline import at_backend_arguments
 logger = logging.getLogger('atPipeline')
 
@@ -37,7 +37,8 @@ class DockerManager:
         containers = self.dClient.containers.list(all=True)
 
         for ctr in containers:
-            logger.info("Container: " + ctr.name + " : " + ctr.status)
+            if ctr.name.find(self.container_prefix) == 0:
+                logger.info("Container: " + ctr.name + " : " + ctr.status)
 
         #If everythin is ok, return 0
         return 0
