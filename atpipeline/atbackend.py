@@ -4,6 +4,7 @@ import pathlib
 import docker
 import argparse
 import traceback
+import logging
 from atpipeline import at_logging, at_docker_manager, at_system_config
 logger = at_logging.create_logger('atPipeline')
 from atpipeline import __version__
@@ -17,8 +18,16 @@ def main():
         at_backend_arguments.add_arguments(parser)
         args = parser.parse_args()
         system_config = at_system_config.ATSystemConfig(args, client = 'atbackend')
-
+        logger.setLevel(getattr(logging, args.loglevel))
         dManager = at_docker_manager.DockerManager(system_config)
+
+        if args.printsettings:
+            #print({section: dict(system_config.config[section]) for section in system_config.config.sections()})
+            for section in system_config.config.sections():
+                print ("\n[" + section + "]")
+                for (key, value) in system_config.config.items(section):
+                    print('{:<30} = {}'.format(key, value))
+            return
 
         #If no arguments are supplied, show help and quit
         if len(sys.argv)==1:

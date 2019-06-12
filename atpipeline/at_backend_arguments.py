@@ -23,6 +23,11 @@ def add_arguments(parser):
     cmdgroup.add_argument('-k', '--kill',          help='Stop a specific backend container',                  nargs='?',const='atcore', type=str)
     cmdgroup.add_argument('-r', '--restart',       help='Restart a specific backend container, e.g. atcore',   nargs='?',const='atcore', type=str)
 
+    parser.add_argument('--loglevel',
+        choices={'INFO', 'DEBUG', 'WARNING', 'ERROR'},
+        help='Set program loglevel',
+        default='INFO')
+
     # Flags to alter behaviour
     parser.add_argument('--atcoreimagetag',       help='atcore image tag to use', default=None)
 
@@ -30,6 +35,10 @@ def add_arguments(parser):
             metavar="PATH",
             help='Path to config folder',
             default=None)
+
+    parser.add_argument('--printsettings',
+        help='Print settings',
+        action='store_true')
 
     parser.add_argument('--define', '-D',
         action='append',
