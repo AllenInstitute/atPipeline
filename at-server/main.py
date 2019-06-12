@@ -2,9 +2,6 @@
 from flask import Flask, Blueprint, redirect, url_for
 from flask_restplus import Resource, Api
 from werkzeug.routing import Rule
-#from sub_volume import SubVolume
-#from render import RenderStack
-
 from atpipeline import at_pipeline_api as atAPI
 from atpipeline.render_classes import sub_volume
 from atpipeline.render_classes import render_stack
@@ -24,7 +21,7 @@ fine_align_api      = api.namespace('finealign',            description='Fine Al
 register_api        = api.namespace('registers',            description='Register API\'s')
 app.register_blueprint(blueprint)
 
-#global
+#global ATPipeline API object
 atp = atAPI.ATPipelineAPI()
 
 ##-------------------------------------------------------------------------------------------------------

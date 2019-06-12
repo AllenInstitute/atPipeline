@@ -1,11 +1,15 @@
 import traceback
 import os
-from render_classes.render_stack import RenderStack, RenderStackBounds
-from render_classes.sub_volume import SubVolume
-import at_logging
+import argparse
+
+from atpipeline import at_logging
 logger = at_logging.create_logger('atPipeline')
-import renderapi
-from at_system_config import ATSystemConfig
+
+from atpipeline.render_classes.render_stack import RenderStack, RenderStackBounds
+from atpipeline.render_classes import at_simple_renderapi
+from atpipeline.render_classes.sub_volume import SubVolume
+from atpipeline import at_system_config
+from atpipeline import at_atcore_arguments
 
 #The ATServer createSubvolume API will require
 # input stack name
@@ -27,45 +31,39 @@ from at_system_config import ATSystemConfig
 
 def main():
     try:
-        data_root = "c:\data"
-        configFolder = os.environ['AT_SYSTEM_CONFIG_FOLDER']
-
-        system_config = ATSystemConfig(os.path.join(configFolder, 'at-system-config.ini'))
-        system_config.DATA_INPUT['DATA_ROOT_FOLDER'] = data_root
+        parser = argparse.ArgumentParser()
+        at_atcore_arguments.add_arguments(parser)
+        args = parser.parse_args()
+        system_config = at_system_config.ATSystemConfig(args, client = 'atcore')
 
         #This is the input
-        INPUT = "Testing,M33,S1_Stitched".split(',')
-        BOUNDS_INPUT = [1436,1894,4045,4422,400,403]
-        if len(INPUT) < 3:
-            raise ValueError("Bad input for creation of RenderStack object.")
+        render_project_owner     = 'PyTest'
+        project_name            = 'pytest_Q1023'
+        source_stack            = 'S2_Session2'
 
-        input_rs    = RenderStack(owner=INPUT[0], project_name=INPUT[1], stack_name=INPUT[2])
-        bounds      = RenderStackBounds(BOUNDS_INPUT)
+        bounds = [1436,1894,4045,4422,1000,1005]
 
-        render_project_owner    = 'Testing'
+        input_stack = RenderStack(owner=render_project_owner, project_name=project_name, stack_name=source_stack)
+        bounds      = RenderStackBounds(bounds)
 
         args = {
             'host': system_config.renderHost,
             'port': system_config.renderHostPort,
             'owner': render_project_owner,
-            'project': INPUT[1],
+            'project': project_name,
             'client_scripts': system_config.clientScripts
         }
 
-        rc = renderapi.render.connect(**args)
-        print (rc.DEFAULT_HOST)   #Weird naming.. DEFAULT_HOST is the host given by the args..
+        simple_render = at_simple_renderapi.SimpleRenderAPI(system_config)
 
-        test = renderapi.render.get_owners(render = rc)
-
-        #renderapi.stack.
         #Create a SubVolume object, pass renderhost parameters and system parameters
-        sv = SubVolume(rc, system_config)
+        sv = SubVolume(system_config, simple_render)
 
         #Create the subvolume on render
-        output_stack_name = sv.create(input_rs, bounds)
+        output_stack_name = sv.create(input_stack, bounds)
 
         #Check that the stack was created on the host. if not, this function throws an Exception
-        sv_stack_info = renderapi.stack.get_full_stack_metadata(render = rc, owner=render_project_owner, project=INPUT[1], stack=output_stack_name)
+        #sv_stack_info = renderapi.stack.get_full_stack_metadata(render = rc, owner = render_project_owner, project=INPUT[1], stack=output_stack_name)
 
         print (sv_stack_info)
 

@@ -13,11 +13,10 @@ class SubVolume():
 
     def __init__(self, sys_config:ATSystemConfig, simple_render_api:at_simple_renderapi.SimpleRenderAPI):
 
-        self.system_config = sys_config
-        self.simple_render_api = simple_render_api
-        self.render_client = simple_render_api.get_render_client()
+        self.system_config      = sys_config
+        self.simple_render_api  = simple_render_api
+        self.render_client      = simple_render_api.get_render_client()
 
-        #print (self.render_client.
 
     def get(self):
         pass
@@ -39,7 +38,7 @@ class SubVolume():
         output_data_folder = "" #os.path.join(self.system_config.DATA_INPUT['DATA_ROOT_FOLDER'], ostack.project_name, "processed", ostack.project_name, "subvolumes", ostack.stack_name)
 
         #upload acquisition stacks
-        cmd = "docker exec " + sc.atcore_ctr_name + " python -m renderapps.stack.create_subvolume_stack"
+        cmd = "docker exec " + self.system_config.atcore_ctr_name + " python -m renderapps.stack.create_subvolume_stack"
         cmd = cmd + " --render.memGB 5G"
         cmd = cmd + " --log_level INFO"
 

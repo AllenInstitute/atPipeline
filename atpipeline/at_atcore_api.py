@@ -17,7 +17,6 @@ from atpipeline import at_utils as u
 
 class ATCoreAPI():
     def __init__(self):
-
         self.version = '0.5'
         parser = argparse.ArgumentParser()
         at_atcore_arguments.add_arguments(parser)
