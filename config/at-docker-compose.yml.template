@@ -35,10 +35,10 @@ services:
            - 5000:5000
        volumes:
            - ./at-vizrelay-config.json:/app/config.json
-    ndviz:
-      image: neurodata/ndviz:beta
-      ports:
-          - "8001:8080"
+    neuroglancer:
+       image: atpipeline/neuroglancer:dev
+       ports:
+           - "8001:80"
 volumes:
     mongodata:
  
