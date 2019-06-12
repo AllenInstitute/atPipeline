@@ -11,7 +11,7 @@ def add_arguments(parser):
     cmdgroup = parser.add_mutually_exclusive_group()
     cmdgroup.add_argument('--startall',            help='Start the whole AT backend',          action='store_true')
     cmdgroup.add_argument('--startrenderbackend',  help='Start the Render backend',            action='store_true')
-    cmdgroup.add_argument('--killall', '--stopall', help='Stop the AT backend',                nargs='?', const='testing', type=str)
+    cmdgroup.add_argument('--killall', '--stopall',help='Stop the AT backend',                 action='store_true')
     cmdgroup.add_argument('--pruneall',            help='Prune the AT backend',                action='store_true')
     cmdgroup.add_argument('--prunecontainers',     help='Prune the AT backend',                action='store_true')
     cmdgroup.add_argument('--pruneimages',         help='Prune the AT backend',                action='store_true')

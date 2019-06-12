@@ -77,6 +77,10 @@ def add_arguments(parser):
         help='Log messages to file. The logfile is written to the output datafolder and named "projectname".log',
         action='store_true')
 
+    parser.add_argument('--printsettings',
+        help='Print settings',
+        action='store_true')
+
     parser.add_argument('--define', '-D',
         action='append',
         default=[],

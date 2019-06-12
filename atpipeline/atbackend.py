@@ -32,7 +32,7 @@ def main():
             dManager.stopContainer(args.kill)
 
         elif args.killall:
-            dManager.killAllContainers(args.killall)
+            dManager.killAllContainers(system_config.config['GENERAL']['DOCKER_CONTAINER_PREFIX'])
 
         elif args.startall:
             if dManager.startRenderBackend() == False:

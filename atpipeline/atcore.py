@@ -9,7 +9,7 @@ import sys
 import renderapi
 from atpipeline import at_atcore_arguments, at_logging, at_system_config, at_pipeline, at_docker_manager
 from atpipeline import at_utils as u
-from atpipeline.render_classes import at_renderapi as rapi
+#from atpipeline.render_classes import at_simple_renderapi as rapi
 logger = at_logging.create_logger('atPipeline')
 from atpipeline.pipelines import at_rough_align_pipeline, at_stitching_pipeline, at_fine_align_pipeline, at_registration_pipeline, at_fine_registration_pipeline
 from atpipeline import __version__
@@ -19,7 +19,6 @@ def main():
     try:
         parser = argparse.ArgumentParser()
         at_atcore_arguments.add_arguments(parser)
-
         args = parser.parse_args()
 
         #If no arguments are supplied, show help and quit
@@ -29,6 +28,14 @@ def main():
 
         system_config = at_system_config.ATSystemConfig(args, client = 'atcore')
         logger.setLevel(getattr(logging, args.loglevel))
+
+        if args.printsettings:
+            #print({section: dict(system_config.config[section]) for section in system_config.config.sections()})
+            for section in system_config.config.sections():
+                print ("\n[" + section + "]")
+                for (key, value) in system_config.config.items(section):
+                    print('{:<30} = {}'.format(key, value))
+            return
 
         #What project to process?
         dataInfo = {}
