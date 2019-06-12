@@ -68,7 +68,7 @@ class PipelineProcess(ABC):
     def submit(self, cmd):
         logger.info(" Submitting job: " + self.name + ". \n\nCMD: " + cmd.replace('--', '\n--') + "\n...........................")
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, stderr=subprocess.STDOUT, encoding='utf-8')
-        for line in proc.stdout.readlines():
+        for line in proc.stdout:
             logger.debug(line.rstrip())
 
         proc.wait()

@@ -11,10 +11,10 @@ class Spark:
         self.data_info      = dataInfo
 
 
-        self.default_parallelism = 200
+        self.default_parallelism = 48
         self.driver_memory       = "30g"
-        self.executor_memory     = "30g"
-        self.executor_cores      = 4
+        self.executor_memory     = "10g"
+        self.executor_cores      = 48
 
 
 

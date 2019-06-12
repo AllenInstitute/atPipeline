@@ -45,6 +45,6 @@ def test_atcore_version():
     from atpipeline import atcore
 
     out = u.runShellCMD(r'atcore --version')
-    res = (out == ['atcore 0.5.0\n'])
+    res = (out == ['atcore 0.5.6\n'])
     assert res == True
 
