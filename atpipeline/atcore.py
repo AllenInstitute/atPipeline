@@ -11,8 +11,7 @@ from atpipeline import at_atcore_arguments, at_logging, at_system_config, at_pip
 from atpipeline import at_utils as u
 from atpipeline.render_classes import at_simple_renderapi as rapi
 logger = at_logging.create_logger('atPipeline')
-
-from atpipeline.pipelines import at_rough_align_pipeline, at_stitching_pipeline, at_fine_align_pipeline, at_registration_pipeline
+from atpipeline.pipelines import at_rough_align_pipeline, at_stitching_pipeline, at_fine_align_pipeline, at_registration_pipeline, at_fine_registration_pipeline
 from atpipeline import __version__
 
 def main():
@@ -119,6 +118,10 @@ def main():
 
         elif system_config.pipeline == 'singletile':
             aPipeline = at_single_tile_data_pipeline.SingleTileData(system_config)
+
+        elif system_config.pipeline == 'fineregister':
+            aPipeline = at_fine_registration_pipeline.FineAlignRegistration(system_config)
+        
         else:
             logger.error('No such pipeline: "' + system_config.pipeline + '"')
             raise Exception('No such pipeline')

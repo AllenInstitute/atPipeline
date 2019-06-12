@@ -86,7 +86,9 @@ RUN mvn install
 
 # Install render-python
 WORKDIR /shared/render-python
-RUN git clone --branch master --single-branch https://github.com/fcollman/render-python.git /shared/render-python && \
+#RUN git clone --branch master --single-branch https://github.com/fcollman/render-python.git /shared/render-python && \
+#    pip install -e /shared/render-python
+RUN git clone --branch pointmatch_channels --single-branch https://github.com/perlman/render-python /shared/render-python && \
     pip install -e /shared/render-python
 
 # Install render-modules
@@ -109,7 +111,11 @@ RUN ln -s /shared/render /pipeline/render
 ENV CC=/usr/bin/clang
 ENV CXX=/usr/bin/clang++
 RUN mkdir -p /libs && mkdir -p /build
-COPY ./docker/clang-container/third-party-libs /libs
+
+RUN git clone --branch develop --single-branch --recurse-submodules https://github.com/TotteKarlsson/dsl.git /libs/dsl
+RUN git clone --branch develop --single-branch https://github.com/AllenInstitute/ATExplorer.git /libs/atExplorer
+
+# COPY ./docker/clang-container/third-party-libs /libs
 COPY ./docker/clang-container/build-thirdparty-libs.bash /build
 WORKDIR /build
 RUN bash build-thirdparty-libs.bash

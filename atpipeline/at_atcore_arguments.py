@@ -39,7 +39,7 @@ def add_arguments(parser):
 
     parser.add_argument('--pipeline',
         help='Specify the pipeline to use',
-        choices={'stitch', 'roughalign', 'finealign', 'register', 'singletile'},
+        choices={'stitch', 'roughalign', 'finealign', 'register', 'singletile', 'fineregister'},
         required=False)
 
     parser.add_argument('--renderprojectowner',

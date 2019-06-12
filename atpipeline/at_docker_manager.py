@@ -130,7 +130,10 @@ class DockerManager:
         return True
 
     #Kill all containers with prefix
-    def killAllContainers(self, prefix):
+    def killAllContainers(self, prefix = None):
+        if prefix == None:
+            prefix = self.container_prefix
+
         containers = self.dClient.containers.list(all=True)
         for ctr in containers:
             if ctr.status == 'running':
@@ -142,8 +145,7 @@ class DockerManager:
 
     def reStartAll(self):
         self.killAllContainers()
-        self.startContainer('atcore')
-        self.startRenderBackend()
+        self.startAll()
 
     def startAll(self):
         self.startContainer('atcore')
