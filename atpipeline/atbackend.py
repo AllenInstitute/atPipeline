@@ -13,14 +13,17 @@ def main():
 
     try:
         logger.info('============ Managing the atBackend =============')
-
         parser = argparse.ArgumentParser('atbackend')
         at_backend_arguments.add_arguments(parser)
         args = parser.parse_args()
-
         system_config = at_system_config.ATSystemConfig(args, client = 'atbackend')
 
         dManager = at_docker_manager.DockerManager(system_config)
+
+        #If no arguments are supplied, show help and quit
+        if len(sys.argv)==1:
+            parser.print_help(sys.stderr)
+            sys.exit(1)
 
         if args.restart:
             dManager.reStartContainer(args.restart)
