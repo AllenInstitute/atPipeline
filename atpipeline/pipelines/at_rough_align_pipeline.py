@@ -30,6 +30,7 @@ class RoughAlign(atp.ATPipeline):
     def run(self):
         #Run any pre pipeline(s)
         self.stitchingPipeline.run()
+
         atp.ATPipeline.run(self)
 
         return True
@@ -187,10 +188,10 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
 
-            cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism) #p.LOWRES_POINTMATCHES['SPARK_DEFAULT_PARALLELISM'])
-            cmd = cmd + " --driver-memory %s"                       %(spark.driver_memory)       #p.LOWRES_POINTMATCHES['SPARK_DRIVER_MEMORY'])
-            cmd = cmd + " --executor-memory %s"                     %(spark.executor_memory)     #p.LOWRES_POINTMATCHES['SPARK_EXECUTOR_MEMORY'])
-            cmd = cmd + " --executor-cores %s"                      %(spark.executor_cores)       #p.LOWRES_POINTMATCHES['SPARK_EXECUTOR_CORES'])
+            cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism)
+            cmd = cmd + " --driver-memory %s"                       %(spark.driver_memory)
+            cmd = cmd + " --executor-memory %s"                     %(spark.executor_memory)
+            cmd = cmd + " --executor-cores %s"                      %(spark.executor_cores)
 
             cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
             cmd = cmd + " --name PointMatchFull"

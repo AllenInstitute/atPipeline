@@ -25,6 +25,7 @@ class RegisterSessions(atp.ATPipeline):
         self.roughAlignPipeline.run()
 
         atp.ATPipeline.run(self)
+
         return True
 
 class RegisterSessionsProcess(atpp.PipelineProcess):
