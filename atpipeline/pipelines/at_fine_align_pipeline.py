@@ -27,28 +27,10 @@ class FineAlign(atp.ATPipeline):
         self.append_pipeline_process(Create_fine_aligned_stacks(_paras))
 
     def run(self):
-        atp.ATPipeline.run(self)
-
         #Run any pre pipeline(s)
         self.roughAlignPipeline.run()
 
-        #Iterate through the pipeline
-        for process in self.pipeline_processes:
-
-            if process.check_if_done() == False:
-                if process.run() == False:
-                    logger.info("Failed in pipelinestep: " + process.get_name())
-                    return False
-
-                #Validate the result of the run
-                res = process.validate()
-
-                if res == False:
-                    logger.info("Failed validating pipeline step: " + process.get_name())
-                    return False
-            else:
-                logger.info("Skipping pipeline step: " + process.get_name())
-
+        atp.ATPipeline.run(self)
 
         return True
 
@@ -203,15 +185,16 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
             jsonInput       = os.path.join(jsonInputFolder, "tilepairs-%s-%s-%d-%d-nostitch-EDIT.json"     %(sessionNR, p.CREATE_HR_TILEPAIRS['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
 
             data_info = []
-            spark = at_spark.Spark(p.config['GENERAL']['HOST_MEMORY'], p.config['GENERAL']['HOST_NUMBER_OF_CORES'], data_info)
+            spark = at_spark.Spark(int(p.config['GENERAL']['HOST_MEMORY']), int(p.config['GENERAL']['HOST_NUMBER_OF_CORES']), data_info)
 
             #SIFT Point Match Client
             cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
-            cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism)    #%(p.SPARK['SPARK_DEFAULT_PARALLELISM'])
-            cmd = cmd + " --driver-memory %s"                       %(spark.driver_memory)          #%(p.SPARK['DRIVER_MEMORY'])
-            cmd = cmd + " --executor-memory %s"                     %(spark.executor_memory)        #%(p.SPARK['EXECUTOR_MEMORY'])
-            cmd = cmd + " --executor-cores %s"                      %(spark.executor_cores)          #%(p.SPARK['EXECUTOR_CORES'])
+
+            cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism)
+            cmd = cmd + " --driver-memory %s"                       %(str(spark.driver_memory) + "g")
+            cmd = cmd + " --executor-memory %s"                     %(str(spark.executor_memory) + "g")
+            cmd = cmd + " --executor-cores %s"                      %(str(spark.executor_cores) )
 
             cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
             cmd = cmd + " --name PointMatchFull"
@@ -227,11 +210,11 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
             #cmd = cmd + " --matchMaxEpsilon 15.0"
             #cmd = cmd + " --matchMaxTrust 1.0"
 
-            cmd = cmd + " --SIFTmaxScale %s"                      %(p.CREATE_HR_POINTMATCHES['SIFT_MAX_SCALE'])
-            cmd = cmd + " --SIFTminScale %s"                       %(p.CREATE_HR_POINTMATCHES['SIFT_MIN_SCALE'])
-            cmd = cmd + " --SIFTsteps %s"                            %(p.CREATE_HR_POINTMATCHES['SIFT_STEPS'])
-            cmd = cmd + " --renderScale %s"                        %(p.CREATE_HR_POINTMATCHES['RENDER_SCALE'])
-            cmd = cmd + " --matchRod %s"                           %(p.CREATE_HR_POINTMATCHES['MATCH_ROD'])
+            cmd = cmd + " --SIFTmaxScale %s"                        %(p.CREATE_HR_POINTMATCHES['SIFT_MAX_SCALE'])
+            cmd = cmd + " --SIFTminScale %s"                        %(p.CREATE_HR_POINTMATCHES['SIFT_MIN_SCALE'])
+            cmd = cmd + " --SIFTsteps %s"                           %(p.CREATE_HR_POINTMATCHES['SIFT_STEPS'])
+            cmd = cmd + " --renderScale %s"                         %(p.CREATE_HR_POINTMATCHES['RENDER_SCALE'])
+            cmd = cmd + " --matchRod %s"                            %(p.CREATE_HR_POINTMATCHES['MATCH_ROD'])
             #cmd = cmd + " --matchFilter CONSENSUS_SETS"
             self.submit(cmd)
 

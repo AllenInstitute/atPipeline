@@ -9,7 +9,7 @@ import sys
 import renderapi
 from atpipeline import at_atcore_arguments, at_logging, at_system_config, at_pipeline, at_docker_manager
 from atpipeline import at_utils as u
-#from atpipeline.render_classes import at_simple_renderapi as rapi
+from atpipeline.render_classes import at_simple_renderapi as rapi
 logger = at_logging.create_logger('atPipeline')
 from atpipeline.pipelines import at_rough_align_pipeline, at_stitching_pipeline, at_fine_align_pipeline, at_registration_pipeline, at_fine_registration_pipeline
 from atpipeline import __version__
@@ -63,7 +63,7 @@ def main():
             if args.renderprojectowner is None:
                 parser.error("--deleterenderproject flag requires --renderprojectowner to be set")
             else:
-                r = rapi.RenderAPI(system_config)
+                r = rapi.SimpleRenderAPI(system_config)
                 count = r.delete_stacks(args.renderprojectowner, args.deleterenderproject)
                 print ("Deleted " + str(count) + " stacks")
 
@@ -72,6 +72,21 @@ def main():
                     response = r.delete_match_context(args.renderprojectowner, c)
                     print('Delete match context response: ' + str(response))
                 return
+
+        if args.getprojectsbyowner:
+            r = rapi.SimpleRenderAPI(system_config)
+            projects = r.get_projects(args.getprojectsbyowner)
+            print (projects)
+            return
+
+        if args.getstacksforproject:
+            if args.renderprojectowner is None:
+                parser.error("--getstacksforproject flag requires --renderprojectowner to be set")
+            else:
+                r = rapi.SimpleRenderAPI(system_config)
+                stacks = r.get_stacks(args.renderprojectowner, args.getstacksforproject)
+                print (stacks)
+            return
 
         #All parameters are now well defined, copy them (and do some parsing) to a file where output data is written
         #The create rexieferences functions appends and overrides various arguments
@@ -106,7 +121,7 @@ def main():
 
         elif system_config.pipeline == 'fineregister':
             aPipeline = at_fine_registration_pipeline.FineAlignRegistration(system_config)
-        
+
         else:
             logger.error('No such pipeline: "' + system_config.pipeline + '"')
             raise Exception('No such pipeline')

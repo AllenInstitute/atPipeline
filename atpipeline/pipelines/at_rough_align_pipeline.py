@@ -28,26 +28,10 @@ class RoughAlign(atp.ATPipeline):
         self.append_pipeline_process(ApplyLowResToHighRes(_paras))
 
     def run(self):
-        atp.ATPipeline.run(self)
-
         #Run any pre pipeline(s)
         self.stitchingPipeline.run()
 
-        #Iterate through the pipeline
-        for process in self.pipeline_processes:
-
-            if process.check_if_done() == False:
-                process.run()
-
-                #Validate the result of the run
-                res = process.validate()
-
-                if res == False:
-                    logger.info("Failed in pipelinestep" + process.get_name())
-                    return False
-            else:
-                logger.info("Skipping pipeline step: " + process.get_name())
-
+        atp.ATPipeline.run(self)
 
         return True
 
@@ -190,7 +174,7 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             data_info = []
 
 
-            spark = at_spark.Spark(p.config['GENERAL']['HOST_MEMORY'], p.config['GENERAL']['HOST_NUMBER_OF_CORES'], data_info)
+            spark = at_spark.Spark(int(p.config['GENERAL']['HOST_MEMORY']), int(p.config['GENERAL']['HOST_NUMBER_OF_CORES']), data_info)
 
             #output directories
             downsample_dir   = os.path.join(p.absoluteDataOutputFolder, "low_res")
@@ -204,10 +188,10 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
 
-            cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism) #p.LOWRES_POINTMATCHES['SPARK_DEFAULT_PARALLELISM'])
-            cmd = cmd + " --driver-memory %s"                       %(spark.driver_memory)       #p.LOWRES_POINTMATCHES['SPARK_DRIVER_MEMORY'])
-            cmd = cmd + " --executor-memory %s"                     %(spark.executor_memory)     #p.LOWRES_POINTMATCHES['SPARK_EXECUTOR_MEMORY'])
-            cmd = cmd + " --executor-cores %s"                      %(spark.executor_cores)       #p.LOWRES_POINTMATCHES['SPARK_EXECUTOR_CORES'])
+            cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism)
+            cmd = cmd + " --driver-memory %s"                       %(str(spark.driver_memory) + "g")
+            cmd = cmd + " --executor-memory %s"                     %(str(spark.executor_memory) + "g")
+            cmd = cmd + " --executor-cores %s"                      %(str(spark.executor_cores) )
 
             cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
             cmd = cmd + " --name PointMatchFull"

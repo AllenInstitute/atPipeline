@@ -22,23 +22,6 @@ class Stitch(atp.ATPipeline):
 
     def run(self):
         atp.ATPipeline.run(self)
-
-        #Iterate through the pipeline
-        for process in self.pipeline_processes:
-
-            if process.check_if_done() == False:
-                process.run()
-
-                #Validate the result of the run
-                res = process.validate()
-
-                if res == False:
-                    logger.info("Failed in pipelinestep" + process.get_name())
-                    return False
-            else:
-                logger.info("Skipping pipeline step: " + process.get_name())
-
-
         return True
 
 
@@ -79,20 +62,17 @@ class CreateStateTables(atpp.PipelineProcess):
                 statetablefile = self.paras.getStateTableFileName(ribbon, session, sectnum)
                 logger.info("Creating statetable file: " + statetablefile)
 
-                if os.path.exists(statetablefile) and self.paras.overwritedata == False:
-                   logger.info("The statetable: " + statetablefile + " already exists. Continuing..")
-                else:
-                    cmd = "docker exec " + self.paras.atcore_ctr_name
-                    cmd = cmd + " /opt/conda/bin/python /pipeline/make_state_table_ext_multi_pseudoz.py"
-                    cmd = cmd + " --projectDirectory %s"        %(p.toMount(project_root))
-                    cmd = cmd + " --outputFile %s"              %(p.toMount(statetablefile))
-                    cmd = cmd + " --ribbon %d"                  %(ribbon)
-                    cmd = cmd + " --session %d"                 %(session)
-                    cmd = cmd + " --section %d"                 %(sectnum)
-                    cmd = cmd + " --oneribbononly True"
+                cmd = "docker exec " + self.paras.atcore_ctr_name
+                cmd = cmd + " /opt/conda/bin/python /pipeline/make_state_table_ext_multi_pseudoz.py"
+                cmd = cmd + " --projectDirectory %s"        %(p.toMount(project_root))
+                cmd = cmd + " --outputFile %s"              %(p.toMount(statetablefile))
+                cmd = cmd + " --ribbon %d"                  %(ribbon)
+                cmd = cmd + " --session %d"                 %(session)
+                cmd = cmd + " --section %d"                 %(sectnum)
+                cmd = cmd + " --oneribbononly True"
 
-    		        #Run ====================
-                    self.submit(cmd)
+		        #Run ====================
+                self.submit(cmd)
 
 class CreateRawDataRenderStacks(atpp.PipelineProcess):
 
