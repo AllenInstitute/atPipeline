@@ -99,7 +99,7 @@ def main():
         #Save current config values to the data output folder
         system_config.write(os.path.join(system_config.absoluteDataOutputFolder, system_config.project_name + '.ini'))
 
-        if args.logtofile == True:
+        if args.skiploggingtofile == False:
             logfilename = os.path.join(system_config.absoluteDataOutputFolder, system_config.project_name + '.log')
             at_logging.add_logging_to_file('atPipeline', logfilename)
 
