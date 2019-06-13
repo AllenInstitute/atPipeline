@@ -174,7 +174,7 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             data_info = []
 
 
-            spark = at_spark.Spark(p.config['GENERAL']['HOST_MEMORY'], p.config['GENERAL']['HOST_NUMBER_OF_CORES'], data_info)
+            spark = at_spark.Spark(int(p.config['GENERAL']['HOST_MEMORY']), int(p.config['GENERAL']['HOST_NUMBER_OF_CORES']), data_info)
 
             #output directories
             downsample_dir   = os.path.join(p.absoluteDataOutputFolder, "low_res")
@@ -189,9 +189,9 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
 
             cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism)
-            cmd = cmd + " --driver-memory %s"                       %(spark.driver_memory)
-            cmd = cmd + " --executor-memory %s"                     %(spark.executor_memory)
-            cmd = cmd + " --executor-cores %s"                      %(spark.executor_cores)
+            cmd = cmd + " --driver-memory %s"                       %(str(spark.driver_memory) + "g")
+            cmd = cmd + " --executor-memory %s"                     %(str(spark.executor_memory) + "g")
+            cmd = cmd + " --executor-cores %s"                      %(str(spark.executor_cores) )
 
             cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
             cmd = cmd + " --name PointMatchFull"

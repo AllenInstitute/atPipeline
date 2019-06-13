@@ -121,7 +121,7 @@ def main():
 
         elif system_config.pipeline == 'fineregister':
             aPipeline = at_fine_registration_pipeline.FineAlignRegistration(system_config)
-        
+
         else:
             logger.error('No such pipeline: "' + system_config.pipeline + '"')
             raise Exception('No such pipeline')

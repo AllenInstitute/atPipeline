@@ -185,15 +185,17 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
             jsonInput       = os.path.join(jsonInputFolder, "tilepairs-%s-%s-%d-%d-nostitch-EDIT.json"     %(sessionNR, p.CREATE_HR_TILEPAIRS['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
 
             data_info = []
-            spark = at_spark.Spark(p.config['GENERAL']['HOST_MEMORY'], p.config['GENERAL']['HOST_NUMBER_OF_CORES'], data_info)
+            spark = at_spark.Spark(int(p.config['GENERAL']['HOST_MEMORY']), int(p.config['GENERAL']['HOST_NUMBER_OF_CORES']), data_info)
 
             #SIFT Point Match Client
             cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
+
             cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism)
-            cmd = cmd + " --driver-memory %s"                       %(spark.driver_memory)
-            cmd = cmd + " --executor-memory %s"                     %(spark.executor_memory)
-            cmd = cmd + " --executor-cores %s"                      %(spark.executor_cores)
+            cmd = cmd + " --driver-memory %s"                       %(str(spark.driver_memory) + "g")
+            cmd = cmd + " --executor-memory %s"                     %(str(spark.executor_memory) + "g")
+            cmd = cmd + " --executor-cores %s"                      %(str(spark.executor_cores) )
+
             cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
             cmd = cmd + " --name PointMatchFull"
             cmd = cmd + " --master local[%s] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"%(p.config['GENERAL']['SPARK_WORKER_THREADS'])
@@ -208,11 +210,11 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
             #cmd = cmd + " --matchMaxEpsilon 15.0"
             #cmd = cmd + " --matchMaxTrust 1.0"
 
-            cmd = cmd + " --SIFTmaxScale %s"                      %(p.CREATE_HR_POINTMATCHES['SIFT_MAX_SCALE'])
-            cmd = cmd + " --SIFTminScale %s"                       %(p.CREATE_HR_POINTMATCHES['SIFT_MIN_SCALE'])
-            cmd = cmd + " --SIFTsteps %s"                            %(p.CREATE_HR_POINTMATCHES['SIFT_STEPS'])
-            cmd = cmd + " --renderScale %s"                        %(p.CREATE_HR_POINTMATCHES['RENDER_SCALE'])
-            cmd = cmd + " --matchRod %s"                           %(p.CREATE_HR_POINTMATCHES['MATCH_ROD'])
+            cmd = cmd + " --SIFTmaxScale %s"                        %(p.CREATE_HR_POINTMATCHES['SIFT_MAX_SCALE'])
+            cmd = cmd + " --SIFTminScale %s"                        %(p.CREATE_HR_POINTMATCHES['SIFT_MIN_SCALE'])
+            cmd = cmd + " --SIFTsteps %s"                           %(p.CREATE_HR_POINTMATCHES['SIFT_STEPS'])
+            cmd = cmd + " --renderScale %s"                         %(p.CREATE_HR_POINTMATCHES['RENDER_SCALE'])
+            cmd = cmd + " --matchRod %s"                            %(p.CREATE_HR_POINTMATCHES['MATCH_ROD'])
             #cmd = cmd + " --matchFilter CONSENSUS_SETS"
             self.submit(cmd)
 
