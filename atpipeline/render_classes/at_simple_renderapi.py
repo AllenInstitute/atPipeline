@@ -23,7 +23,7 @@ class SimpleRenderAPI:
 
         self.sys_config = sys_config
         if owner == None:
-            self.owner = sys_config.renderProjectOwner
+            self.owner = sys_config.args.renderprojectowner
         else:
             self.owner      = owner
 
