@@ -28,26 +28,9 @@ class RoughAlign(atp.ATPipeline):
         self.append_pipeline_process(ApplyLowResToHighRes(_paras))
 
     def run(self):
-        atp.ATPipeline.run(self)
-
         #Run any pre pipeline(s)
         self.stitchingPipeline.run()
-
-        #Iterate through the pipeline
-        for process in self.pipeline_processes:
-
-            if process.check_if_done() == False:
-                process.run()
-
-                #Validate the result of the run
-                res = process.validate()
-
-                if res == False:
-                    logger.info("Failed in pipelinestep" + process.get_name())
-                    return False
-            else:
-                logger.info("Skipping pipeline step: " + process.get_name())
-
+        atp.ATPipeline.run(self)
 
         return True
 

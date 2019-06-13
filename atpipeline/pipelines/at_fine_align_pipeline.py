@@ -27,28 +27,10 @@ class FineAlign(atp.ATPipeline):
         self.append_pipeline_process(Create_fine_aligned_stacks(_paras))
 
     def run(self):
-        atp.ATPipeline.run(self)
-
         #Run any pre pipeline(s)
         self.roughAlignPipeline.run()
 
-        #Iterate through the pipeline
-        for process in self.pipeline_processes:
-
-            if process.check_if_done() == False:
-                if process.run() == False:
-                    logger.info("Failed in pipelinestep: " + process.get_name())
-                    return False
-
-                #Validate the result of the run
-                res = process.validate()
-
-                if res == False:
-                    logger.info("Failed validating pipeline step: " + process.get_name())
-                    return False
-            else:
-                logger.info("Skipping pipeline step: " + process.get_name())
-
+        atp.ATPipeline.run(self)
 
         return True
 
@@ -208,11 +190,10 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
             #SIFT Point Match Client
             cmd = "docker exec " + p.atcore_ctr_name
             cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
-            cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism)    #%(p.SPARK['SPARK_DEFAULT_PARALLELISM'])
-            cmd = cmd + " --driver-memory %s"                       %(spark.driver_memory)          #%(p.SPARK['DRIVER_MEMORY'])
-            cmd = cmd + " --executor-memory %s"                     %(spark.executor_memory)        #%(p.SPARK['EXECUTOR_MEMORY'])
-            cmd = cmd + " --executor-cores %s"                      %(spark.executor_cores)          #%(p.SPARK['EXECUTOR_CORES'])
-
+            cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism)
+            cmd = cmd + " --driver-memory %s"                       %(spark.driver_memory)
+            cmd = cmd + " --executor-memory %s"                     %(spark.executor_memory)
+            cmd = cmd + " --executor-cores %s"                      %(spark.executor_cores)
             cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
             cmd = cmd + " --name PointMatchFull"
             cmd = cmd + " --master local[%s] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"%(p.config['GENERAL']['SPARK_WORKER_THREADS'])

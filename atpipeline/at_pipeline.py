@@ -27,7 +27,20 @@ class ATPipeline:
         self.pipeline_processes = []
 
     def run(self):
-        pass
+        #Iterate through the pipeline
+        for process in self.pipeline_processes:
+            if process.check_if_done() == False or self.parameters.overwritedata == True:
+                process.run()
+
+                #Validate the result of the run
+                res = process.validate()
+
+                if res == False:
+                    logger.info("Failed in pipelinestep" + process.get_name())
+                    return False
+            else:
+                logger.info("Skipping pipeline step: " + process.get_name())
+
 
     def append_pipeline_process(self, process : pp.PipelineProcess):
         self.pipeline_processes.append(process)
