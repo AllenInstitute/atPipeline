@@ -73,8 +73,9 @@ def add_arguments(parser):
         help='Set program loglevel',
         default='INFO')
 
-    parser.add_argument('--logtofile',
-        help='Log messages to file. The logfile is written to the output datafolder and named "projectname".log',
+    parser.add_argument('--skiploggingtofile',
+        help='Skip logging to file (default = false). The logfile is written to the output datafolder and named "projectname".log',
+        default=False,
         action='store_true')
 
     parser.add_argument('--printsettings',
