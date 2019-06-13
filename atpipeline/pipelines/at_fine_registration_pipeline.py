@@ -22,30 +22,12 @@ class FineAlignRegistration(atp.ATPipeline):
         self.append_pipeline_process(FineAlignRegistrationProcess(_paras))
 
     def run(self):
-        atp.ATPipeline.run(self)
-
         #Run any pre pipeline(s)
         self.registrationPipeline.run()
         self.finealignPipeline.run()
 
-        #Iterate through the pipeline
-        for process in self.pipeline_processes:
-
-            if process.check_if_done() == False:
-                if process.run() == False:
-                    logger.info("Failed in pipelinestep: " + process.get_name())
-                    return False
-
-                #Validate the result of the run
-                res = process.validate()
-
-                if res == False:
-                    logger.info("Failed validating pipeline step: " + process.get_name())
-                    return False
-            else:
-                logger.info("Skipping pipeline step: " + process.get_name())
-
-
+        atp.ATPipeline.run(self)
+        
         return True
 
 class FineAlignRegistrationProcess(atpp.PipelineProcess):
