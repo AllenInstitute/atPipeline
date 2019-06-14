@@ -7,7 +7,7 @@ import argparse
 import logging
 import sys
 import renderapi
-from atpipeline import at_atcore_arguments, at_logging, at_system_config, at_pipeline, at_docker_manager
+from atpipeline import at_atcore_arguments, at_common_arguments, at_logging, at_system_config, at_pipeline, at_docker_manager
 from atpipeline import at_utils as u
 from atpipeline.render_classes import at_simple_renderapi as rapi
 logger = at_logging.create_logger('atPipeline')
@@ -19,6 +19,7 @@ def main():
     try:
         parser = argparse.ArgumentParser()
         at_atcore_arguments.add_arguments(parser)
+        at_common_arguments.add_arguments(parser)
         args = parser.parse_args()
 
         #If no arguments are supplied, show help and quit

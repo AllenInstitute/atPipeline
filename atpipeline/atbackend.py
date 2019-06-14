@@ -8,7 +8,7 @@ import logging
 from atpipeline import at_logging, at_docker_manager, at_system_config
 logger = at_logging.create_logger('atPipeline')
 from atpipeline import __version__
-from atpipeline import at_backend_arguments
+from atpipeline import at_backend_arguments, at_common_arguments
 
 def main():
 
@@ -16,6 +16,7 @@ def main():
         logger.info('============ Managing the atBackend =============')
         parser = argparse.ArgumentParser('atbackend')
         at_backend_arguments.add_arguments(parser)
+        at_common_arguments.add_arguments(parser)
         args = parser.parse_args()
         system_config = at_system_config.ATSystemConfig(args, client = 'atbackend')
         logger.setLevel(getattr(logging, args.loglevel))

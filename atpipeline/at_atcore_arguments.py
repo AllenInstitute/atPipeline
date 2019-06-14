@@ -4,25 +4,20 @@
 # Created:     23/05/2019
 #-------------------------------------------------------------------------------
 import argparse
+import getpass
 from atpipeline import __version__
 
+def getUserName():
+    try:
+        return getpass.getuser()
+    except:
+        return "unknown"
 
 def add_arguments(parser):
-    parser.add_argument('--configfolder',
-        metavar="PATH",
-        help='Path to config folder',
-        default=None)
-
-    parser.add_argument('--configfile',
-        metavar="PATH",
-        help='Name of data processing config file. May include the path',
-        default="at-data-processing-config.ini")
-
     #Don't allow this one to be set..
     parser.add_argument('--system_config_file',
         help=argparse.SUPPRESS,
-        default="at-system-config.ini"
-        )
+        default="at-system-config.ini")
 
     parser.add_argument('--data',
         metavar="PATH",
@@ -34,7 +29,7 @@ def add_arguments(parser):
         action='store_true')
 
     parser.add_argument('--projectname',
-        help='Set project name. Default: name of input datas basefolder',
+        help='Set project name used in render. Default: name of input data',
         required=False)
 
     parser.add_argument('--pipeline',
@@ -43,17 +38,17 @@ def add_arguments(parser):
         required=False)
 
     parser.add_argument('--renderprojectowner',
-        help='Specify a RenderProject owner',
+        help='Specify owner for the render project being created',
         metavar="OWNER",
-        type=str,
-        nargs='?')
+        default=getUserName(),
+        required=False)
 
     parser.add_argument('--sessions',
-        help='Specify sessions to process',
+        help='Specify sessions to process. Default is all sessions.',
         type=str)
 
     parser.add_argument('--ribbons',
-        help='Specify ribbons  to process',
+        help='Specify ribbons to process. Default is all ribbons.',
         type=str)
 
     parser.add_argument('--firstsection', metavar='N',
@@ -64,28 +59,15 @@ def add_arguments(parser):
         help='Specify last section',
         type=int)
 
-    parser.add_argument('--overwritedata',
+    parser.add_argument('--overwritedata', '--force',
         help='Overwrite any already processed data',
-        action='store_true')
-
-    parser.add_argument('--loglevel',
-        choices={'INFO', 'DEBUG', 'WARNING', 'ERROR'},
-        help='Set program loglevel',
-        default='INFO')
+        action='store_true',
+        default=False)
 
     parser.add_argument('--skiploggingtofile',
         help='Skip logging to file (default = false). The logfile is written to the output datafolder and named "projectname".log',
         default=False,
         action='store_true')
-
-    parser.add_argument('--printsettings',
-        help='Print settings',
-        action='store_true')
-
-    parser.add_argument('--define', '-D',
-        action='append',
-        default=[],
-        help="Override a value in the config file (-D section.item=value)")
 
     parser.add_argument('--deleterenderproject',
         help="Delete a render project (including its stacks and match collections) for a specific owner, --renderprojectowner",
@@ -104,14 +86,3 @@ def add_arguments(parser):
         type=str,
         nargs='?'
         )
-
-    parser.add_argument('--version', '-v',
-        action='version',
-        version=('%%(prog)s %s' % __version__))
-
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()
