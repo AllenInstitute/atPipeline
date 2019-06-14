@@ -14,6 +14,11 @@ def getUserName():
         return "unknown"
 
 def add_arguments(parser):
+    parser.add_argument('--configfile', 
+       metavar="PATH", 
+       help='Name of data processing config file. May include the path',   
+       default="at-data-processing-config.ini")
+
     #Don't allow this one to be set..
     parser.add_argument('--system_config_file',
         help=argparse.SUPPRESS,
