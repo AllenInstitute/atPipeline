@@ -1,9 +1,11 @@
 import os
 import logging
 import json
+import renderapi
 from .. import at_pipeline as atp
 from .. import at_pipeline_process as atpp
-from .. import at_utils as u
+from atpipeline.render_classes import at_simple_renderapi as srapi
+from atpipeline import at_utils as u
 import posixpath
 
 logger = logging.getLogger('atPipeline')
@@ -294,20 +296,44 @@ class CreateStitchedSections(atpp.PipelineProcess):
         	#Create json files and start stitching...
             for sectnum in range(firstSection, lastSection + 1):
 
-                with open(p.stitching_template) as json_data:
-                     stitching_template = json.load(json_data)
-
-                stitching_json = os.path.join(stitching_dir, "stitched""_%s_%s_%d.json"%(ribbon, session, sectnum))
+                #Stitching is needed if the section have more than one tile
+                nr_of_tiles_in_section = u.get_number_of_physical_tiles_in_section(sectnum, current_ribbon, p.dataInfo)
                 z = ribbon*100 + sectnum
+                if nr_of_tiles_in_section > 1:
+                    with open(p.stitching_template) as json_data:
+                         stitching_template = json.load(json_data)
 
-                self.savestitchingjson(stitching_template, stitching_json, p.renderProject, input_stack, output_stack, z)
+                    stitching_json = os.path.join(stitching_dir, "stitched""_%s_%s_%d.json"%(ribbon, session, sectnum))
 
-                cmd = "docker exec " + p.atcore_ctr_name
-                cmd = cmd + " java -cp /shared/at_modules/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
-                cmd = cmd + " --input_json %s"%(p.toMount(stitching_json))
 
-                #Run =============
-                self.submit(cmd)
+                    self.savestitchingjson(stitching_template, stitching_json, p.renderProject, input_stack, output_stack, z)
+
+                    cmd = "docker exec " + p.atcore_ctr_name
+                    cmd = cmd + " java -cp /shared/at_modules/target/allen-1.0-SNAPSHOT-jar-with-dependencies.jar at_modules.StitchImagesByCC"
+                    cmd = cmd + " --input_json %s"%(p.toMount(stitching_json))
+
+                    #Run =============
+                    self.submit(cmd)
+                else:
+                    rp     = p.renderProject
+                    sr = srapi.SimpleRenderAPI(p, rp.owner)
+                    #Create the output stack if it does not exist
+##                    response = renderapi.stack.create_stack(output_stack,
+##                                                            host="http://" + rp.host,
+##                                                            owner=rp.owner,
+##                                                            project=rp.project_name,
+##                                                            render=sr.get_render_client())
+##
+##
+##
+##                    one_tile = renderapi.resolvedtiles.get_resolved_tiles_from_z(input_stack, z, project=rp.project_name, render=sr.get_render_client())
+##                    response = renderapi.resolvedtiles.put_tilespecs(output_stack, one_tile, project=rp.project_name, render=sr.get_render_client())
+##                    if response != 200:
+##                        raise ValueError('Failed uploading tiles..')
+                    response = renderapi.stack.clone_stack(input_stack, output_stack, owner=rp.owner, project=rp.project_name,  render=sr.get_render_client())
+                    break
+                    #just save the tile to output stack
+
 
     #def check_if_done(self):
     #    pass
@@ -338,27 +364,42 @@ class DropStitchingMistakes(atpp.PipelineProcess):
 
             rp     = p.renderProject
 
-            # command string
-            cmd = "docker exec " + p.atcore_ctr_name
-            cmd = cmd + " /opt/conda/bin/python -m renderapps.stitching.detect_and_drop_stitching_mistakes"
-            cmd = cmd + " --render.owner %s"                        %(rp.owner)
-            cmd = cmd + " --render.host %s"                         %(rp.host)
-            cmd = cmd + " --render.project %s"                      %(rp.project_name)
-            cmd = cmd + " --render.client_scripts %s"               %(rp.clientScripts)
-            cmd = cmd + " --render.port %d"                         %(rp.hostPort)
-            cmd = cmd + " --render.memGB %s"                        %(rp.memGB)
-            cmd = cmd + " --log_level %s"                           %(rp.logLevel)
-            cmd = cmd + " --prestitchedStack %s"                    %(acquisition_Stack)
-            cmd = cmd + " --poststitchedStack %s"                   %(stitched_dapi_Stack)
-            cmd = cmd + " --outputStack %s"                         %(dropped_dapi_Stack)
-            cmd = cmd + " --jsonDirectory %s"                       %(p.toMount(dropped_dir))
+            #Check which ribbon we are processing, and adjust section numbers accordingly
+            current_ribbon = u.getRibbonLabelFromSessionFolder(sessionFolder)
+            firstSection, lastSection = p.convertGlobalSectionIndexesToCurrentRibbon(current_ribbon)
 
-            cmd = cmd + " --edge_threshold %s"                      %(p.DROP_STITCHING_MISTAKES['EDGE_THRESHOLD'])
-            cmd = cmd + " --pool_size %s"                           %(p.DROP_STITCHING_MISTAKES['POOL_SIZE'])
-            cmd = cmd + " --distance_threshold %s"                  %(p.DROP_STITCHING_MISTAKES['DISTANCE_THRESHOLD'])
+            nr_of_tiles_in_section = u.get_number_of_physical_tiles_in_section(firstSection, current_ribbon, p.dataInfo)
 
-            # Run =============
-            self.submit(cmd)
+            if nr_of_tiles_in_section > 1:
+
+                # command string
+                cmd = "docker exec " + p.atcore_ctr_name
+                cmd = cmd + " /opt/conda/bin/python -m renderapps.stitching.detect_and_drop_stitching_mistakes"
+                cmd = cmd + " --render.owner %s"                        %(rp.owner)
+                cmd = cmd + " --render.host %s"                         %(rp.host)
+                cmd = cmd + " --render.project %s"                      %(rp.project_name)
+                cmd = cmd + " --render.client_scripts %s"               %(rp.clientScripts)
+                cmd = cmd + " --render.port %d"                         %(rp.hostPort)
+                cmd = cmd + " --render.memGB %s"                        %(rp.memGB)
+                cmd = cmd + " --log_level %s"                           %(rp.logLevel)
+                cmd = cmd + " --prestitchedStack %s"                    %(acquisition_Stack)
+                cmd = cmd + " --poststitchedStack %s"                   %(stitched_dapi_Stack)
+                cmd = cmd + " --outputStack %s"                         %(dropped_dapi_Stack)
+                cmd = cmd + " --jsonDirectory %s"                       %(p.toMount(dropped_dir))
+
+                cmd = cmd + " --edge_threshold %s"                      %(p.DROP_STITCHING_MISTAKES['EDGE_THRESHOLD'])
+                cmd = cmd + " --pool_size %s"                           %(p.DROP_STITCHING_MISTAKES['POOL_SIZE'])
+                cmd = cmd + " --distance_threshold %s"                  %(p.DROP_STITCHING_MISTAKES['DISTANCE_THRESHOLD'])
+
+                # Run =============
+                self.submit(cmd)
+            else:
+                rp     = p.renderProject
+                sr = srapi.SimpleRenderAPI(p, rp.owner)
+
+                #Create the output stack if it does not exist
+                response = renderapi.stack.clone_stack(stitched_dapi_Stack, dropped_dapi_Stack, owner=rp.owner, project=rp.project_name,  render=sr.get_render_client())
+
 
     #def check_if_done(self):
     #    pass

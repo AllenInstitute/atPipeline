@@ -32,9 +32,9 @@ class RoughAlign(atp.ATPipeline):
         self.stitchingPipeline.run()
 
         atp.ATPipeline.run(self)
-
         return True
 
+#-----------------------------------------------------------------------------------------------
 
 class CreateLowResStacks(atpp.PipelineProcess):
 

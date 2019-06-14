@@ -18,7 +18,7 @@ class FineAlign(atp.ATPipeline):
         super().__init__(_paras)
 
         #Define the pipeline
-        self.roughAlignPipeline                     =  at_rough_align_pipeline.RoughAlign(_paras)
+        self.roughAlignPipeline = at_rough_align_pipeline.RoughAlign(_paras)
 
         self.append_pipeline_process(ConsolidateRoughAlignedStackTransforms(_paras))
         self.append_pipeline_process(Create_2D_pointmatches(_paras))
@@ -86,7 +86,15 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
         super().run()
 
         p = self.paras
+
         for session in p.sessions:
+            #Check which ribbon we are processing, and adjust section numbers accordingly
+            current_ribbon = u.getRibbonLabelFromSessionFolder(self.sessionFolders[0])
+            firstSection, lastSection = p.convertGlobalSectionIndexesToCurrentRibbon(current_ribbon)
+            nr_of_tiles_in_section = u.get_number_of_physical_tiles_in_section(firstSection, current_ribbon, p.dataInfo)
+            if nr_of_tiles_in_section <= 1:
+                break
+
             sessionNR = int(session[7:])
             logger.info("Processing session: " + str(sessionNR))
 
@@ -247,7 +255,12 @@ class Create_fine_aligned_stacks(atpp.PipelineProcess):
         template['pointmatch']['owner']                          = owner
         template['pointmatch']['log_level']                      = logLevel
         template['pointmatch']['project']                        = project
-        template['pointmatch']['name']                           = [collection_2D, collection_3D]
+
+        if collection_2D != None:
+            template['pointmatch']['name']                           = [collection_2D, collection_3D]
+        else:
+            template['pointmatch']['name']                           = [collection_3D]
+
         template['pointmatch']['port']                           = port
         template['pointmatch']['host']                           = renderHost
 
@@ -293,6 +306,12 @@ class Create_fine_aligned_stacks(atpp.PipelineProcess):
             with open(p.fine_alignment_template) as json_data:
                ra = json.load(json_data)
 
+            #Testing__single_tile_HR_2D
+            current_ribbon = u.getRibbonLabelFromSessionFolder(self.sessionFolders[0])
+            firstSection, lastSection = p.convertGlobalSectionIndexesToCurrentRibbon(current_ribbon)
+            nr_of_tiles_in_section = u.get_number_of_physical_tiles_in_section(firstSection, current_ribbon, p.dataInfo)
+            if nr_of_tiles_in_section <= 1:
+                pm_collection2D = None
 
             self.saveFineAlignJSON(ra, input_json, rp.host, rp.hostPort, rp.owner, rp.project_name,
                                     input_stack, output_stack, pm_collection2D, pm_collection3D,

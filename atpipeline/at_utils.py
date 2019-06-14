@@ -90,6 +90,7 @@ def runPipelineStep(cmd, stepName):
         logger.error("PROC_RETURN_CODE:" + str(proc.returncode))
         raise Exception("Error in pipeline step: " + stepName)
 
+#Move this to render_classes folder
 class RenderProject:
     def __init__(self, owner, project_name, host_name, host_port, client_scripts, mem_gb, log_level):
         self.owner          = owner
@@ -99,6 +100,22 @@ class RenderProject:
         self.clientScripts  = client_scripts
         self.memGB          = mem_gb
         self.logLevel       = log_level
+
+def get_number_of_physical_tiles_in_section(sectnum:int, current_ribbon, data_info):
+    #Get sectiondata from data_info dictionary
+    ribbon_id = get_ribbon_id_from_ribbon_folder_name(current_ribbon, data_info)
+    nr_of_channels = data_info["atdata"]["TotalNumberOfChannels"]
+    ribbons = data_info["atdata"]["Ribbons"]
+    section = ribbons[ribbon_id]["Sections"][sectnum]
+    nr_of_tiles = section["NumberOfTiles"]
+
+    #Divide by number of channels
+    return nr_of_tiles / nr_of_channels
+
+def get_ribbon_id_from_ribbon_folder_name(ribbon_folder, data_info):
+
+    ribbons = data_info["atdata"]["RibbonFolders"]
+    return ribbons.index(ribbon_folder)
 
 def parse_session_folder(path):
     proj = path.split("raw")
