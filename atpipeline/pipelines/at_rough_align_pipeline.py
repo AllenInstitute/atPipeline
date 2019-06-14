@@ -317,7 +317,7 @@ class ApplyLowResToHighRes(atpp.PipelineProcess):
 
             logger.info("Processing session: " + str(sessionNR))
 
-            lowresStack             = "S%d_LowRes"%(sessionNR)
+            lowresStack             = "S%d_RoughAligned_LowRes"%(sessionNR)
 
             inputStack              = "S%d_Stitched_Dropped"%(sessionNR)
             outputStack             = "S%d_RoughAligned"%(sessionNR)
