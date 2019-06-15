@@ -86,20 +86,42 @@ class SimpleRenderAPI:
         #Find a way todo this
         return False #renderapi.render.get_projects_by_owner(render = rc)
 
-    def delete_match_context(self, owner, matchCollection):
+    def get_matchcollections(self, owner):
         self.render_args['owner'] = owner
-        print ("Deleting match context '" + matchCollection + "' for owner " + owner)
         rc = renderapi.render.connect(**self.render_args)
-
         collections = renderapi.pointmatch.get_matchcollections(owner, render = rc)
+        return collections
+
+    def get_matchcollection(self, owner, match_collection):
+        self.render_args['owner'] = owner
+        rc = renderapi.render.connect(**self.render_args)
+        collections = renderapi.pointmatch.get_matchcollections(owner, render = rc)
+
+        for c in collections:
+            if c['collectionId']['name'] == match_collection:
+                return c
+        logger.warning('No such match collection: "' + match_collection + '"')
+        return None
+
+    def delete_match_context(self, owner, match_collection):
+
+        print ("Deleting match context '" + match_collection + "' for owner " + owner)
+        collections = self.get_matchcollections(owner)
 
         exists = False
         for c in collections:
-            if c['collectionId']['name'] == matchCollection:
+            if c['collectionId']['name'] == match_collection:
                 exists = True
 
         if exists == True:
-            return renderapi.pointmatch.delete_collection(matchCollection, render = rc)
+            self.render_args['owner'] = owner
+            rc = renderapi.render.connect(**self.render_args)
+            return renderapi.pointmatch.delete_collection(match_collection, render = rc)
 
         logger.warning('No such match collection: "' + matchCollection + '"')
         return None
+
+
+    def clone_stack(self, input_stack, output_stack, render_project):
+
+        return renderapi.stack.clone_stack(input_stack, output_stack, owner=render_project.owner, project=render_project.project_name,  render=self.get_render_client())

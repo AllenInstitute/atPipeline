@@ -16,7 +16,7 @@ class FineAlign(atp.ATPipeline):
 
     def __init__(self, _paras):
         super().__init__(_paras)
-
+        self.name = "finealign"
         #Define the pipeline
         self.roughAlignPipeline = at_rough_align_pipeline.RoughAlign(_paras)
 

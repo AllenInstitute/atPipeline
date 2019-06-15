@@ -15,7 +15,7 @@ class RegisterSessions(atp.ATPipeline):
 
     def __init__(self, _paras):
         super().__init__(_paras)
-
+        self.name = "register"
         #Define the pipeline
         self.roughAlignPipeline = at_rough_align_pipeline.RoughAlign(_paras)
         self.append_pipeline_process(RegisterSessionsProcess(_paras))
@@ -23,10 +23,7 @@ class RegisterSessions(atp.ATPipeline):
     def run(self):
         #Run any pre pipeline(s)
         self.roughAlignPipeline.run()
-
         atp.ATPipeline.run(self)
-
-        return True
 
 class RegisterSessionsProcess(atpp.PipelineProcess):
 
@@ -94,4 +91,3 @@ class RegisterSessionsProcess(atpp.PipelineProcess):
                         self.submit_atcore(cmd)
             except:
                 raise
-        return True

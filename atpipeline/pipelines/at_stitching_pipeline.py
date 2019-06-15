@@ -13,6 +13,7 @@ logger = logging.getLogger('atPipeline')
 class Stitch(atp.ATPipeline):
     def __init__(self, _paras):
         super().__init__(_paras)
+        self.name = "stitch"
 
         #Define the pipeline
         self.append_pipeline_process(CreateStateTables(_paras))
@@ -24,8 +25,6 @@ class Stitch(atp.ATPipeline):
 
     def run(self):
         atp.ATPipeline.run(self)
-        return True
-
 
 ##Sub processes in the stitching pipeline are defined below
 
@@ -312,6 +311,8 @@ class CreateStitchedSections(atpp.PipelineProcess):
                 else:
                     rp     = p.renderProject
                     sr = srapi.SimpleRenderAPI(p, rp.owner)
+                    response = sr.clone_stack(input_stack, output_stack, rp)
+
                     #Create the output stack if it does not exist
 ##                    response = renderapi.stack.create_stack(output_stack,
 ##                                                            host="http://" + rp.host,
@@ -325,7 +326,7 @@ class CreateStitchedSections(atpp.PipelineProcess):
 ##                    response = renderapi.resolvedtiles.put_tilespecs(output_stack, one_tile, project=rp.project_name, render=sr.get_render_client())
 ##                    if response != 200:
 ##                        raise ValueError('Failed uploading tiles..')
-                    response = renderapi.stack.clone_stack(input_stack, output_stack, owner=rp.owner, project=rp.project_name,  render=sr.get_render_client())
+
                     break
                     #just save the tile to output stack
 

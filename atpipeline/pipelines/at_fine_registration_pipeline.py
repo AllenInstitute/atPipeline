@@ -12,9 +12,11 @@ from .. import at_utils as u
 
 logger = logging.getLogger('atPipeline')
 
+#Todo - sync main class name with the name of the file
 class FineAlignRegistration(atp.ATPipeline):
     def __init__(self, _paras):
         super().__init__(_paras)
+        self.name = "fineregister"
 
         #Define the pipeline
         self.registrationPipeline = at_registration_pipeline.RegisterSessions(_paras)
@@ -25,10 +27,8 @@ class FineAlignRegistration(atp.ATPipeline):
         #Run any pre pipeline(s)
         self.registrationPipeline.run()
         self.finealignPipeline.run()
-
         atp.ATPipeline.run(self)
-        
-        return True
+
 
 class FineAlignRegistrationProcess(atpp.PipelineProcess):
     def __init__(self, _paras):
