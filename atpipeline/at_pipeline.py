@@ -12,10 +12,13 @@ logger = logging.getLogger('atPipeline')
 
 class ATPipeline:
     def __init__(self, parameters : c.ATSystemConfig):
-        self.parameters = parameters
 
+        self.name = "Pipeline mame is not defined"
+        self.parameters = parameters
         dockerClient = docker.from_env()
         atcore = dockerClient.containers.get(self.parameters.atcore_ctr_name)
+
+        #TODO - remove hardcoded container name
         render = dockerClient.containers.get("default_render_1")
 
         if render.status != "running":
@@ -25,6 +28,9 @@ class ATPipeline:
             raise ValueError("The atcore docker container is not running!")
 
         self.pipeline_processes = []
+
+    def get_name(self):
+        return self.name
 
     def run(self):
         #Iterate through the pipeline
@@ -36,8 +42,7 @@ class ATPipeline:
                 res = process.validate()
 
                 if res == False:
-                    logger.info("Failed in pipelinestep" + process.get_name())
-                    return False
+                    raise Exception("The '" + self.get_name()  + "' pipeline failed in pipeline step: " + process.get_name())
             else:
                 logger.info("Skipping pipeline step: " + process.get_name())
 

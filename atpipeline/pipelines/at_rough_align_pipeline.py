@@ -4,6 +4,7 @@ import json
 import fileinput
 from shutil import copyfile
 import posixpath
+from atpipeline.render_classes import at_simple_renderapi as srapi
 from .. import at_pipeline as atp
 from .. import at_pipeline_process as atpp
 from . import at_stitching_pipeline
@@ -17,7 +18,7 @@ class RoughAlign(atp.ATPipeline):
 
     def __init__(self, _paras):
         super().__init__(_paras)
-
+        self.name = "roughalign"
         #Define the pipeline
         self.stitchingPipeline     =  at_stitching_pipeline.Stitch(_paras)
 
@@ -30,9 +31,7 @@ class RoughAlign(atp.ATPipeline):
     def run(self):
         #Run any pre pipeline(s)
         self.stitchingPipeline.run()
-
         atp.ATPipeline.run(self)
-        return True
 
 #-----------------------------------------------------------------------------------------------
 
@@ -150,6 +149,10 @@ class CreateLowResTilePairs(atpp.PipelineProcess):
             for line in fileinput.input(jsonfileedit, inplace=True):
                 print(line.replace("render-parameters", "render-parameters?removeAllOption=true"), end="")
 
+    def validate(self):
+        #Make sure that a match collection was created.. if not return false
+
+        return True
 
 class CreateLowResPointMatches(atpp.PipelineProcess):
 
@@ -212,6 +215,17 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             #Run =============
             self.submit_atcore(cmd)
 
+    def validate(self):
+        #Make sure that a match collection was created.. if not return false
+        p = self.paras
+        rp     = p.renderProject
+        sr      = srapi.SimpleRenderAPI(p, rp.owner)
+        match_collection_name = rp.project_name + "_lowres_round"
+        mc = sr.get_matchcollection(rp.owner, match_collection_name)
+        if mc == None:
+            return False
+
+        return True
 
 class CreateRoughAlignedStacks(atpp.PipelineProcess):
 
@@ -340,9 +354,6 @@ class ApplyLowResToHighRes(atpp.PipelineProcess):
             cmd = cmd + " --prealigned_stack %s"           %(inputStack)
             cmd = cmd + " --output_stack %s"     		   %(outputStack)
 
-
-       #cmd = cmd + " --minZ 0"#%d"                  %(p.firstSection*100)
-            #cmd = cmd + " --maxZ 5000"#%d"                  %(p.lastSection*100)
             first_ribbon = int(p.ribbons[0][6:])
             last_ribbon  = int(p.ribbons[-1][6:])
 

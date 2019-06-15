@@ -131,6 +131,7 @@ def main():
 
         #Run the pipeline
         aPipeline.run()
+        logger.info("The '" + system_config.pipeline + "' pipeline finished succesfully")
 
     except ValueError as e:
         logger.error('ValueError: ' + str(e))
