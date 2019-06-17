@@ -86,14 +86,12 @@ RUN mvn install
 
 # Install render-python
 WORKDIR /shared/render-python
-#RUN git clone --branch master --single-branch https://github.com/fcollman/render-python.git /shared/render-python && \
-#    pip install -e /shared/render-python
-RUN git clone --branch pointmatch_channels --single-branch https://github.com/perlman/render-python /shared/render-python && \
+RUN git clone --branch master --single-branch https://github.com/perlman/render-python /shared/render-python && \
     pip install -e /shared/render-python
 
 # Install render-modules
 WORKDIR /shared/render-modules
-RUN git clone --branch at_develop --single-branch https://github.com/AllenInstitute/render-modules.git /shared/render-modules && \
+RUN git clone --branch master --single-branch https://github.com/AllenInstitute/render-modules.git /shared/render-modules && \
     pip install -e /shared/render-modules
 
 # Install render-python-apps
