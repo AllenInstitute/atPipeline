@@ -68,8 +68,7 @@ class FineAlignRegistrationProcess(atpp.PipelineProcess):
                     source_stack = "S%d_Stitched" %(int(session))
                     output_stack = "S%d_FineAligned_Registered"%(int(session))
 
-                    cmd = "docker exec " + p.atcore_ctr_name
-                    cmd = cmd + " /opt/conda/bin/python -m renderapps.registration.apply_alignment_transform_from_registered_stack"
+                    cmd =       "/opt/conda/bin/python -m renderapps.registration.apply_alignment_transform_from_registered_stack"
                     cmd = cmd + " --render.host %s"                 %(rp.host)
                     cmd = cmd + " --render.owner %s "               %(rp.owner)
                     cmd = cmd + " --render.project %s"              %(rp.project_name)
@@ -84,7 +83,7 @@ class FineAlignRegistrationProcess(atpp.PipelineProcess):
                     cmd = cmd + " --pool_size %d"                   %(4)
                     cmd = cmd + " --diffZ %s"                       %("True")
 
-                    self.submit(cmd)
+                    self.submit_atcore(cmd)
             except:
                 raise
 

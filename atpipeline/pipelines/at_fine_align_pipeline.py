@@ -54,9 +54,7 @@ class ConsolidateRoughAlignedStackTransforms(atpp.PipelineProcess):
                 sessionNR = int(session[7:])
                 logger.info("Processing session: " + str(sessionNR))
 
-
-                cmd = "docker exec "+ p.atcore_ctr_name
-                cmd = cmd + " /opt/conda/bin/python -m rendermodules.stack.consolidate_transforms"
+                cmd =       "/opt/conda/bin/python -m rendermodules.stack.consolidate_transforms"
                 cmd = cmd + " --render.host %s"                             %(rp.host)
                 cmd = cmd + " --render.project %s"                          %(rp.project_name)
                 cmd = cmd + " --render.owner %s"                            %(rp.owner)
@@ -70,7 +68,7 @@ class ConsolidateRoughAlignedStackTransforms(atpp.PipelineProcess):
                 cmd = cmd + " --output_json Test"
 
                 # Run =============
-                self.submit(cmd)
+                self.submit_atcore(cmd)
             return True
         except:
             return False
@@ -100,8 +98,7 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
 
             rp = p.renderProject
 
-            cmd = "docker exec " + p.atcore_ctr_name
-            cmd = cmd + " /opt/conda/bin/python -m renderapps.stitching.create_montage_pointmatches_in_place"
+            cmd =       "/opt/conda/bin/python -m renderapps.stitching.create_montage_pointmatches_in_place"
             cmd = cmd + " --render.host %s"                           %(rp.host)
             cmd = cmd + " --render.project %s"                        %(rp.project_name)
             cmd = cmd + " --render.owner %s"                          %(rp.owner)
@@ -118,7 +115,7 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
             cmd = cmd + " --output_json Test"
 
             # Run =============
-            self.submit(cmd)
+            self.subsubmit_atcoremit(cmd)
 
 
 class Create_HR_tilepairs(atpp.PipelineProcess):
@@ -144,8 +141,7 @@ class Create_HR_tilepairs(atpp.PipelineProcess):
             jsonfile = os.path.join(jsonOutputFolder, "tilepairs-%s-%s-%s-%s-nostitch.json"     %(sessionNR, p.CREATE_HR_TILEPAIRS['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
 
             #Run the TilePairClient
-            cmd = "docker exec " + p.atcore_ctr_name
-            cmd = cmd + " java -cp /shared/render/render-ws-java-client/target/render-ws-java-client-2.1.0-SNAPSHOT-standalone.jar"
+            cmd =       "java -cp /shared/render/render-ws-java-client/target/render-ws-java-client-2.1.0-SNAPSHOT-standalone.jar"
             cmd = cmd + " org.janelia.render.client.TilePairClient"
             cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(rp.host, rp.hostPort)
             cmd = cmd + " --owner %s"							    %(rp.owner)
@@ -160,7 +156,7 @@ class Create_HR_tilepairs(atpp.PipelineProcess):
             cmd = cmd + " --xyNeighborFactor %s"                    %(p.CREATE_HR_TILEPAIRS['XY_NEIGHBOR_FACTOR'])
 
             #Run =============
-            self.submit(cmd)
+            self.submit_atcore(cmd)
 
             #Prepare json file for the SIFTPointMatch Client
             jsonfileedit      = os.path.join(jsonOutputFolder, "tilepairs-%s-%s-%d-%d-nostitch-EDIT.json"%(sessionNR, p.CREATE_HR_TILEPAIRS['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
@@ -196,14 +192,11 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
             spark = at_spark.Spark(int(p.config['GENERAL']['HOST_MEMORY']), int(p.config['GENERAL']['HOST_NUMBER_OF_CORES']), data_info)
 
             #SIFT Point Match Client
-            cmd = "docker exec " + p.atcore_ctr_name
-            cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
-
+            cmd =       "/usr/spark-2.0.2/bin/spark-submit"
             cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism)
             cmd = cmd + " --driver-memory %s"                       %(str(spark.driver_memory) + "g")
             cmd = cmd + " --executor-memory %s"                     %(str(spark.executor_memory) + "g")
             cmd = cmd + " --executor-cores %s"                      %(str(spark.executor_cores) )
-
             cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
             cmd = cmd + " --name PointMatchFull"
             cmd = cmd + " --master local[%s] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"%(p.config['GENERAL']['SPARK_WORKER_THREADS'])
@@ -224,7 +217,7 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
             cmd = cmd + " --renderScale %s"                         %(p.CREATE_HR_POINTMATCHES['RENDER_SCALE'])
             cmd = cmd + " --matchRod %s"                            %(p.CREATE_HR_POINTMATCHES['MATCH_ROD'])
             #cmd = cmd + " --matchFilter CONSENSUS_SETS"
-            self.submit(cmd)
+            self.submit_atcore(cmd)
 
 class Create_fine_aligned_stacks(atpp.PipelineProcess):
 
@@ -318,10 +311,9 @@ class Create_fine_aligned_stacks(atpp.PipelineProcess):
                                     rp.clientScripts, rp.logLevel, p.firstSection, p.lastSection, p.toMount(dataOutputFolder))
 
             #Run docker command
-            cmd = "docker exec " + p.atcore_ctr_name
-            cmd = cmd + " /opt/conda/bin/python -m rendermodules.solver.solve"
+            cmd =       "/opt/conda/bin/python -m rendermodules.solver.solve"
             cmd = cmd + " --input_json %s" %(p.toMount(input_json))
             cmd = cmd + " --output_json %s"%(p.toMount(output_json))
 
             # Run =============
-            self.submit(cmd)
+            self.submit_atcore(cmd)

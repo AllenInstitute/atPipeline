@@ -71,8 +71,7 @@ class RegisterSessionsProcess(atpp.PipelineProcess):
                     for sectnum in range(firstSection, lastSection + 1):
                         z = ribbon*100+sectnum
 
-                        cmd = "docker exec " + p.atcore_ctr_name
-                        cmd = cmd + " /opt/conda/bin/python -m renderapps.registration.calc_registration"
+                        cmd =       " /opt/conda/bin/python -m renderapps.registration.calc_registration"
                         cmd = cmd + " --render.host %s"                 %(rp.host)
                         cmd = cmd + " --render.owner %s "               %(rp.owner)
                         cmd = cmd + " --render.project %s"              %(rp.project_name)
@@ -92,7 +91,7 @@ class RegisterSessionsProcess(atpp.PipelineProcess):
                         cmd = cmd + " --matchcollection %s"             %("S1_S%d_matches" % session)
                         cmd = cmd + " --pool_size %d"                   %(1)
                         cmd = cmd + " --scale %f"                       %(0.25)
-                        self.submit(cmd)
+                        self.submit_atcore(cmd)
             except:
                 raise
         return True
