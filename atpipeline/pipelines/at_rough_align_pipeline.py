@@ -77,8 +77,7 @@ class CreateLowResStacks(atpp.PipelineProcess):
             rp = p.renderProject
 
             # docker commands
-            cmd = "docker exec " + p.atcore_ctr_name
-            cmd = cmd + " /opt/conda/bin/python -m renderapps.materialize.make_downsample_image_stack"
+            cmd =       "/opt/conda/bin/python -m renderapps.materialize.make_downsample_image_stack"
             cmd = cmd + " --render.host %s"                                %(rp.host)
             cmd = cmd + " --render.project %s"                             %(rp.project_name)
             cmd = cmd + " --render.owner %s"                               %(rp.owner)
@@ -96,7 +95,7 @@ class CreateLowResStacks(atpp.PipelineProcess):
             cmd = cmd + " --numsectionsfile %s"                            %(p.toMount(numsections_file))
 
             # Run =============
-            self.submit(cmd)
+            self.submit_atcore(cmd)
 
 
 #Note, this seem to require at least two sections to work which makes sense, so tell the user that
@@ -127,8 +126,7 @@ class CreateLowResTilePairs(atpp.PipelineProcess):
             jsonfile = os.path.join(jsondir, "tilepairs-%d-%s-%d-%d-nostitch.json"     %(sessionNR, p.LOWRES_TILE_PAIR_CLIENT['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
 
             #Run the TilePairClient
-            cmd = "docker exec " + p.atcore_ctr_name
-            cmd = cmd + " java -cp /shared/render/render-ws-java-client/target/render-ws-java-client-2.1.0-SNAPSHOT-standalone.jar"
+            cmd =       "java -cp /shared/render/render-ws-java-client/target/render-ws-java-client-2.1.0-SNAPSHOT-standalone.jar"
             cmd = cmd + " org.janelia.render.client.TilePairClient"
             cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(rp.host, rp.hostPort)
             cmd = cmd + " --owner %s"							    %(rp.owner)
@@ -143,7 +141,7 @@ class CreateLowResTilePairs(atpp.PipelineProcess):
             cmd = cmd + " --xyNeighborFactor %s"                    %(p.LOWRES_TILE_PAIR_CLIENT['XY_NEIGHBOR_FACTOR'])
 
             #Run =============
-            self.submit(cmd)
+            self.submit_atcore(cmd)
 
             #Prepare json file for the SIFTPointMatch Client
             jsonfileedit      = os.path.join(jsondir, "tilepairs-%d-%s-%d-%d-nostitch-EDIT.json"%(sessionNR, p.LOWRES_TILE_PAIR_CLIENT['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
@@ -185,14 +183,11 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             rp     = p.renderProject
 
             #SIFT Point Match Client
-            cmd = "docker exec " + p.atcore_ctr_name
-            cmd = cmd + " /usr/spark-2.0.2/bin/spark-submit"
-
+            cmd =       "/usr/spark-2.0.2/bin/spark-submit"
             cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism)
             cmd = cmd + " --driver-memory %s"                       %(str(spark.driver_memory) + "g")
             cmd = cmd + " --executor-memory %s"                     %(str(spark.executor_memory) + "g")
             cmd = cmd + " --executor-cores %s"                      %(str(spark.executor_cores) )
-
             cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
             cmd = cmd + " --name PointMatchFull"
             cmd = cmd + " --master local[%s] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-SNAPSHOT-standalone.jar"%(p.config['GENERAL']['SPARK_WORKER_THREADS'])
@@ -215,7 +210,7 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             #cmd = cmd + " --matchFilter %s"                         %(p.LOWRES_POINTMATCHES['CONSENSUS_SETS'])
 
             #Run =============
-            self.submit(cmd)
+            self.submit_atcore(cmd)
 
 
 class CreateRoughAlignedStacks(atpp.PipelineProcess):
@@ -294,11 +289,10 @@ class CreateRoughAlignedStacks(atpp.PipelineProcess):
             self.saveRoughAlignJSON(ra, input_json, rp, inputStack, outputStack, lowresPmCollection, p.firstSection, p.lastSection, p.toMount(dataOutputFolder))
 
             #Run docker command
-            cmd = "docker exec " + p.atcore_ctr_name
-            cmd = cmd + " /opt/conda/bin/python -m rendermodules.solver.solve"
+            cmd =       "/opt/conda/bin/python -m rendermodules.solver.solve"
             cmd = cmd + " --input_json %s" %(p.toMount(input_json))
             cmd = cmd + " --output_json %s"%(p.toMount(output_json))
-            self.submit(cmd)
+            self.submit_atcore(cmd)
 
 class ApplyLowResToHighRes(atpp.PipelineProcess):
 
@@ -331,8 +325,7 @@ class ApplyLowResToHighRes(atpp.PipelineProcess):
                 os.mkdir(roughalign_ts_dir)
 
             #Run docker command
-            cmd = "docker exec " + p.atcore_ctr_name
-            cmd = cmd + " /opt/conda/bin/python -m renderapps.rough_align.ApplyLowRes2HighRes"
+            cmd =       "/opt/conda/bin/python -m renderapps.rough_align.ApplyLowRes2HighRes"
             cmd = cmd + " --render.host %s"                %(rp.host)
             cmd = cmd + " --render.owner %s "              %(rp.owner)
             cmd = cmd + " --render.project %s"             %(rp.project_name)
@@ -355,4 +348,4 @@ class ApplyLowResToHighRes(atpp.PipelineProcess):
 
             cmd = cmd + " --minZ %d --maxZ %d"       %(first_ribbon*100, (last_ribbon+1) * 100)
 
-            self.submit(cmd)
+            self.submit_atcore(cmd)

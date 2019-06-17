@@ -76,3 +76,26 @@ class PipelineProcess(ABC):
             logger.error("PROC_RETURN_CODE:" + str(proc.returncode))
             raise Exception("Error in pipeline step: " + self.name)
 
+        return True
+
+    def submit_atcore(self, cmd, container_name=None, use_container=True):
+        """Submit a command to be run in the atcore container.
+        Parameters
+        ==========
+        cmd: str
+            Command to be run.
+        container_name: str or None
+            Name of container to use (or p.atcore_ctr_name if None)
+        use_container: bool
+            Use the atcore container (true) or execute directly (false).
+            Set to false if already running inside the atcore container.
+        """
+        p = self.paras
+        if use_container:
+            if container_name is None:
+                container_name = p.atcore_ctr_name
+            newcmd = "docker exec %s %s" % (container_name, cmd)
+            return self.submit(newcmd)
+        else:
+            # This call is being made inside the container. Don't add 'docker exec'.
+            return self.submit(cmd)
