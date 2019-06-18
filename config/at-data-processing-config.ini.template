@@ -92,3 +92,16 @@ POOL_SIZE=10
 [DATA_INPUT]
 DATA_ROOT_FOLDER=c:\data
 
+[DOCKER]
+# Should we use the --user flag with docker exec?
+USE_DOCKER_USER_FLAG=yes
+
+# Should operations within atcore be called as the calling user and group?
+RUN_ATCORE_AS_CALLING_USER=yes
+RUN_ATCORE_AS_CALLING_GROUP=no
+
+# Should operations within atcore be called as a _single_ user?
+# (Used only if relevent RUN_ATCORE_AS_CALLING_* setting above is not set.)
+# These values can be a UID (e.g. 0), or a string (which will be resolved outside of the container)
+RUN_ATCORE_AS_USER=
+RUN_ATCORE_AS_GROUP=atpipeline
