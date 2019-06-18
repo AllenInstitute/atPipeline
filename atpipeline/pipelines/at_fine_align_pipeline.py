@@ -192,7 +192,7 @@ class Create_HR_pointmatches(atpp.PipelineProcess):
             spark = at_spark.Spark(int(p.config['GENERAL']['HOST_MEMORY']), int(p.config['GENERAL']['HOST_NUMBER_OF_CORES']), data_info)
 
             #SIFT Point Match Client
-            cmd =       "/usr/spark-2.0.2/bin/spark-submit"
+            cmd =       "/pipeline/spark_wrapper.sh /usr/spark-2.0.2/bin/spark-submit"
             cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism)
             cmd = cmd + " --driver-memory %s"                       %(str(spark.driver_memory) + "g")
             cmd = cmd + " --executor-memory %s"                     %(str(spark.executor_memory) + "g")
