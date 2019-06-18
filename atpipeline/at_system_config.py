@@ -5,7 +5,8 @@ from . import at_utils as u
 import posixpath
 from . import at_render_project as rp
 import re
-
+import grp
+import pwd
 
 #Class that carries system and other parameters for the AT pipeline.
 #Two 'clients' are using this class, the atbackend and the atcore.
@@ -73,6 +74,31 @@ class ATSystemConfig:
 
         if client == 'atbackend':
             self.createReferencesForBackend(args)
+
+        if client == 'atcore' and u.toBool(self.config['DOCKER']['USE_DOCKER_USER_FLAG']):
+            self.atcore_user_flag = True
+            # Figure out userids for execution
+            if  u.toBool(self.config['DOCKER']['RUN_ATCORE_AS_CALLING_USER']):
+                # What is the calling uid?
+                self.atcore_uid = os.getuid()
+            else:
+                try:
+                    # Use the integer value, if specified
+                    self.atcore_uid = int(self.config['DOCKER']['RUN_ATCORE_AS_USER'])
+                except ValueError:
+                    self.atcore_uid = pwd.getpwnam(self.config['DOCKER']['RUN_ATCORE_AS_CALLING_GROUP'])[2]
+            if  u.toBool(self.config['DOCKER']['RUN_ATCORE_AS_CALLING_GROUP']):
+                # What is the calling primary gid?
+                self.atcore_gid = os.getgid()
+            else:
+                try:
+                    # Use the integer value, if specified
+                    self.atcore_gid =int(self.config['DOCKER']['RUN_ATCORE_AS_GROUP'])
+                except ValueError:
+                    self.atcore_gid = grp.getgrnam(self.config['DOCKER']['RUN_ATCORE_AS_GROUP'])[2]
+        else:
+            self.atcore_user_flag = False
+
 
 
     #The arguments passed here are captured from the commandline and will over ride any option

@@ -115,7 +115,7 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
             cmd = cmd + " --output_json Test"
 
             # Run =============
-            self.subsubmit_atcoremit(cmd)
+            self.submit_atcore(cmd)
 
 
 class Create_HR_tilepairs(atpp.PipelineProcess):

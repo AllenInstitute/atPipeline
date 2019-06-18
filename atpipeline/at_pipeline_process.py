@@ -94,7 +94,11 @@ class PipelineProcess(ABC):
         if use_container:
             if container_name is None:
                 container_name = p.atcore_ctr_name
-            newcmd = "docker exec %s %s" % (container_name, cmd)
+            if p.atcore_user_flag:
+                userflag = "--user %d:%d" % (p.atcore_uid, p.atcore_gid)
+                newcmd = "docker exec %s %s %s" % (userflag, container_name, cmd)
+            else:
+                newcmd = "docker exec %s %s" % (container_name, cmd)
             return self.submit(newcmd)
         else:
             # This call is being made inside the container. Don't add 'docker exec'.
