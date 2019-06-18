@@ -183,7 +183,7 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             rp     = p.renderProject
 
             #SIFT Point Match Client
-            cmd =       "/usr/spark-2.0.2/bin/spark-submit"
+            cmd =       "/pipeline/spark_wrapper.sh /usr/spark-2.0.2/bin/spark-submit"
             cmd = cmd + " --conf spark.default.parallelism=%s"      %(spark.default_parallelism)
             cmd = cmd + " --driver-memory %s"                       %(str(spark.driver_memory) + "g")
             cmd = cmd + " --executor-memory %s"                     %(str(spark.executor_memory) + "g")
