@@ -65,7 +65,7 @@ class ConsolidateRoughAlignedStackTransforms(atpp.PipelineProcess):
                 cmd = cmd + " --stack S%d_RoughAligned"                     %(sessionNR)
                 cmd = cmd + " --output_stack S%d_RoughAligned_Consolidated" %(sessionNR)
                 cmd = cmd + " --close_stack %d"                             %(True)
-                cmd = cmd + " --output_json Test"
+                # cmd = cmd + " --output_json Test"
 
                 # Run =============
                 self.submit_atcore(cmd)
@@ -112,7 +112,7 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
             cmd = cmd + " --dataRoot %s"                              %(p.toMount(p.absoluteDataOutputFolder))
             cmd = cmd + " --matchCollection %s"                       %("%s_HR_2D"%(rp.project_name))
             cmd = cmd + " --delta %s"                                 %(p.CREATE_2D_POINTMATCHES['DELTA'])
-            cmd = cmd + " --output_json Test"
+            # cmd = cmd + " --output_json Test"
 
             # Run =============
             self.submit_atcore(cmd)
