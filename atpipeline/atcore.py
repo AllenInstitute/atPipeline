@@ -55,8 +55,7 @@ def main():
             dataInfo = json.loads(u.getJSON(cmd))
 
             if args.pipeline == None:
-                #print(json.dumps(dataInfo, indent=2, sort_keys=False))
-                print (json.dumps(dataInfo, sort_keys=False))
+                print (json.dumps(dataInfo, indent=4, sort_keys=True))
                 #print('\nPlease supply a valid pipeline to option "--pipeline" in order to process data.')
                 return
 
