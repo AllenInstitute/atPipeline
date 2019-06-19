@@ -82,6 +82,7 @@ class ATSystemConfig:
 
         if client == 'atcore' and u.toBool(self.config['DOCKER']['USE_DOCKER_USER_FLAG']):
             self.atcore_user_flag = True
+
             # Figure out userids for execution
             if  u.toBool(self.config['DOCKER']['RUN_ATCORE_AS_CALLING_USER']):
                 # What is the calling uid?
@@ -91,7 +92,8 @@ class ATSystemConfig:
                     # Use the integer value, if specified
                     self.atcore_uid = int(self.config['DOCKER']['RUN_ATCORE_AS_USER'])
                 except ValueError:
-                    self.atcore_uid = pwd.getpwnam(self.config['DOCKER']['RUN_ATCORE_AS_CALLING_GROUP'])[2]
+                    self.atcore_uid = pwd.getpwnam(self.config['DOCKER']['RUN_ATCORE_AS_USER'])[2]
+
             if  u.toBool(self.config['DOCKER']['RUN_ATCORE_AS_CALLING_GROUP']):
                 # What is the calling primary gid?
                 self.atcore_gid = os.getgid()
