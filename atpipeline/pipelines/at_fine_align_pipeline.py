@@ -29,9 +29,7 @@ class FineAlign(atp.ATPipeline):
     def run(self):
         #Run any pre pipeline(s)
         self.roughAlignPipeline.run()
-
         atp.ATPipeline.run(self)
-
         return True
 
 class ConsolidateRoughAlignedStackTransforms(atpp.PipelineProcess):
@@ -39,41 +37,36 @@ class ConsolidateRoughAlignedStackTransforms(atpp.PipelineProcess):
     def __init__(self, _paras):
         super().__init__(_paras, "ConsolidateRoughAlignedStackTransforms")
 
-##    def validate(self):
-##        super().validate()
-##        pass
-
     def run(self):
         super().run()
+        p = self.paras
+        rp = p.renderProject
 
-        try:
-            p = self.paras
-            rp = p.renderProject
+        jsonOutputFolder  = os.path.join(p.absoluteDataOutputFolder, "consolidated_transforms")
 
-            for session in p.sessions:
-                sessionNR = int(session[7:])
-                logger.info("Processing session: " + str(sessionNR))
+        # Make sure that the output folder exist
+        if os.path.isdir(jsonOutputFolder) == False:
+            os.mkdir(jsonOutputFolder)
 
-                cmd =       "/opt/conda/bin/python -m rendermodules.stack.consolidate_transforms"
-                cmd = cmd + " --render.host %s"                             %(rp.host)
-                cmd = cmd + " --render.project %s"                          %(rp.project_name)
-                cmd = cmd + " --render.owner %s"                            %(rp.owner)
-                cmd = cmd + " --render.client_scripts %s"                   %(rp.clientScripts)
-                cmd = cmd + " --render.memGB %s"                            %(rp.memGB)
-                cmd = cmd + " --render.port %s"                             %(rp.hostPort)
-                cmd = cmd + " --pool_size %s"                               %(p.GENERAL['AT_CORE_THREADS'])
-                cmd = cmd + " --stack S%d_RoughAligned"                     %(sessionNR)
-                cmd = cmd + " --output_stack S%d_RoughAligned_Consolidated" %(sessionNR)
-                cmd = cmd + " --close_stack %d"                             %(True)
-                # cmd = cmd + " --output_json Test"
+        for session in p.sessions:
+            sessionNR = int(session[7:])
+            logger.info("Processing session: " + str(sessionNR))
 
-                # Run =============
-                self.submit_atcore(cmd)
-            return True
-        except:
-            return False
+            cmd =       "/opt/conda/bin/python -m rendermodules.stack.consolidate_transforms"
+            cmd = cmd + " --render.host %s"                             %(rp.host)
+            cmd = cmd + " --render.project %s"                          %(rp.project_name)
+            cmd = cmd + " --render.owner %s"                            %(rp.owner)
+            cmd = cmd + " --render.client_scripts %s"                   %(rp.clientScripts)
+            cmd = cmd + " --render.memGB %s"                            %(rp.memGB)
+            cmd = cmd + " --render.port %s"                             %(rp.hostPort)
+            cmd = cmd + " --pool_size %s"                               %(p.GENERAL['AT_CORE_THREADS'])
+            cmd = cmd + " --stack S%d_RoughAligned"                     %(sessionNR)
+            cmd = cmd + " --output_stack S%d_RoughAligned_Consolidated" %(sessionNR)
+            cmd = cmd + " --close_stack %d"                             %(True)
+            cmd = cmd + " --output_json %s"%(p.toMount(os.path.join(jsonOutputFolder, "out.json")))
 
-
+            # Run =============
+            self.submit_atcore(cmd)
 
 class Create_2D_pointmatches(atpp.PipelineProcess):
 
@@ -84,6 +77,12 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
         super().run()
 
         p = self.paras
+
+        jsonOutputFolder  = os.path.join(p.absoluteDataOutputFolder, "consolidated_transforms")
+
+        # Make sure that the output folder exist
+        if os.path.isdir(jsonOutputFolder) == False:
+            os.mkdir(jsonOutputFolder)
 
         for session in p.sessions:
             #Check which ribbon we are processing, and adjust section numbers accordingly
@@ -112,7 +111,7 @@ class Create_2D_pointmatches(atpp.PipelineProcess):
             cmd = cmd + " --dataRoot %s"                              %(p.toMount(p.absoluteDataOutputFolder))
             cmd = cmd + " --matchCollection %s"                       %("%s_HR_2D"%(rp.project_name))
             cmd = cmd + " --delta %s"                                 %(p.CREATE_2D_POINTMATCHES['DELTA'])
-            # cmd = cmd + " --output_json Test"
+            cmd = cmd + " --output_json %s"%(p.toMount(os.path.join(jsonOutputFolder, "out2.json")))
 
             # Run =============
             self.submit_atcore(cmd)

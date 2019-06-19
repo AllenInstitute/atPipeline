@@ -8,11 +8,13 @@ from atpipeline import at_system_config
 @pytest.fixture
 def system_config():
     from atpipeline import at_system_config
-    from atpipeline import at_atcore_arguments
+    from atpipeline import at_atcore_arguments, at_common_arguments
 
     parser = argparse.ArgumentParser('backend')
     at_backend_arguments.add_arguments(parser)
+    at_common_arguments.add_arguments(parser)
     args = parser.parse_args([])
+
     return at_system_config.ATSystemConfig(args, client = 'backend')
 
 @pytest.fixture

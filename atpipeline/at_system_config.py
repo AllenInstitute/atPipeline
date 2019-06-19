@@ -5,8 +5,13 @@ from . import at_utils as u
 import posixpath
 from . import at_render_project as rp
 import re
-import grp
-import pwd
+
+#If on windows..
+try:
+    import grp
+    import pwd
+except ImportError:
+    pass
 
 #Class that carries system and other parameters for the AT pipeline.
 #Two 'clients' are using this class, the atbackend and the atcore.

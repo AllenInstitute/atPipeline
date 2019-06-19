@@ -30,12 +30,18 @@ def test_rough_aligning(test_data_folder, test_data_set):
     from atpipeline import at_utils as u
     data_root = os.path.join(test_data_folder, 'input', test_data_set)
     data_ini_file = os.path.join(test_data_folder,'input', PROJECT_INI)
-    cmd = r'atcore --data ' + data_root + ' --pipeline roughalign --overwritedata --renderprojectowner PyTest --configfile ' + data_ini_file + ' --projectname ' + PROJECT_NAME
+    cmd = r'atcore --data ' + data_root + ' --pipeline roughalign --renderprojectowner PyTest --configfile ' + data_ini_file + ' --projectname ' + PROJECT_NAME
 
     #This will take about 15 minutes ===============
     print (cmd)
     try:
         out = u.runShellCMD(cmd)
+        for item in out:
+            if item.find('Error') != -1:
+                print ("ErrorLine: " + item)
+                assert False
+        else:
+            assert True		        
     except Exception:
         assert False
 

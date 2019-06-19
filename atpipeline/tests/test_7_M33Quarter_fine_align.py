@@ -35,6 +35,12 @@ def test_fine_aligning(test_data_folder, test_data_set):
     print (cmd)
     try:
         out = u.runShellCMD(cmd)
+        for item in out:
+            if item.find('Error') != -1:
+                print ("ErrorLine: " + item)
+                assert False
+        else:
+            assert True
     except Exception:
         assert False
 
