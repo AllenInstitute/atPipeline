@@ -63,9 +63,9 @@ class FineAlignRegistrationProcess(atpp.PipelineProcess):
                     continue
                 else:
                     logger.info("Processing session: " + str(session))
-                    prealigned_stack = "S1_Stitched"
+                    prealigned_stack = "S1_Stitched_Dropped"
                     postaligned_stack = "S1_FineAligned"
-                    source_stack = "S%d_Stitched" %(int(session))
+                    source_stack = "S%d_Stitched_Dropped" %(int(session))
                     output_stack = "S%d_FineAligned_Registered"%(int(session))
 
                     cmd =       "/opt/conda/bin/python -m renderapps.registration.apply_alignment_transform_from_registered_stack"
