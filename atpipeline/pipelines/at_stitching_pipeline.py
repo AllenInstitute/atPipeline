@@ -308,25 +308,10 @@ class CreateStitchedSections(atpp.PipelineProcess):
 
                     #Run =============
                     self.submit_atcore(cmd)
-                else:
+                else: #Single tile/section data
                     rp     = p.renderProject
                     sr = srapi.SimpleRenderAPI(p, rp.owner)
                     response = sr.clone_stack(input_stack, output_stack, rp)
-
-                    #Create the output stack if it does not exist
-##                    response = renderapi.stack.create_stack(output_stack,
-##                                                            host="http://" + rp.host,
-##                                                            owner=rp.owner,
-##                                                            project=rp.project_name,
-##                                                            render=sr.get_render_client())
-##
-##
-##
-##                    one_tile = renderapi.resolvedtiles.get_resolved_tiles_from_z(input_stack, z, project=rp.project_name, render=sr.get_render_client())
-##                    response = renderapi.resolvedtiles.put_tilespecs(output_stack, one_tile, project=rp.project_name, render=sr.get_render_client())
-##                    if response != 200:
-##                        raise ValueError('Failed uploading tiles..')
-
                     break
                     #just save the tile to output stack
 
