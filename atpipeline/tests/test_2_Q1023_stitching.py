@@ -33,7 +33,9 @@ def test_meta_data(test_data_folder, test_data_set):
 
     data_root = os.path.join(test_data_folder, 'input', test_data_set)
     cmd = 'atcore --datasummary --data ' + data_root
+    print (cmd)
     out = u.getJSON(cmd)
+    print (out)
     data = json.loads(out)
 
     #Values for the Q1023 dataset
@@ -136,7 +138,7 @@ def test_median_jsons(test_data_folder, test_data_set):
                'median_11_2_0_3.json'
             ]
     for f in files:
-        assert tu.compare_file_in_folders(f, test_folder, ref_folder) == True
+       assert tu.compare_file_in_folders(f, test_folder, ref_folder) == True
 
 def test_flatfield_jsons(test_data_folder, test_data_set):
     sub_dir = 'flatfield'
