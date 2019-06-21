@@ -15,18 +15,6 @@ class ATPipeline:
 
         self.name = "Pipeline mame is not defined"
         self.parameters = parameters
-        dockerClient = docker.from_env()
-        atcore = dockerClient.containers.get(self.parameters.atcore_ctr_name)
-
-        #TODO - remove hardcoded container name
-        render = dockerClient.containers.get("default_render_1")
-
-        if render.status != "running":
-            raise ValueError("The Render docker container is not running!")
-
-        if atcore.status != "running":
-            raise ValueError("The atcore docker container is not running!")
-
         self.pipeline_processes = []
 
     def get_name(self):
