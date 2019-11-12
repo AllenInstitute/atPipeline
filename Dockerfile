@@ -99,10 +99,6 @@ WORKDIR /shared/render-python-apps
 RUN git clone --branch at_develop --single-branch https://github.com/AllenInstitute/render-python-apps.git /shared/render-python-apps && \
     pip install -e /shared/render-python-apps
 
-# Force a new version of EMaligner
-WORKDIR /shared
-RUN pip install --upgrade EMaligner==0.3.7
-
 # Copy pipeline files
 WORKDIR /pipeline
 COPY ./pipeline/ /pipeline
