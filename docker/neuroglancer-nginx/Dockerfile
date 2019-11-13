@@ -1,6 +1,6 @@
 FROM node:12 as build-stage
-ARG NG_GIT=https://github.com/perlman/neuroglancer.git 
-ARG NG_BRANCH=atpipeline
+ARG NG_GIT=https://github.com/google/neuroglancer.git 
+ARG NG_BRANCH=master
 WORKDIR /work
 RUN git clone $NG_GIT --depth 1 --branch $NG_BRANCH neuroglancer
 WORKDIR /work/neuroglancer
