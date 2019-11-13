@@ -11,6 +11,7 @@ The AT Pipeline requiremes Python >= 3.4.
 
 To install in developer mode (e.g., install via symlink)
 ```console
+% pip install git+https://github.com/fcollman/render-python
 % pip install -e .
 ```
 
@@ -23,7 +24,6 @@ The backend can be run with ```atbackend <args>``` or ```python -m atpipeline.at
 ## Run the pipeline (atfrontend)
 
 The backend can be run with ```atcore <args>``` or ```python -m atpipeline.atcore <args>```.
-
 
 ## Level of support
 

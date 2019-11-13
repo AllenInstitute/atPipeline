@@ -110,10 +110,10 @@ ENV CC=/usr/bin/clang
 ENV CXX=/usr/bin/clang++
 RUN mkdir -p /libs && mkdir -p /build
 
-RUN git clone --branch develop --single-branch --recurse-submodules https://github.com/TotteKarlsson/dsl.git /libs/dsl
-RUN git clone --branch develop --single-branch https://github.com/AllenInstitute/ATExplorer.git /libs/atExplorer
+RUN echo hello world!
+RUN git clone --branch atpipeline --recurse-submodules https://github.com/TotteKarlsson/dsl.git /libs/dsl
+RUN git clone --branch develop --depth 1 https://github.com/AllenInstitute/ATExplorer.git /libs/atExplorer
 
-# COPY ./docker/clang-container/third-party-libs /libs
 COPY ./docker/clang-container/build-thirdparty-libs.bash /build
 WORKDIR /build
 RUN bash build-thirdparty-libs.bash

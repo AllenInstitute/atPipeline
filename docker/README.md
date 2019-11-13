@@ -1,7 +1,6 @@
 ## Instructions to compile AT Pipeline docker images
 
 ### Build render-ws
-
 ```console
 git clone --branch at_develop --single-branch https://github.com/perlman/render.git build/render
 docker build -t atpipeline/render-ws:dev build/render
