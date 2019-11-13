@@ -110,7 +110,6 @@ ENV CC=/usr/bin/clang
 ENV CXX=/usr/bin/clang++
 RUN mkdir -p /libs && mkdir -p /build
 
-RUN echo hello world!
 RUN git clone --branch atpipeline --recurse-submodules https://github.com/TotteKarlsson/dsl.git /libs/dsl
 RUN git clone --branch develop --depth 1 https://github.com/AllenInstitute/ATExplorer.git /libs/atExplorer
 

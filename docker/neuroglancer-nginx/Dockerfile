@@ -2,7 +2,7 @@ FROM node:12 as build-stage
 ARG NG_GIT=https://github.com/perlman/neuroglancer.git 
 ARG NG_BRANCH=atpipeline
 WORKDIR /work
-RUN git clone $NG_GIT --branch $NG_BRANCH neuroglancer
+RUN git clone $NG_GIT --depth 1 --branch $NG_BRANCH neuroglancer
 WORKDIR /work/neuroglancer
 RUN npm install && npm run build-min
 
