@@ -1,7 +1,8 @@
 {
     "render":
     {
-        "protocol": "http"
+        "protocol": "http",
+        "encoding": "raw16"
     },
     "log_level": "ERROR",
     "neuroglancer":
@@ -9,6 +10,7 @@
         "base_url": "http://localhost:8001",
         "layer_options":{
             "opacity": 1.0,
+            "blend":"additive",
             "shader": "#uicontrol vec3 color color()\n#uicontrol float min slider(min=0, max=1.0, default=0.0)\n#uicontrol float max slider(min=0, max=1.0, default=1.0)\n\nfloat scale(float x) {\n  return (x - min) / (max - min);\n}\nvoid main() {\n  emitRGB(\n    color * vec3(\n      scale(toNormalized(getDataValue())),\n      scale(toNormalized(getDataValue())),\n      scale(toNormalized(getDataValue()))\n    )\n  );\n}"
         },
         "options":
