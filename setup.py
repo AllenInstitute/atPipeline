@@ -14,7 +14,7 @@ if __name__ == '__main__':
         version=version,
         description='Scripts to run the Allen Institute array tomography pipeline',
         url='https://github.com/allenInstitute/atPipeline',
-        packages=['atpipeline'],
+        packages=['atpipeline','atpipeline.pipelines','atpipeline.render_classes'],
         install_requires=[],
         zip_safe=False,
         entry_points = {
