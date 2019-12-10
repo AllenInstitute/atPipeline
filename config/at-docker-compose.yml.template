@@ -21,7 +21,7 @@ services:
                max-size: "5g"
 
     mongo:
-       image: mongo:3.4.2
+       image: mongo:3.4.23
        ports:
            - "27017"
        volumes:
