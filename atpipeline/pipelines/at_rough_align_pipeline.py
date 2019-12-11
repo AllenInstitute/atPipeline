@@ -125,7 +125,7 @@ class CreateLowResTilePairs(atpp.PipelineProcess):
             jsonfile = os.path.join(jsondir, "tilepairs-%d-%s-%d-%d-nostitch.json"     %(sessionNR, p.LOWRES_TILE_PAIR_CLIENT['Z_NEIGHBOR_DISTANCE'], p.firstSection, p.lastSection))
 
             #Run the TilePairClient
-            cmd =       "java -cp /shared/render/render-ws-java-client/target/render-ws-java-client-2.1.0-standalone.jar"
+            cmd =       "java -cp /shared/render/render-ws-java-client/target/render-ws-java-client-2.1.1-SNAPSHOT-standalone.jar"
             cmd = cmd + " org.janelia.render.client.TilePairClient"
             cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(rp.host, rp.hostPort)
             cmd = cmd + " --owner %s"							    %(rp.owner)
@@ -193,7 +193,7 @@ class CreateLowResPointMatches(atpp.PipelineProcess):
             cmd = cmd + " --executor-cores %s"                      %(str(spark.executor_cores) )
             cmd = cmd + " --class org.janelia.render.client.spark.SIFTPointMatchClient"
             cmd = cmd + " --name PointMatchFull"
-            cmd = cmd + " --master local[%s] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.0-standalone.jar"%(p.config['GENERAL']['SPARK_WORKER_THREADS'])
+            cmd = cmd + " --master local[%s] /shared/render/render-ws-spark-client/target/render-ws-spark-client-2.1.1-SNAPSHOT-standalone.jar"%(p.config['GENERAL']['SPARK_WORKER_THREADS'])
             cmd = cmd + " --baseDataUrl http://%s:%d/render-ws/v1"  %(rp.host, rp.hostPort)
             cmd = cmd + " --collection %s_lowres_round"             %(rp.project_name)
             cmd = cmd + " --owner %s"                               %(rp.owner)

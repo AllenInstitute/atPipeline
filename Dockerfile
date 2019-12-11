@@ -38,7 +38,8 @@ RUN addgroup --gid 10151 anaconda && \
 # USER 10151
 ENV PATH $PATH:"/bin:/sbin:/usr/bin:/opt/conda/bin"
 
-RUN conda update conda && conda update python && conda install nomkl
+# Updates currently lead to a broken python (due to new code not working with python2.7)
+# RUN conda update conda && conda update python && conda install nomkl
 
 RUN mkdir -p /shared
 WORKDIR /shared
