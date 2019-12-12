@@ -3,6 +3,7 @@ import pathlib
 import argparse
 import re
 import os
+import json
 
 def main():
 
@@ -24,12 +25,19 @@ def main():
 
 
 
-def update_metadata(oldfile, newfile, oldchannel, newchannel, dryrun=False):
+def update_metadata(oldfile, newfile, oldchannel, newchannel, dryrun=False, json_format=False):
     """Update references from oldchannel to newchannel.
        Newfile may be "None" to update inplace.
     """
+
     data = oldfile.read_text()
-    data = re.sub(r'^%s\t' % oldchannel, "%s\t" % newchannel, data, count=1, flags=re.MULTILINE)
+    if json_format:
+        json_data = json.loads(data)
+        json_data["channelname"] = newchannel
+        data = json.dumps(json_data)
+    else:
+        data = re.sub(r'^%s\t' % oldchannel, "%s\t" % newchannel, data, count=1, flags=re.MULTILINE)
+
     if not dryrun:
         if newfile:
             newfile.write_text(data)
@@ -53,7 +61,7 @@ def rename(oldname, newname, data, dryrun=False):
             # raw/data/Ribbon0004/session01/PSD95/PSD95_S0001_F0006_Z00.tif
             parts = child.parts
             # Try to match file...
-            m = re.match(r'(?P<channel>.*)(?P<rest>_S\d{4}_F\d{4}_Z\d{2}(.tif|_metadata.txt))', parts[-1])
+            m = re.match(r'(?P<channel>.*)(?P<rest>_S\d{4}_F\d{4}_Z\d{2}(.tif|_metadata.txt|_metadata.json))', parts[-1])
             if m:
                 channel = m.group('channel')
                 if channel == oldname:
@@ -71,6 +79,8 @@ def rename(oldname, newname, data, dryrun=False):
                             print("Dry run: not moving %s to %s" % (child, newfile))
                     elif parts[-1].endswith("_metadata.txt"):
                         update_metadata(child, newfile, oldname, newname, dryrun)
+                    elif parts[-1].endswith("_metadata.json"):
+                        update_metadata(child, newfile, oldname, newname, dryrun, json_format=True)
                 else:
                     print("Skipping data from channel %s" % channel)
             else:
