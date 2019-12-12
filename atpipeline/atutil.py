@@ -33,7 +33,12 @@ def update_metadata(oldfile, newfile, oldchannel, newchannel, dryrun=False, json
     data = oldfile.read_text()
     if json_format:
         json_data = json.loads(data)
-        json_data["channelname"] = newchannel
+        if oldfile.name == "session_metadata.json":
+            for channel in json_data["all_channels"]:
+                if channel["channel"] == oldchannel:
+                    channel["channel"] == newchannel
+        else:
+            json_data["channelname"] = newchannel
         data = json.dumps(json_data)
     else:
         data = re.sub(r'^%s\t' % oldchannel, "%s\t" % newchannel, data, count=1, flags=re.MULTILINE)
@@ -56,6 +61,9 @@ def rename(oldname, newname, data, dryrun=False):
             # Edit file to replace channel name at start of line!
             print("Updating %s" % child)
             update_metadata(child, None, oldname, newname, dryrun)
+        if child.name == "session_metadata.json":
+            print("Updating %s" % child)
+            update_metadata(child, None, oldname, newname, dryrun, json_format=True)
         else:
             # raw/data/Ribbon0004/session01/PSD95/PSD95_S0000_F0001_Z00_metadata.txt
             # raw/data/Ribbon0004/session01/PSD95/PSD95_S0001_F0006_Z00.tif
