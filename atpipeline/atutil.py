@@ -34,9 +34,9 @@ def update_metadata(oldfile, newfile, oldchannel, newchannel, dryrun=False, json
     if json_format:
         json_data = json.loads(data)
         if oldfile.name == "session_metadata.json":
-            for channel in json_data["all_channels"]:
-                if channel["channel"] == oldchannel:
-                    channel["channel"] == newchannel
+            for i in range(len(json_data["all_channels"])):
+                if json_data["all_channels"][i] == oldchannel:
+                    json_data["all_channels"][i] == newchannel
         else:
             json_data["channelname"] = newchannel
         data = json.dumps(json_data)
