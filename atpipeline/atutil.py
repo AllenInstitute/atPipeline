@@ -54,6 +54,7 @@ def update_metadata(oldfile, newfile, oldchannel, newchannel, dryrun=False, json
 
 
 def rename(oldname, newname, data, dryrun=False):
+    to_remove = set()
     datapath = pathlib.Path(data)
     for child in datapath.rglob("*"):
         # raw/data/Ribbon0004/session01/session_metadata.txt
@@ -77,7 +78,7 @@ def rename(oldname, newname, data, dryrun=False):
                     newfile = pathlib.Path(newdir, newname + m.group('rest'))
                     # print(newdir, newfile)
                     newdir.mkdir(exist_ok=True)
-
+                    to_remove.add(str(child.parents[0]))
                     # Found a file to move
                     if parts[-1].endswith(".tif"):
                         # Image data, move it!
@@ -93,6 +94,11 @@ def rename(oldname, newname, data, dryrun=False):
                     print("Skipping data from channel %s" % channel)
             else:
                 print("Skipping file %s" % child)
-
+    for d in to_remove:
+        try:
+            if not dryrun:
+                pathlib.Path(d).rmdir()
+        except:
+            print("Could not remove %s -- try manually?" % d)
 if __name__ == '__main__':
     main()
