@@ -19,6 +19,7 @@ if __name__ == '__main__':
         zip_safe=False,
         entry_points = {
             'console_scripts': ['atcore=atpipeline.atcore:main',
-                                'atbackend=atpipeline.atbackend:main'],
+                                'atbackend=atpipeline.atbackend:main',
+                                'atutil=atpipeline.atutil:main'],
         }
     )
