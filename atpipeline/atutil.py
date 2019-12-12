@@ -36,7 +36,7 @@ def update_metadata(oldfile, newfile, oldchannel, newchannel, dryrun=False, json
         if oldfile.name == "session_metadata.json":
             for i in range(len(json_data["all_channels"])):
                 if json_data["all_channels"][i]["channel"] == oldchannel:
-                    json_data["all_channels"][i]["channel"] == newchannel
+                    json_data["all_channels"][i]["channel"] = newchannel
         else:
             json_data["channelname"] = newchannel
         data = json.dumps(json_data)
@@ -61,7 +61,7 @@ def rename(oldname, newname, data, dryrun=False):
             # Edit file to replace channel name at start of line!
             print("Updating %s" % child)
             update_metadata(child, None, oldname, newname, dryrun)
-        if child.name == "session_metadata.json":
+        elif child.name == "session_metadata.json":
             print("Updating %s" % child)
             update_metadata(child, None, oldname, newname, dryrun, json_format=True)
         else:
