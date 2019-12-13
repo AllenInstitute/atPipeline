@@ -118,7 +118,7 @@ class SimpleRenderAPI:
             rc = renderapi.render.connect(**self.render_args)
             return renderapi.pointmatch.delete_collection(match_collection, render = rc)
 
-        logger.warning('No such match collection: "' + matchCollection + '"')
+        logger.warning('No such match collection: "' + match_collection + '"')
         return None
 
 
