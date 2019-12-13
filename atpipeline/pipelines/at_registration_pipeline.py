@@ -93,27 +93,27 @@ class RegisterSessionsProcess(atpp.PipelineProcess):
             except:
                 raise
 
-            logger.info("Combining registered volumes into a single stack")
-            stack_merge_list = []
-            merged_stack = "S%d_Stitched_Dropped_Registered_Merged"%(int(reference_session))
-            for sessionFolder in self.sessionFolders:
-                [project_root, ribbon, session] = u.parse_session_folder(sessionFolder)
-                if session == reference_session:
-                    stack_to_merge = "S%d_Stitched_Dropped"%(int(session))
-                else:
-                    stack_to_merge = "S%d_Stitched_Dropped_Registered"%(int(session))
-                stack_merge_list.append(stack_to_merge)
+        logger.info("Combining registered volumes into a single stack")
+        stack_merge_list = []
+        merged_stack = "S%d_Stitched_Dropped_Registered_Merged"%(int(reference_session))
+        for sessionFolder in self.sessionFolders:
+            [project_root, ribbon, session] = u.parse_session_folder(sessionFolder)
+            if session == reference_session:
+                stack_to_merge = "S%d_Stitched_Dropped"%(int(session))
+            else:
+                stack_to_merge = "S%d_Stitched_Dropped_Registered"%(int(session))
+            stack_merge_list.append(stack_to_merge)
 
-            print("Merging %s" % stack_merge_list)
+        print("Merging %s" % stack_merge_list)
 
-            cmd =       " /opt/conda/bin/python -m renderapps.stack.merge_stacks"
-            cmd = cmd + " --render.host %s"                 %(rp.host)
-            cmd = cmd + " --render.owner %s "               %(rp.owner)
-            cmd = cmd + " --render.project %s"              %(rp.project_name)
-            cmd = cmd + " --render.client_scripts %s"       %(rp.clientScripts)
-            cmd = cmd + " --render.port %d"                 %(rp.hostPort)
-            cmd = cmd + " --render.memGB %s"                %(rp.memGB)
-            cmd = cmd + " --output_stack %s"                %(merged_stack)
-            cmd = cmd + " --stacks %s"                      %(' '.join(stack_merge_list))
+        cmd =       " /opt/conda/bin/python -m renderapps.stack.merge_stacks"
+        cmd = cmd + " --render.host %s"                 %(rp.host)
+        cmd = cmd + " --render.owner %s "               %(rp.owner)
+        cmd = cmd + " --render.project %s"              %(rp.project_name)
+        cmd = cmd + " --render.client_scripts %s"       %(rp.clientScripts)
+        cmd = cmd + " --render.port %d"                 %(rp.hostPort)
+        cmd = cmd + " --render.memGB %s"                %(rp.memGB)
+        cmd = cmd + " --output_stack %s"                %(merged_stack)
+        cmd = cmd + " --stacks %s"                      %(' '.join(stack_merge_list))
 
-            self.submit_atcore(cmd)
+        self.submit_atcore(cmd)
