@@ -87,7 +87,7 @@ class RegisterSessionsProcess(atpp.PipelineProcess):
                         cmd = cmd + " --grossStack %s"                  %("tempGrossStack2")
                         cmd = cmd + " --filter %d"                      %(1)
                         cmd = cmd + " --matchcollection %s"             %("S1_S%d_matches" % session)
-                        cmd = cmd + " --pool_size %d"                   %(p.GENERAL['AT_CORE_THREADS'])
+                        cmd = cmd + " --pool_size %d"                   %(int(p.GENERAL['AT_CORE_THREADS']))
                         cmd = cmd + " --scale %f"                       %(0.25)
                         self.submit_atcore(cmd)
             except:
