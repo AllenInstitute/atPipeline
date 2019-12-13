@@ -2,7 +2,8 @@
     "render":
     {
         "protocol": "http",
-        "encoding": "raw16"
+        "encoding": "raw16",
+        "all_channels": true
     },
     "log_level": "ERROR",
     "neuroglancer":
