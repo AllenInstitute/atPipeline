@@ -15,6 +15,7 @@ logger = logging.getLogger('atPipeline')
 class RoughAlignRegistration(atp.ATPipeline):
     def __init__(self, _paras):
         super().__init__(_paras)
+        self.name = "roughalignregister"
 
         #Define the pipeline
         self.roughAlignPipeline = at_rough_align_pipeline.RoughAlign(_paras)
@@ -23,8 +24,8 @@ class RoughAlignRegistration(atp.ATPipeline):
 
     def run(self):
         #Run any pre pipeline(s)
-        self.registrationPipeline.run()
         self.roughAlignPipeline.run()
+        self.registrationPipeline.run()
 
         atp.ATPipeline.run(self)
         

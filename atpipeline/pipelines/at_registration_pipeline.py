@@ -6,6 +6,7 @@ from shutil import copyfile
 from .. import at_pipeline as atp
 from .. import at_pipeline_process as atpp
 from . import at_rough_align_pipeline
+from . import at_stitching_pipeline
 from .. import at_utils as u
 
 
@@ -16,14 +17,17 @@ class RegisterSessions(atp.ATPipeline):
     def __init__(self, _paras):
         super().__init__(_paras)
         self.name = "register"
+
         #Define the pipeline
-        self.roughAlignPipeline = at_rough_align_pipeline.RoughAlign(_paras)
+        self.stitchingPipeline = at_stitching_pipeline.Stitch(_paras)
         self.append_pipeline_process(RegisterSessionsProcess(_paras))
 
     def run(self):
         #Run any pre pipeline(s)
-        self.roughAlignPipeline.run()
+        self.stitchingPipeline.run()
         atp.ATPipeline.run(self)
+
+        return True
 
 class RegisterSessionsProcess(atpp.PipelineProcess):
 
@@ -83,11 +87,11 @@ class RegisterSessionsProcess(atpp.PipelineProcess):
                         cmd = cmd + " --outputStack %s"     		    %(outputStack)
                         cmd = cmd + " --section %d"                     %(z)
                         cmd = cmd + " --output_dir %s"                  %(output_dir)
-                        cmd = cmd + " --grossRefStack %s"               %("tempGrossStack1")
-                        cmd = cmd + " --grossStack %s"                  %("tempGrossStack2")
+                        cmd = cmd + " --grossRefStack %s"               %("%s_tempGrossStack1" % rp.project_name)
+                        cmd = cmd + " --grossStack %s"                  %("%s_tempGrossStack2" % rp.project_name)
                         cmd = cmd + " --filter %d"                      %(1)
-                        cmd = cmd + " --matchcollection %s"             %("S1_S%d_matches" % session)
-                        cmd = cmd + " --pool_size %d"                   %(int(p.GENERAL['AT_CORE_THREADS']))
+                        cmd = cmd + " --matchcollection %s"             %("%s_S1_S%d_matches" % (rp.project_name, session))
+                        cmd = cmd + " --pool_size %d"                   %(1)
                         cmd = cmd + " --scale %f"                       %(0.25)
                         self.submit_atcore(cmd)
             except:
