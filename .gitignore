@@ -103,3 +103,11 @@ tksProject.psproj
 
 # vscode
 .vscode
+
+# java/mvn
+.classpath
+.factorypath
+.project
+
+# docker build
+docker/build
