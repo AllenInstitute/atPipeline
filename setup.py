@@ -15,7 +15,10 @@ if __name__ == '__main__':
         description='Scripts to run the Allen Institute array tomography pipeline',
         url='https://github.com/allenInstitute/atPipeline',
         packages=['atpipeline','atpipeline.pipelines','atpipeline.render_classes'],
-        install_requires=[],
+        install_requires=[
+            'docker==4.1.0',
+            'render-python==2.2.2'
+        ],
         zip_safe=False,
         entry_points = {
             'console_scripts': ['atcore=atpipeline.atcore:main',
