@@ -73,7 +73,22 @@ The following command will start the backend:
 atbackend --startall
 ```
 
-To stop all of the services:
+Check the status:
+```bash
+atbackend --status
+```
+
+...which should report 5 running containers:
+```
+12:34:29 - INFO - atbackend :: ============ Managing the atBackend =============
+12:34:29 - INFO - at_docker_manager :: Container: default_atcore : running
+12:34:29 - INFO - at_docker_manager :: Container: default_render_1 : running
+12:34:29 - INFO - at_docker_manager :: Container: default_vizrelay_1 : running
+12:34:29 - INFO - at_docker_manager :: Container: default_neuroglancer_1 : running
+12:34:29 - INFO - at_docker_manager :: Container: default_mongo_1 : running
+```
+
+Backend services can be stopped with:
 ```bash
 atbackend --killall 
 ```
