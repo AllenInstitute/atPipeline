@@ -11,22 +11,27 @@ services:
            - MONGO_HOST=mongo
            - MONGO_PORT=27017
            - NDVIZ_URL=${HOSTNAME}:5000
+           # The following line will allocate 10g for render. Adjust down if needed.
            - JAVA_OPTIONS=-Xms10g -Xmx10g -server -Djava.awt.headless=true
            - WEB_SERVICE_MAX_TILE_SPECS_TO_RENDER=100
        volumes:
-#           - c:\data:/data_input_mount_1
-#           - c:\data\processed:/data_output_mount_1
+# Example mount for Linux or OS X:
+#           - /data:/data
+# Example mount for Windows:
+#           - c:\data:/data
        logging:
            options:
-               max-size: "5g"
+               max-size: "1g"
 
     mongo:
        image: mongo:3.4.23
        ports:
            - "27017"
        volumes:
+           # By default, create a new data volume for mongodb.
            - mongodata:/data/db
-       restart: always
+           # Alternatively, mount to a local path
+           # - /var/mongo/db:/data/db
        security_opt:
          - seccomp:unconfined
     vizrelay:

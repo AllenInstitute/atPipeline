@@ -4,6 +4,20 @@
 
 These instructions are for building the atPipeline containers.
 Commands should be run in the `docker` directory.
+=======
+# AT Pipeline Docker containers
+
+## Description of each container
+* `atcore`: Core processing code. The majority of processing code comes from [`render-modules`](https://github.com/AllenInstitute/render-modules) and [`render-python-apps`](https://github.com/AllenInstitute/render-python-apps/).
+* `render`: The Janelia [`render`](https://github.com/saalfeldlab/render/) service for storing and rendering image transformations.
+* `vizrelay`: small service to construct `neuroglancer` URLs for viewing data from `render` ([source](https://github.com/perlman/vizrelay)).
+* `neuroglancer`: container using `nginx` to serve the [`neuroglancer`](https://github.com/google/neuroglancer) viewer for looking at data from render.
+* mongodb (not built): storage of transformations from render.
+
+## Instructions to rebuild the docker images
+
+These are the instructions to build, tag & push new docker containers.
+Containers are pushed to [docker hub](https://hub.docker.com/orgs/atpipeline).
 
 ### Build render-ws
 ```console

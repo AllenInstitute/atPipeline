@@ -85,6 +85,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+ATENV/
 
 # Spyder project settings
 .spyderproject
@@ -99,4 +100,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 tksProject.psproj
-/docker/clang-container/build/build-thirdparty-libs.bash
+
+# vscode
+.vscode

@@ -1,7 +1,16 @@
 # atPipeline
-Pipeline code for Array Tomography (AT).
 
-_These instructions are incomplete. See the AT User Manual for more details._
+Pipeline code for processing Array Tomography (AT) data, built as part of [Stephen Smith](https://alleninstitute.org/what-we-do/brain-science/about/team/staff-profiles/stephen-j-smith/) group at the (Allen Institute)[https://alleninstitute.org].
+
+The first stages of the pipeline code are specific to data collected within the lab, but most of the steps could be modified for use on similar data.
+
+## Documentation
+* [Setup instructions](SETUP.md)
+* [Usage instructions](USAGE.md)
+* [Instructions to rebuild docker containers](docker/README.md)
+  * _Optional_, containers can be pulled from [docker hub](https://hub.docker.com/orgs/atpipeline).
+* [Export data from render](EXPORT.md)
+
 
 ## Requirements
 
@@ -28,3 +37,5 @@ The backend can be run with ```atcore <args>``` or ```python -m atpipeline.atcor
 ## Level of support
 
 We are planning on occasional updating this tool with no fixed schedule. Community involvement is encouraged through both issues and pull requests.
+
+## Contributors
