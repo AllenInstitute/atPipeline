@@ -1,6 +1,9 @@
 [GENERAL]
 #Folders to mount in docker containers
-DATA_ROOTS=[["C:\data", "/data"] , ["C:\data2", "/data2"]]
+# For Linux or Mac, update to reflect paths to data mounts:
+DATA_ROOTS=[["/data", "/data"], ["/data2", "/data2"]]
+# For windows, use something like:
+# DATA_ROOTS=[["C:\data", "/data"] , ["C:\data2", "/data2"]]
 
 #Folder for test data
 TEST_DATA_FOLDER=c:\data\atp-test-data
@@ -19,18 +22,21 @@ SPARK_WORKER_THREADS=*
 #AT Docker Backend 
 DOCKER_CONTAINER_PREFIX=default
 AT_CORE_DOCKER_CONTAINER_NAME=atcore
-AT_CORE_DOCKER_IMAGE_TAG=0.6.3
-RENDER_DOCKER_IMAGE_TAG=0.6.3
+AT_CORE_DOCKER_IMAGE_TAG=0.7.0
+RENDER_DOCKER_IMAGE_TAG=0.7.0
 MONGO_DOCKER_IMAGE_TAG=3.4.23
-NDVIZ_DOCKER_IMAGE_TAG=0.6.3
-VIZ_RELAY_DOCKER_IMAGE_TAG=0.6.3
+NDVIZ_DOCKER_IMAGE_TAG=0.7.0
+VIZ_RELAY_DOCKER_IMAGE_TAG=0.7.0
 
 #JSON Template folder location
-JSON_TEMPLATES_FOLDER=c:\\pDisk\\ATPipeline\\templates
+JSON_TEMPLATES_FOLDER=/data/atPipeline/templates
+#JSON_TEMPLATES_FOLDER=c:\\pDisk\\ATPipeline\\templates
 
 #Render host parameters
-RENDER_HOST=W10DTMJ03EG6Z.corp.alleninstitute.org
-RENDER_HOST_PORT=80
+RENDER_HOST=your.hostname.here
+# On Mac OS X, you can use host.docker.internal:
+# RENDER_HOST=host.docker.internal
+RENDER_HOST_PORT=8080
 RENDER_MEM_GB=5G
 RENDER_PROJECT_OWNER=Testing
 CLIENT_SCRIPTS=/shared/render/render-ws-java-client/src/main/scripts
