@@ -62,10 +62,10 @@ docker tag atpipeline/atcore:dev atpipeline/atcore
 docker tag atpipeline/vizrelay:dev atpipeline/vizrelay
 docker tag atpipeline/neuroglancer:dev atpipeline/neuroglancer
 
-docker push atpipeline/render-ws
-docker push atpipeline/atcore
-docker push atpipeline/vizrelay
-docker push atpipeline/neuroglancer
+docker push atpipeline/render-ws:latest
+docker push atpipeline/atcore:latest
+docker push atpipeline/vizrelay:latest
+docker push atpipeline/neuroglancer:latest
 ```
 
 ...or to push with the version number:
