@@ -33,8 +33,7 @@ docker build -t atpipeline/atcore:dev ..
 
 ### Build vizrelay
 ```console
-git clone --branch master --single-branch https://github.com/perlman/vizrelay build/vizrelay
-docker build -t atpipeline/vizrelay:dev -f build/vizrelay/Dockerfile build/vizrelay
+docker build -t atpipeline/vizrelay:dev https://github.com/perlman/vizrelay.git
 ```
 
 ### Build neuroglancer
