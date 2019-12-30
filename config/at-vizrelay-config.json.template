@@ -3,7 +3,8 @@
     {
         "protocol": "http",
         "encoding": "raw16",
-        "all_channels": true
+        "all_channels": true,
+        "enable_one_channel" : true
     },
     "log_level": "ERROR",
     "neuroglancer":
