@@ -54,7 +54,7 @@ The `--pipeline PIPELINE` flag is used to specify one of the following pipelines
   * Rough aligned stacks are called `S1_RoughAligned`, `S2_RoughAligned`, etc.
 * `roughalignregister`
   * Perform registration between sessions on the roughly aligned data.
-  * Calls `roughalign` first.
+  * Calls `roughalign` and `register` first.
   * The merge stack (with all channels from all sessions) is called `S1_RoughAligned_Registered_Merged`.
 * `finealign`
   * Performs a fine alignment (per-tile affine).
@@ -62,7 +62,7 @@ The `--pipeline PIPELINE` flag is used to specify one of the following pipelines
   * Fine aligned stacks are called `S1_FineAligned`, `S2_FineAligned`, etc.
 * `finealignregister`
   * Perform registration between fine-aligned stacks.
-  * Calls `finealign` first.
+  * Calls `finealign` and `register` first.
   * The merge stack (with all channels from all sessions) is called `S1_FineAligned_Registered_Merged`.
 * `singletile`
   * Mode for alignment of a dataset with 1 tile per layer. Skips stitching step.

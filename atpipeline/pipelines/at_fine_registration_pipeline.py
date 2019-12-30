@@ -63,9 +63,9 @@ class FineAlignRegistrationProcess(atpp.PipelineProcess):
                     continue
                 else:
                     logger.info("Processing session: " + str(session))
-                    prealigned_stack = "S1_Stitched_Dropped"
-                    postaligned_stack = "S1_FineAligned"
-                    source_stack = "S%d_Stitched_Dropped" %(int(session))
+                    prealigned_stack = "S%d_Stitched_Dropped" % (reference_session)
+                    postaligned_stack = "S%d_FineAligned" % (reference_session)
+                    source_stack = "S%d_Stitched_Dropped_Registered" %(int(session))
                     output_stack = "S%d_FineAligned_Registered"%(int(session))
 
                     cmd =       "/opt/conda/bin/python -m renderapps.registration.apply_alignment_transform_from_registered_stack"
@@ -87,5 +87,32 @@ class FineAlignRegistrationProcess(atpp.PipelineProcess):
             except:
                 raise
 
-        return False
+                logger.info("Combining registered volumes into a single stack")
+        # TODO: Do we need to do this? Can we just apply the low-res transformations to the previously merged stack?
+
+        stack_merge_list = []
+        merged_stack = "S%d_FineAligned_Registered_Merged"%(int(reference_session))
+        for sessionFolder in self.sessionFolders:
+                [project_root, ribbon, session] = u.parse_session_folder(sessionFolder)
+                if session == reference_session:
+                    stack_to_merge = "S%d_FineAligned"%(int(session))
+                else:
+                    stack_to_merge = "S%d_FineAligned_Registered"%(int(session))
+                stack_merge_list.append(stack_to_merge)
+
+        print("Merging %s" % stack_merge_list)
+
+        cmd =       " /opt/conda/bin/python -m renderapps.stack.merge_stacks"
+        cmd = cmd + " --render.host %s"                 %(rp.host)
+        cmd = cmd + " --render.owner %s "               %(rp.owner)
+        cmd = cmd + " --render.project %s"              %(rp.project_name)
+        cmd = cmd + " --render.client_scripts %s"       %(rp.clientScripts)
+        cmd = cmd + " --render.port %d"                 %(rp.hostPort)
+        cmd = cmd + " --render.memGB %s"                %(rp.memGB)
+        cmd = cmd + " --output_stack %s"                %(merged_stack)
+        cmd = cmd + " --stacks %s"                      %(' '.join(stack_merge_list))
+
+        self.submit_atcore(cmd)
+
+        return True
 
