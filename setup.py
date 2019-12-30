@@ -17,7 +17,8 @@ if __name__ == '__main__':
         packages=['atpipeline','atpipeline.pipelines','atpipeline.render_classes'],
         install_requires=[
             'docker==4.1.0',
-            'render-python==2.2.2'
+            'render-python==2.2.2',
+            'requests==2.22.0'
         ],
         zip_safe=False,
         entry_points = {
