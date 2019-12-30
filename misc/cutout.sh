@@ -22,12 +22,13 @@ BASE_Z=0
 SECTIONS=2
 CHANNELS=(DAPI_1 DAPI_2)
 
+SCALE=1.0
 SUFFIX=png
 FORMAT=png16-image
 
 for channel in "${CHANNELS[@]}"; do
     for ((z=BASE_Z; z < $BASE_Z+$SECTIONS; z++)); do
-        URL=$RENDER_BASE/owner/$RENDER_OWNER/project/$RENDER_PROJECT/stack/$RENDER_STACK/z/$z/box/4096,0,2048,2048,0.5/$FORMAT?channels=$channel
+        URL=$RENDER_BASE/owner/$RENDER_OWNER/project/$RENDER_PROJECT/stack/$RENDER_STACK/z/$z/box/$BASE_X,$BASE_Y,$WIDTH,$HEIGHT,$SCALE/$FORMAT?channels=$channel
         FILENAME=${channel}.${z}.${SUFFIX}
         curl $URL > $FILENAME
     done
