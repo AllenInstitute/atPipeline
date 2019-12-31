@@ -9,6 +9,7 @@
 #
 # Example URL:
 # http://localhost:8080/render-ws/v1/owner/eric/project/M33Quarter/stack/S1_FineAligned_Registered_Merged/z/1/box/4096,0,2048,2048,0.5/png16-image?channels=DAPI_2
+#
 
 RENDER_BASE=http://localhost:8080/render-ws/v1
 RENDER_OWNER=eric

@@ -21,14 +21,14 @@ Containers are pushed to [docker hub](https://hub.docker.com/orgs/atpipeline).
 
 ### Build render-ws
 ```console
-git clone --branch at_develop --single-branch https://github.com/perlman/render.git build/render
-docker build -t atpipeline/render-ws:dev build/render
+git clone --branch at_develop --single-branch https://github.com/perlman/render.git docker/build/render
+docker build -t atpipeline/render-ws:dev docker/build/render
 ```
 
 ### Build monolithic docker image for ATPipeline
 
 ```console
-docker build -t atpipeline/atcore:dev ..
+docker build -t atpipeline/atcore:dev .
 ```
 
 ### Build vizrelay
@@ -38,7 +38,7 @@ docker build -t atpipeline/vizrelay:dev https://github.com/perlman/vizrelay.git
 
 ### Build neuroglancer
 ```console
-docker build -t atpipeline/neuroglancer:dev neuroglancer-nginx
+docker build -t atpipeline/neuroglancer:dev docker/neuroglancer-nginx
 ```
 
 ## Push images to Docker hub
@@ -57,10 +57,10 @@ docker push atpipeline/neuroglancer:dev
 
 If you want to declare these images as latest:
 ```console
-docker tag atpipeline/render-ws:dev atpipeline/render-ws
-docker tag atpipeline/atcore:dev atpipeline/atcore
-docker tag atpipeline/vizrelay:dev atpipeline/vizrelay
-docker tag atpipeline/neuroglancer:dev atpipeline/neuroglancer
+docker tag atpipeline/render-ws:dev atpipeline/render-ws:latest
+docker tag atpipeline/atcore:dev atpipeline/atcore:latest
+docker tag atpipeline/vizrelay:dev atpipeline/vizrelay:latest
+docker tag atpipeline/neuroglancer:dev atpipeline/neuroglancer:latest
 
 docker push atpipeline/render-ws:latest
 docker push atpipeline/atcore:latest
@@ -83,4 +83,8 @@ docker push atpipeline/neuroglancer:`cat VERSION.txt`
 
 ## Using the atcore container for development
 
-The `atpipeline/atcore``container keeps render-python, render-modules and at_modules in ```/shared``` for easy development via volume mounts to the a local copy of the libraries.
+The `atpipeline/atcore` container keeps render-python, render-modules and at_modules in `/shared` for easy development via volume mounts to the a local copy of the libraries.  The following is an example of a `DATA_ROOTS` setting for debugging:
+
+```
+DATA_ROOTS=[["/Users/eric/nobackup/atp-testdata/", "/Users/eric/nobackup/atp-testdata/"], ["/Users/eric/tra/render-python-apps", "/shared/render-python-apps"], ["/Users/eric/tra/render-python", "/shared/render-python"], ["/Users/eric/tra/render-modules", "/shared/render-modules"]]
+```

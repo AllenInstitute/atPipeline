@@ -5,16 +5,16 @@ Pipeline code for processing Array Tomography (AT) data, built as part of [Steph
 The first stages of the pipeline code are specific to data collected within the lab, but most of the steps could be modified for use on similar data.
 
 ## Documentation
-* [Setup instructions](SETUP.md)
-* [Usage instructions](USAGE.md)
-* [Instructions to rebuild docker containers](docker/README.md)
+* [Setup instructions](docs/SETUP.md)
+* [Usage instructions](docs/USAGE.md)
+* [Instructions to rebuild docker containers](docs/DOCKER.md)
   * _Optional_, containers can be pulled from [docker hub](https://hub.docker.com/orgs/atpipeline).
-* [Export data from render](EXPORT.md)
+* [Export data from render](docs/EXPORT.md)
 
 
 ## Requirements
 
-The AT Pipeline requiremes Python >= 3.4.
+The AT Pipeline requires Python >= 3.4.
 
 ## Installation
 

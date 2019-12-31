@@ -111,3 +111,6 @@ tksProject.psproj
 
 # docker build
 docker/build
+
+# local config
+etc
