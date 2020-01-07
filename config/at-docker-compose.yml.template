@@ -1,7 +1,7 @@
 version: "2.0"
 services:
     render:
-       image: atpipeline/render-ws:0.7.0
+       image: atpipeline/render-ws:0.7.2
        links:
            - mongo
        ports:
@@ -35,13 +35,13 @@ services:
        security_opt:
          - seccomp:unconfined
     vizrelay:
-       image: atpipeline/vizrelay:0.7.1
+       image: atpipeline/vizrelay:0.7.2
        ports:
            - 5000:5000
        volumes:
            - ./at-vizrelay-config.json:/app/config.json
     neuroglancer:
-       image: atpipeline/neuroglancer:0.7.0
+       image: atpipeline/neuroglancer:0.7.2
        ports:
            - "8001:80"
 volumes:

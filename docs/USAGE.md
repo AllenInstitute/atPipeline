@@ -69,20 +69,18 @@ The `--pipeline PIPELINE` flag is used to specify one of the following pipelines
 
 ### Running on a subsection of data
 
-`atcore` has flags to limit the range of sessions (`--sessions`), ribbons (`--ribbons`) and sections (`--firstsection`, `--lastsection`) being processed. This is useful for trying on a small subset of the data first.
+`atcore` has flags to limit the range of sessions (`--sessions`), ribbons (`--ribbons`) and sections (`--firstsection`, `--lastsection`) being processed. This is usefptul for trying on a small subset of the data first.
 
 ```bash
 atcore --data /atp-testdata/input/M33Quarter --pipeline stitch --ribbons Ribbon0004 --sessions session01,session02 --firstsection 0 --lastsection 10
 ```
 
 
-
-
 ### Logging
 
 To get more verbose logs, add `--logging DEBUG`.
 
-Logs will be saved as a text file in `${DATA_PATH}/processed/${DATA_NAME}.log`.
+Logs are saved as a text file in `${DATA_PATH}/processed/${DATA_NAME}.log`.
 
 ### Other flags
 
@@ -98,6 +96,16 @@ The easiest way to re-run the entire pipeline is to delete this directory.
 ## Other utilities
 
 ### Delete render stacks
+
+`atcore --deleterenderproject` can be used to remove a complete set of intermediary render projects.
+
+```bash
+atcore --renderprojectowner ericp --deleterenderproject MyProject --
+
+```
+
+_Note:_ This command will only remove the projects in render, but will not remove data in the `processed` folder on the disk.
+
 
 ### Rename channels
 
